@@ -1,0 +1,14 @@
+name: openbotrisk
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - quarto
+  - numpy
+  - pandas
+  - polars
+  - scikit-learn
+  - pip:
+      - -e ".[dev]"

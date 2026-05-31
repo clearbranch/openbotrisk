@@ -1,0 +1,5 @@
+---
+title: "Methodology investigations"
+---
+
+*This section will contain: concrete experiments on public datasets demonstrating what current best-practice methodology can and cannot do — each as a self-contained piece with its own write-up.*

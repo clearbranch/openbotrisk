@@ -1,0 +1,5 @@
+---
+title: "Orientation"
+---
+
+*This section will contain: what the project is, why it exists, scope and non-scope, and how to read the site.*

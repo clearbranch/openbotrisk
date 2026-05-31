@@ -1,0 +1,5 @@
+---
+title: "What can and cannot be replicated from public data"
+---
+
+*This section will contain: an honest account of the boundary between what is buildable outside commercial telemetry and what is not.*

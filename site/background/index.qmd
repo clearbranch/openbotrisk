@@ -1,0 +1,5 @@
+---
+title: "Background and landscape"
+---
+
+*This section will contain: the threat model, the actors, the economics of bot activity, and the commercial vendor landscape — cited as evidence about the territory, not characterised individually.*

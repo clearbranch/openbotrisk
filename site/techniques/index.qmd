@@ -1,0 +1,5 @@
+---
+title: "Technical territory"
+---
+
+*This section will contain: what techniques exist, how they work, and what their limits are — organised by technique family (behavioural analysis, fingerprinting, infrastructure signals, graph/entity resolution, sequence modelling) rather than by vendor.*

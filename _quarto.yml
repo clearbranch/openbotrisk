@@ -1,0 +1,31 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "openbotrisk"
+  description: "Bot risk, demystified. What is publicly known, what can be reproduced, what remains opaque."
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: site/orientation/index.qmd
+        text: Orientation
+      - href: site/background/index.qmd
+        text: Background
+      - href: site/techniques/index.qmd
+        text: Techniques
+      - href: site/methodology/index.qmd
+        text: Methodology
+      - href: site/reading/index.qmd
+        text: Reading
+  page-footer:
+    center: |
+      Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;
+      Code: [MIT](https://github.com/openbotrisk/openbotrisk/blob/main/LICENSE)
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true

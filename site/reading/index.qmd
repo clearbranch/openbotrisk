@@ -1,0 +1,5 @@
+---
+title: "Reading list and primary sources"
+---
+
+*This section will contain: the literature, vendor publications, conference talks, and threat intelligence reports the project draws on.*
