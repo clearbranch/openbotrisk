@@ -2,4 +2,85 @@
 title: "Orientation"
 ---
 
-*This section will contain: what the project is, why it exists, scope and non-scope, and how to read the site.*
+openbotrisk is a long-horizon, open investigation of bot and abuse prevention: the commercial and technical territory concerned with detecting and mitigating automated adversarial activity against legitimate web-facing systems.
+
+The project is a public knowledge base. Its purpose is to make an opaque category easier to reason about: what techniques exist, what evidence supports them, what can be reproduced from public data, and what remains structurally hard to verify from outside commercial systems.
+
+This is information work, not product work. It is not a vendor comparison, a buying guide, a benchmark, or an attempt to build a competing bot-management product. It is a map of the territory, including the parts that cannot be mapped cleanly with public data and open tooling.
+
+## Why this exists
+
+Bot and abuse prevention is a large, technically dense, and unusually opaque category. Vendors describe their systems in public language that is often hard to evaluate technically. Independent explanations of what these systems do, how the methods work, and where the genuine limits sit are comparatively sparse.
+
+That leaves several groups reconstructing the same terrain from fragments:
+
+- Engineers trying to decide what can be built in-house and what depends on commercial telemetry
+- Researchers entering the field without a clear route through the literature
+- Security practitioners trying to separate useful concepts from vendor vocabulary
+- Future open-source builders looking for shared reference points
+- Technical readers who want a grounded explanation of the category without being routed immediately into procurement material
+
+The project addresses that gap by treating public sources as evidence about the field, not as material for ranking or critiquing individual vendors.
+
+## In scope
+
+The core subject is automated abuse against legitimate web, mobile, and API flows. That includes:
+
+- Bot detection and bot management
+- Credential stuffing and account takeover
+- Fake account creation
+- Web scraping and content extraction
+- API abuse and business-logic abuse
+- Click fraud and ad fraud
+- Inventory hoarding, scalping, and limited-stock attacks
+- Loyalty, promotion, gift-card, and stored-value abuse
+- Carding and payment-flow abuse where bot-driven
+
+The common structure is automated activity at scale, targeting systems built for ordinary human use, in order to extract value or cause harm.
+
+The project also covers browser-native automation: cloud browser infrastructure, browser extensions, userscripts, and AI browser agents that operate inside otherwise legitimate browser sessions. These change the threat model in ways that older bot-detection writing does not always handle well.
+
+## Out of scope
+
+Several adjacent security fields overlap with this one but are not the focus here:
+
+- Network intrusion detection, lateral movement, and APT analysis
+- Malware analysis and reverse engineering
+- Vulnerability research and exploit development
+- Cryptography and secure protocol design
+- Endpoint security, EDR, threat hunting, incident response, and forensics
+- Broad information security governance and compliance
+- IoT botnets and network-layer DDoS
+
+Those topics matter, but they use different methods and answer different questions. Keeping the boundary visible is part of the discipline of the project.
+
+## How to read the site
+
+The site is organised by question rather than by vendor.
+
+[Background and landscape](../background/) explains the threat model, actors, economics, and commercial setting.
+
+[Technical territory](../techniques/) covers technique families such as behavioural analysis, fingerprinting, infrastructure signals, graph or entity resolution, and sequence modelling.
+
+[Methodology investigations](../methodology/) contains public-data experiments and write-ups about what current methods can and cannot show.
+
+[What can and cannot be replicated from public data](../boundaries/) is where the project names the boundary between open reproducible work and commercial telemetry.
+
+[Reading list and primary sources](../reading/) records the literature, vendor publications, conference talks, and threat-intelligence material the project draws on.
+
+[Open questions and gaps](../open-questions/) collects places where the territory remains genuinely unsettled.
+
+You do not need to read linearly. Start with the orientation if you want the frame, use the background pages if the category is new to you, and go directly to techniques or methodology if you already know the basic abuse patterns.
+
+## Working principles
+
+The project is guided by a few recurring commitments:
+
+- Be explicit about what public data cannot show.
+- Treat vendor material as evidence about the field, not as a ranking target.
+- Prefer durable explanation over topical commentary.
+- Keep code, analysis, and writing reproducible where licensing permits.
+- Treat writing as the deliverable; experiments are incomplete until they can be read and understood.
+- Give each substantive page a reason to exist beyond summarising a single source.
+
+The fuller working scope lives in [`PROJECT.md`](../../PROJECT.md).
