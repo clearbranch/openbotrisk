@@ -32,6 +32,7 @@ openbotrisk/
 │
 ├── site/                     # All site content (Quarto markdown)
 │   ├── orientation/          # What this is, how to read, scope
+|   ├── foundations/          # Basics 
 │   ├── background/           # Threat model, landscape, vendor evidence
 │   ├── techniques/           # Technique families: detection, fingerprinting, etc.
 │   ├── methodology/          # Methodology investigations (writeups)

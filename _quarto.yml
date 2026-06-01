@@ -11,6 +11,8 @@ website:
         text: Home
       - href: site/orientation/index.qmd
         text: Orientation
+      - href: site/foundations/index.qmd
+        text: Foundations
       - href: site/background/index.qmd
         text: Background
       - href: site/techniques/index.qmd
