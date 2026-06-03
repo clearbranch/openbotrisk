@@ -1,0 +1,226 @@
+---
+title: "Evidence Register"
+description: "Structured, maintainer-facing register tracing extracted sources into openbotrisk's site pages, signals taxonomy, and reading decisions."
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    page-layout: full
+# Add a site banner/image here to match the rest of the site theme, e.g.:
+# image: ../../assets/<banner>.png
+# title-block-banner: ../../assets/<banner>.png
+---
+
+::: {.callout-note}
+This is the project's bibliographic memory: one row per source read, structured so that extracted evidence can be traced into site pages, the signals/techniques taxonomy, and reading decisions. It is **not** the narrative evidence review — that lives in the Foundations, Background, and Technical territory sections. Per `GOVERNANCE.md` §6 and `EVIDENCE-REVIEW.md` §6 the register is public, including sources read and rejected.
+:::
+
+## Purpose and scope
+
+This register is the structured projection of the per-source extraction entries in `working/register-entries/`. It exists so that the analytical fields the extraction prompt produces — `evidence basis`, `signals / techniques`, `threat types`, `framing distance`, `what it cannot show` — are queryable across the whole corpus rather than buried in free text.
+
+- It tracks every source read, with provenance and review state.
+- It records what kind of evidence each source actually is (`evidence basis`), so a vendor marketing claim is never silently treated as equivalent to a controlled study.
+- It cross-indexes sources by signal/technique family, so a reader can find which sources cover JA3/JA4, mouse dynamics, residential proxies, GAN/RL evasion, etc.
+- It carries the framing-distance ledger — the project's central analytical discipline (`EVIDENCE-REVIEW.md` §5).
+- It records sources read and rejected, so they aren't re-read.
+
+The source of truth for any individual source is its entry file under `working/register-entries/`. This page does not re-read source material and does not infer beyond the entries.
+
+## How to update this register
+
+Append-only by default.
+
+- Add one inventory row per new extraction entry, in the relevant category sub-table.
+- Add the source to the framing-distance ledger and to any signals/techniques cross-index rows it belongs to.
+- Set `evidence basis`, `provenance` (agent + model), and `review state` from the entry's run-metadata block — do not leave provenance blank.
+- Record sources read and rejected in the rejected table with the reason.
+- Do not rewrite an existing judgement silently. If a judgement changes, add a dated note in the update log explaining why and preserve the prior context.
+- Keep `current relevance` separate from `future relevance` in the entry; the register surfaces current `project impact` only.
+
+::: {.callout-warning}
+## Migration state (2026-06-02)
+
+This register was migrated from the flat `working/reading-register.md`. The earlier register stored everything analytical in a single free-text `Notes` column and **did not record which agent/model produced each extraction**. As a result:
+
+- `provenance` is `not recorded` for every migrated row. It is populated going forward from the extraction prompt's run-metadata block (v2).
+- `evidence basis` and `signals / techniques` are migrated from the old one-line notes where those notes supported them; otherwise marked `see entry`.
+- The **framing-distance ledger** and `threat types` are mostly `tbd — backfill from entry`: those fields live in the per-source entry files (`working/register-entries/`), which were not re-read during migration.
+- `review state` is `migrated — review pending` for all rows: extraction quality cannot be judged from a one-line note.
+
+Completing the register is a mechanical backfill pass: an agent reads each `working/register-entries/<slug>.md`, lifts `evidence basis`, `signals / techniques`, `threat types`, `framing distance`, and `what it cannot show`, and fills the stubs. Treat any cell marked `tbd`/`see entry`/`not recorded` as unverified until that pass runs.
+:::
+
+## Extraction inventory
+
+Columns: `id` · `source` · `org / authors` · `year` · `evidence basis` · `signals / techniques` · `threat types` · `provenance (agent / model)` · `review state` · `project impact` · `entry file`. Vocabulary for the ordinal/controlled columns is defined in the [appendix](#register-taxonomy).
+
+### Foundations
+
+| id | source | org / authors | year | evidence basis | signals / techniques | threat types | provenance | review state | project impact | entry file |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SRC-001 | Automated Threats to Web Applications (project page) | OWASP | n.d. | taxonomy | OAT category set | All OAT (taxonomy) | not recorded | migrated — review pending | OAT taxonomy spine for threat-type vocabulary; project page only, full Handbook queued | `owasp-automated-threats-to-web-applications.md` |
+
+### Vendor and industry
+
+*Treated as evidence of what the field claims, not independent proof. Efficacy/prevalence figures are vendor-measured.*
+
+| id | source | org / authors | year | evidence basis | signals / techniques | threat types | provenance | review state | project impact | entry file |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SRC-002 | Bot scores, JA3/JA4, Detection IDs, Web Bot Auth, custom rules (Bots docs) | Cloudflare | 2026 | capability-doc | bot score 1–99, JA3/JA4, Detection IDs, Web Bot Auth, WAF rule fields | Not threat-specific | not recorded | migrated — review pending | Supports "Cloudflare exposes/uses X", not "X works" | `cloudflare-2026-bot-scores-detection-engines-ja3-ja4-web-bot-auth-custom-rules.md` |
+| SRC-003 | Bot Management documentation | Cloudflare | 2026 | capability-doc | Bot Fight Mode → Enterprise tiers; bot-management variables for WAF/Workers | Not threat-specific | not recorded | migrated — review pending | Product-family and exposed-variable companion to SRC-002 | `cloudflare-2026-bot-management-docs.md` |
+| SRC-004 | Bot Protect, AI Detection Engine, 2025 Global Bot Security Report | DataDome | 2025–2026 | vendor-claim; threat-intel | intent-based detection; signal-family taxonomy | tbd — backfill from entry | not recorded | migrated — review pending | Intent-based framing; 2.8% "fully protected" is vendor-measured; pair with SRC-015 for external evidence | `datadome-2025-2026-bot-protect-ai-detection-global-bot-security-report.md` |
+| SRC-005 | Bot Management (product brochure) | Netacea | n.d. | vendor-claim | server-side / no-client-JS positioning; 2 case studies | tbd — backfill from entry | not recorded | migrated — review pending | Product-positioning evidence | `netacea-bot-management-product-brochure.md` |
+| SRC-006 | Technical Showcase: ML in Advanced Bot Management | Netacea | n.d. | methods-taxonomy | supervised/unsupervised, real-time/batch, general/specific; Intent Analytics | Not threat-specific | not recorded | migrated — review pending | ML-methods taxonomy; no reproducible detail | `netacea-technical-showcase-machine-learning.md` |
+| SRC-007 | Death by a Billion Bots | Netacea | 2023 | survey | 440-executive survey; $85.6M/company business-impact framing | tbd — backfill from entry | not recorded | migrated — review pending | Survey evidence; origin/geopolitical claims out of scope | `netacea-2023-death-by-a-billion-bots.md` |
+| SRC-008 | Bot Manager, ACTIR, Agentic AI Security Report | Arkose Labs | 2023–2026 | vendor-claim; survey | dynamic challenges; attacker-cost framing; agentic-AI survey | tbd — backfill from entry | not recorded | migrated — review pending | Account-integrity + attacker-cost angle; several reports gated | `arkose-2023-2026-bot-manager-actir-agentic-ai-reports.md` |
+| SRC-009 | Bot Defense, Adversarial Techniques, AI Agent Trust, 2026 Benchmark | Kasada | 2025–2026 | vendor-claim; threat-intel | solver/proxy/CAPTCHA pricing; proof-of-execution; AI-agent governance | tbd — backfill from entry | not recorded | migrated — review pending | Strong attacker-economy angle | `kasada-2025-2026-bot-defense-adversarial-retooling-ai-agent-trust.md` |
+| SRC-010 | Sightline, AI Agent Detection, OpenClaw, 2026 benchmark | HUMAN Security / PerimeterX | 2026 | vendor-claim; threat-intel | cyberfraud-journey framing; AI-agent detection signal categories; OpenClaw observations | tbd — backfill from entry | not recorded | migrated — review pending | Concrete AI-agent detection signal categories | `human-2026-sightline-bot-mitigation-ai-agent-detection-openclaw.md` |
+
+### Academic and research
+
+| id | source | org / authors | year | evidence basis | signals / techniques | threat types | provenance | review state | project impact | entry file |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SRC-011 | ML-Based Detection and Evasion Techniques for Advanced Web Bots (PhD thesis, Bournemouth) | Iliou, C. | 2022 | empirical-academic | sophistication taxonomy (simple→advanced); web-log + mouse detection; RL & GAN evasion | tbd — backfill from entry | not recorded | migrated — review pending | Primary academic anchor; controlled/academic setting | `iliou-2022-thesis-advanced-web-bots.md` |
+| SRC-012 | Towards a framework for detecting advanced web bots (ARES) | Iliou et al. | 2019 | empirical-academic | advanced-bot AUC ~0.68 at low FPR; proxy labels | tbd — backfill from entry | not recorded | migrated — review pending | Cleanest source for "simple-bot results hide weak advanced-bot detection" | `iliou-2019-ares-detecting-advanced-web-bots.md` |
+| SRC-013 | Web Bot Detection Evasion Using GANs (CSR) | Iliou et al. | 2021 | empirical-academic | GAN evasion of CNN mouse/touch detectors; web mouse recall → ~0.45 | tbd — backfill from entry | not recorded | migrated — review pending | Adversarial framing | `iliou-2021-csr-web-bot-detection-evasion-gans.md` |
+| SRC-014 | Web Bot Detection Evasion Using Deep RL (ARES) | Iliou et al. | 2022 | empirical-academic | RL web-log evasion; detection/evasion as repeated game | tbd — backfill from entry | not recorded | migrated — review pending | PoC mechanism, not observed campaigns | `iliou-2022-ares-web-bot-detection-evasion-deep-rl.md` |
+| SRC-015 | FP-Inconsistent (arXiv 2406.07647) | Venugopalan et al. | 2025 | empirical-operational | purchased evasive bot traffic vs DataDome/BotD on a honey site; fingerprint inconsistency rules | impression / ad fraud | not recorded | migrated — review pending | Strongest operational academic anchor; external evidence on DataDome | `venugopalan-2025-fp-inconsistent-fingerprint-inconsistencies-evasive-bot-traffic.md` |
+| SRC-016 | FP-Inspector (IEEE S&P) | Iqbal et al. | 2021 | empirical-academic | detecting fingerprinting scripts (static + dynamic JS) | Not threat-specific | not recorded | migrated — review pending | Foundations for fingerprinting section; not direct bot-detection evidence | `iqbal-2021-fingerprinting-the-fingerprinters-fp-inspector.md` |
+| SRC-017 | Browser fingerprints for web authentication (ACM TWEB) | Andriamilanto et al. | 2021 | empirical-academic | fingerprint distinctiveness/stability at scale | Not threat-specific (auth context) | not recorded | migrated — review pending | Auth context not bots; 2016–17 data, needs replication caveat | `andriamilanto-2021-large-scale-browser-fingerprints-web-authentication.md` |
+| SRC-018 | Detecting Bad Bots via TLS Fingerprints (arXiv 2602.09606) | Jarad & Bıçakcı | 2026 | empirical-academic | JA4/TLS classification; XGBoost/CatBoost AUC ~0.998 | tbd — backfill from entry | not recorded | migrated — review pending | Strong headline metrics; labelling ("bot" in app field) is a real caveat | `jarad-2026-handshakes-tell-truth-tls-fingerprints-ja4-bad-bots.md` |
+| SRC-019 | BeCAPTCHA-Mouse (arXiv 2005.00890) | Acien et al. | 2021 | empirical-academic | mouse-dynamics detection; synthetic (function/GAN) trajectories; public benchmark | Not threat-specific | not recorded | migrated — review pending | Constrained point-and-click task | `acien-2021-becaptcha-mouse-synthetic-mouse-trajectories.md` |
+| SRC-020 | Hacking reCAPTCHA v3 using RL (arXiv 1903.01003) | Akrout et al. | 2019 | empirical-academic | RL mouse-movement vs reCAPTCHA v3 score | CAPTCHA defeat | not recorded | migrated — review pending | 2019 PoC against one setup; narrow, likely stale | `akrout-2019-recaptcha-v3-reinforcement-learning.md` |
+
+### Threat surface and territory
+
+*Capability / infrastructure evidence, not proof of malicious use or bypass success. README/marketing claims are not independent test results.*
+
+| id | source | org / authors | year | evidence basis | signals / techniques | threat types | provenance | review state | project impact | entry file |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SRC-021 | Official documentation (Playwright / Puppeteer / Selenium) | project maintainers | 2026 | capability-doc | baseline browser-automation capability layer | Not threat-specific | not recorded | migrated — review pending | Capability, not intent; sits beneath stealth/cloud layers | `playwright-puppeteer-selenium-2026-browser-automation-docs.md` |
+| SRC-022 | undetected-chromedriver (GitHub/PyPI) | ultrafunkamsterdam | 2021–2024 | tooling-readme | Selenium ChromeDriver evasion layer; explicit IP-reputation caveat | Not threat-specific | not recorded | migrated — review pending | README claims, not independent tests | `ultrafunkamsterdam-2024-undetected-chromedriver-docs-github.md` |
+| SRC-023 | puppeteer-extra-plugin-stealth (GitHub/npm) | berstend | 2018–2023 | tooling-readme | modular evasion catalogue: webdriver, plugins, codecs, WebGL | Not threat-specific | not recorded | migrated — review pending | "Passes public bot tests" ≠ production | `berstend-2023-puppeteer-extra-plugin-stealth-docs-github.md` |
+| SRC-024 | Anti-scraping bypass, stealth, proxies, fingerprints, Cloudflare bypass | ScrapFly | 2025–2026 | capability-doc; vendor-claim | API-level bypass (`asp`); byte-perfect JA4/HTTP2/QUIC claims; names Nodriver/Camoufox/UC Mode | scraping | not recorded | migrated — review pending | Documents the attacker mental model for Cloudflare | `scrapfly-2025-2026-anti-scraping-bypass-stealth-proxies-fingerprints.md` |
+| SRC-025 | Web Unlocker, Browser API, proxies, agentic web execution | Bright Data | 2026 | capability-doc; vendor-claim | managed proxies/fingerprints/CAPTCHA + cloud browsers; password entry disabled by default | scraping | not recorded | migrated — review pending | Compliance/public-data framing | `brightdata-2026-web-unlocker-browser-api-proxies-anti-bot-bypass.md` |
+| SRC-026 | Cloud-browser & agent docs (Browserless / Browserbase / Hyperbrowser) | respective vendors | 2026 | capability-doc | cloud browsers + AI-agent infra; stealth, proxies, CAPTCHA-solving, persistent sessions | Not threat-specific | not recorded | migrated — review pending | Bridges automation to agentic browsers | `browserless-browserbase-hyperbrowser-2026-cloud-browser-agent-automation-docs.md` |
+
+## Framing-distance ledger
+
+The project's central analytical discipline: each source approximates the real problem differently and fails to represent it differently (`EVIDENCE-REVIEW.md` §5). The `what it cannot show` column below is migrated from the old register's notes where present; everything else is `tbd — backfill from entry` pending a read of `working/register-entries/`.
+
+| id | source | what it approximates | what it fails to represent | what it cannot show (migrated) |
+|---|---|---|---|---|
+| SRC-001 | OWASP OAT | a shared vocabulary for automated-threat types | tbd — backfill from entry | Taxonomy/ontology only — no detection or prevalence evidence |
+| SRC-002 | Cloudflare bots docs | what one major vendor's control plane exposes and uses | tbd — backfill from entry | That any exposed signal actually works in production — only that Cloudflare uses/exposes it |
+| SRC-003 | Cloudflare Bot Mgmt | the product surface area and WAF/Workers variables | tbd — backfill from entry | Efficacy; product structure ≠ detection performance |
+| SRC-004 | DataDome | intent-based detection framing and signal families | tbd — backfill from entry | "Fully protected" exposure figures are vendor-measured, not independently verifiable |
+| SRC-005 | Netacea brochure | server-side / no-client-JS detection positioning | tbd — backfill from entry | Case-study results are vendor-reported |
+| SRC-006 | Netacea ML showcase | a taxonomy of ML approaches to bot detection | tbd — backfill from entry | No reproducible method detail; cannot validate any approach |
+| SRC-007 | Netacea survey | executive-perceived business impact of bots | tbd — backfill from entry | Self-reported survey; not measured prevalence or efficacy |
+| SRC-008 | Arkose | attacker-cost / dynamic-challenge framing; agentic-AI claims | tbd — backfill from entry | Several reports gated; survey/vendor evidence only |
+| SRC-009 | Kasada | the attacker economy (solver/proxy/CAPTCHA pricing) | tbd — backfill from entry | Vendor/threat-intel framing; pricing claims not independently audited |
+| SRC-010 | HUMAN/PerimeterX | AI-agent detection signal categories; OpenClaw observations | tbd — backfill from entry | Vendor/threat-intel; detection-category claims not externally verified |
+| SRC-011 | Iliou thesis | advanced-bot detection in a controlled academic setting | tbd — backfill from entry | Controlled/academic setting; does not establish production behaviour |
+| SRC-012 | Iliou 2019 | that simple-bot metrics hide weak advanced-bot detection | tbd — backfill from entry | Proxy labels; advanced-bot AUC ~0.68 at low FPR is the honest figure |
+| SRC-013 | Iliou 2021 | GAN evasion of CNN mouse/touch detectors | tbd — backfill from entry | One adversarial strategy; recall drop to ~0.45 is not a worst-case bound |
+| SRC-014 | Iliou 2022 RL | detection/evasion as a repeated game (RL evasion) | tbd — backfill from entry | PoC mechanism, not observed campaigns |
+| SRC-015 | FP-Inconsistent | evasive bot traffic vs commercial detectors on a honey site | tbd — backfill from entry | Threat model is impression fraud; one honey site, not general production |
+| SRC-016 | FP-Inspector | detecting fingerprinting *scripts*, not bots | tbd — backfill from entry | Not direct bot-detection evidence |
+| SRC-017 | Andriamilanto | fingerprint distinctiveness/stability at scale (auth) | tbd — backfill from entry | Auth context not bots; 2016–17 data, needs replication |
+| SRC-018 | Jarad TLS | JA4/TLS classification of bad bots | tbd — backfill from entry | Labelling ("bot" in app field) caveats the headline AUC ~0.998 |
+| SRC-019 | BeCAPTCHA-Mouse | mouse-dynamics detection + synthetic trajectories | tbd — backfill from entry | Constrained point-and-click task; not free browsing |
+| SRC-020 | Akrout reCAPTCHA | RL mouse movement vs one reCAPTCHA v3 setup | tbd — backfill from entry | 2019 PoC against one setup; likely stale |
+| SRC-021 | automation docs | the baseline automation capability layer | tbd — backfill from entry | Capability, not intent or malicious use |
+| SRC-022 | undetected-chromedriver | a Selenium evasion layer's claimed capabilities | tbd — backfill from entry | README claims, not independent tests; maintainer's own IP-reputation caveat |
+| SRC-023 | puppeteer-stealth | a modular evasion catalogue | tbd — backfill from entry | Passing public bot tests ≠ evading production detection |
+| SRC-024 | ScrapFly | the attacker mental model for Cloudflare bypass | tbd — backfill from entry | Byte-perfect-fingerprint claims are vendor claims, not verified bypass success |
+| SRC-025 | Bright Data | managed bypass infrastructure + cloud browsers | tbd — backfill from entry | Compliance framing; capability claims not independently verified |
+| SRC-026 | cloud-browser/agent docs | cloud-browser + AI-agent infrastructure features | tbd — backfill from entry | Feature availability, not evasion efficacy |
+
+## Signals and techniques cross-index
+
+The view the flat register lacked: which sources cover which technical material. Membership is migrated from the inventory's `signals / techniques` column; treat as a starting index to be completed by the backfill pass.
+
+| signal / technique family | sources |
+|---|---|
+| TLS / network fingerprints (JA3/JA4) | SRC-002, SRC-018, SRC-024 |
+| Browser fingerprinting (JS / canvas / attributes / scripts) | SRC-016, SRC-017, SRC-023, SRC-024 |
+| Behavioural — mouse / touch dynamics | SRC-011, SRC-013, SRC-019, SRC-020 |
+| ML detection methods (supervised/unsupervised, boosting, CNN) | SRC-006, SRC-011, SRC-018, SRC-019 |
+| Adversarial evasion (GAN / RL) | SRC-011, SRC-013, SRC-014, SRC-020 |
+| Fingerprint-inconsistency / evasion detection | SRC-015, SRC-024 |
+| Browser automation & stealth layers | SRC-021, SRC-022, SRC-023, SRC-024 |
+| Proxy / infrastructure / cloud browsers | SRC-024, SRC-025, SRC-026 |
+| AI-agent signals & governance | SRC-008, SRC-009, SRC-010, SRC-026 |
+| Intent / journey / score-based detection | SRC-002, SRC-004, SRC-009, SRC-010 |
+| Standards / canonical reference (`standards` tag) | tbd — none tagged in migration |
+
+## Read and rejected
+
+Recorded so they aren't re-read (`EVIDENCE-REVIEW.md` §6). Both are title-collision retrieval artefacts — "Actions Speak Louder than Words" papers pulled in by string match, unrelated to bots.
+
+| id | source | org / authors | year | reason rejected | entry file |
+|---|---|---|---|---|---|
+| SRC-R01 | Loyalty Program Building Blocks (*Economics and Sociology*) | Kwiatek et al. | 2018 | Marketing/consumer-perception study. No bot/abuse content. Out of scope; keep only if a loyalty-abuse adjacency is later added. | `kwiatek-2018-actions-speak-louder-loyalty-program-building-blocks.md` |
+| SRC-R02 | Figurative Language & Gesturing in Entrepreneurial Pitches (*AMJ*) | Healey et al. | 2018 | Communication/persuasion study. No bot/abuse content. Out of scope; possible use only for a dissemination/communication note. | `healey-2018-actions-speak-louder-than-words-entrepreneurial-pitches.md` |
+
+## Queued
+
+*Not yet read. Carried over from the prior register; prune freely.*
+
+### Pre-existing
+
+| source | category | notes |
+|---|---|---|
+| OWASP Automated Threat Handbook (full) | foundations / threat-surface | Detailed definitions, symptoms, mitigations behind the project-page summary. Read end-to-end in Phase 0. |
+| Imperva Bad Bot Report (annual) | vendor | Annual prevalence/trend report. |
+| F5 Labs reports | vendor | — |
+
+### Identified gaps (first-batch review — suggestions)
+
+| source / area | category | why flagged |
+|---|---|---|
+| Browser-fingerprinting survey (e.g. Laperdrix et al., ACM TWEB) | academic | §4/§9 say start with surveys; none in register, so citation-network closure can't be judged. |
+| Bot-detection technique survey (classified by data source: network / fingerprint / behavioural) | academic | The academic backbone for closure testing. |
+| Foundations primers: MDN, relevant RFCs, PortSwigger Web Security Academy | foundations | Foundations site section currently has no pedagogical sources. |
+| Anthropic Claude-in-Chrome safety material; OpenAI agent material | vendor / threat-surface | AI agents currently seen only through defender-vendor framing; no agent-builder primary source. |
+| Akamai, Imperva, F5 (WAF/appsec) technical docs | vendor | WAF angle named in §2.2 but absent. |
+| niespodd/browser-fingerprinting GitHub catalogue | threat-surface | Named in §2.4; only referenced indirectly via SRC-024. |
+| Anti-detect browsers (Multilogin, GoLogin, Camoufox); Nodriver; SeleniumBase UC Mode | threat-surface | Currently mentioned inside SRC-024, not extracted as their own entries. |
+
+## Appendices
+
+### Register taxonomy {#register-taxonomy}
+
+**`category`** — `foundations` / `vendor` / `academic` / `threat-surface` (EVIDENCE-REVIEW §2).
+
+**`evidence basis`** — what kind of evidence the source actually is. This is the column that prevents a marketing claim being treated as equivalent to a study.
+
+- `empirical-academic` — controlled study or dataset experiment in a research setting.
+- `empirical-operational` — measurement against real or purchased traffic / a live honey site.
+- `survey` — practitioner/executive survey; self-reported.
+- `vendor-claim` — vendor marketing / efficacy / prevalence claims; vendor-measured, not independently verifiable.
+- `capability-doc` — product or platform documentation describing what a system exposes or can do.
+- `tooling-readme` — open-source tool README / docs; maintainer claims, not independent tests.
+- `methods-taxonomy` — a categorisation of methods with no reproducible detail.
+- `taxonomy` — a canonical categorisation of the field (e.g. OWASP OAT).
+- `threat-intel` — vendor observation/threat reports.
+
+**`provenance`** — extraction agent and model, from the entry's run-metadata block (e.g. `Claude Code / Opus 4.8`). `not recorded` for rows migrated before the v2 prompt.
+
+**`review state`**
+
+- `solid` — extraction reviewed; sufficient for register use and citation.
+- `conditional` — usable for cautious register reference, but check the entry before quoting numbers, equations, or specific claims.
+- `needs review` — do not use without reading the entry / source.
+- `migrated — review pending` — carried over from the flat register; not yet reviewed against its entry file.
+
+**`threat types`** — OWASP OAT categories where they map, else project vocabulary (scraping, credential stuffing, scalping, account takeover, click/ad fraud, carding). `Not threat-specific` for method/infrastructure-only sources.
+
+### Update log
+
+Append-only. New entries at the bottom.
+
+**2026-06-02 — Register schema v2; migrated from `working/reading-register.md`.** Replaced the flat four-column register (Reference / Status / Entry / Notes) with a structured projection of the extraction fields. Added: `evidence basis`, `provenance`, `review state`, and `threat types` columns to the inventory; a framing-distance ledger; a signals-and-techniques cross-index; and this controlled-vocabulary appendix. 26 in-scope sources (SRC-001…SRC-026) and 2 rejected (SRC-R01, SRC-R02) migrated. Provenance is `not recorded` for all migrated rows because the prior register did not track extraction agent/model; the v2 extraction prompt records it going forward. Framing-distance `what it fails to represent`, `threat types`, and several `evidence basis`/`signals` cells are stubbed `tbd — backfill from entry` pending a read of `working/register-entries/`.

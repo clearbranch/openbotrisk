@@ -2,4 +2,23 @@
 title: "Reading list and primary sources"
 ---
 
-*This section will contain: the literature, vendor publications, conference talks, and threat intelligence reports the project draws on.*
+This section records the sources behind the project: academic papers, vendor documentation, threat-surface material, standards, surveys, and sources read and rejected.
+
+The main public artefact here is the [Evidence Register](evidence-register.qmd). It is a structured index of the extraction entries used by the project, with columns for evidence basis, signals and techniques, threat types, review state, and project impact.
+
+The register is not the narrative evidence review. The narrative work appears across the Foundations, Background, Technical territory, Methodology, and Boundaries sections. The register is the traceability layer: it shows what has been read, what kind of evidence each source provides, and where its limits sit.
+
+## Current Register
+
+- [Evidence Register](evidence-register.qmd) — structured inventory of extracted sources, framing-distance notes, signal and technique cross-indexes, and sources read and rejected
+
+## How to Read It
+
+Use the register to answer practical provenance questions:
+
+- Which sources mention a signal or technique such as JA3/JA4, browser fingerprinting, mouse dynamics, or residential proxies?
+- Is a source a controlled academic study, vendor claim, capability document, survey, tooling README, or taxonomy?
+- Which sources are already reviewed, and which migrated rows still need backfill?
+- What should not be concluded from a source alone?
+
+For the project’s current interpretive position, read the synthesis pages. For the evidence trail behind those pages, use the register.

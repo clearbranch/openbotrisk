@@ -1,6 +1,10 @@
 project:
   type: website
   output-dir: _site
+  render:
+    - index.qmd
+    - site/**/*.qmd
+    - site/**/*.md
 
 website:
   title: "openbotrisk"

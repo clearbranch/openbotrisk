@@ -10,5 +10,5 @@ A public investigation into the bot and abuse prevention category: what techniqu
 - [Technical territory](site/techniques/index.qmd) — technique families, how they work, their limits
 - [Methodology investigations](site/methodology/index.qmd) — concrete experiments on public datasets
 - [What can and cannot be replicated](site/boundaries/index.qmd) — the honest boundary of public-data work
-- [Reading list and primary sources](site/reading/index.qmd) — literature, vendor publications, threat intel
+- [Reading list and primary sources](site/reading/index.qmd) — literature, vendor publications, threat intel, and the [Evidence Register](site/reading/evidence-register.qmd)
 - [Open questions and gaps](site/open-questions/index.qmd) — genuinely unmapped territory

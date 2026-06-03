@@ -83,4 +83,4 @@ The project is guided by a few recurring commitments:
 - Treat writing as the deliverable; experiments are incomplete until they can be read and understood.
 - Give each substantive page a reason to exist beyond summarising a single source.
 
-The fuller working scope lives in [`PROJECT.md`](../../PROJECT.md).
+The fuller working scope lives in [`PROJECT.md`](https://github.com/clearbranch/openbotrisk/blob/main/PROJECT.md).
