@@ -25,6 +25,8 @@ The repo already exists with `PROJECT.md`, `EVIDENCE-REVIEW.md`, and `GOVERNANCE
 
 **Framing distance is the project's central analytical move** (EVIDENCE-REVIEW §5). Public datasets, vendor blogs, academic papers, and commercial telemetry are *not* equivalent evidence. Each approximates the real problem differently and fails to represent it differently. Naming this per source is what keeps the project's position visible. This is the most important field below.
 
+**Capability is not use** (the `operational proximity` axis, schema v3). "This tool/technique exists" is weaker evidence than "it is observed against real sites." Record proximity (`capability` / `claimed` / `observed` / `measured` / `n/a`) separately from evidence basis: the corpus skews heavily to capability and claimed, `observed` is mostly vendor telemetry, and real measurement against targets is rare. Do not let a mature tooling market stand in for evidence of real-world use.
+
 ---
 
 ## INPUTS
@@ -44,9 +46,9 @@ If any of these are missing or ambiguous, stop and ask.
 1. Read `PROJECT.md`, `EVIDENCE-REVIEW.md`, and `GOVERNANCE.md` in the repo
 2. Access the source. For URLs, fetch the page. For PDFs, read the document. If access fails, stop and report
 3. Identify the source type and key bibliographic metadata
-4. **Same-source-family pre-check.** Check whether this source belongs to a vendor / tool / site family already represented in the register or in `working/register-entries/` (e.g. another blog post from a vendor already extracted, another page of the same docs). If it does, the default is **not** a new entry: under EVIDENCE-REVIEW §4 the rule is representative claims per source, then stop — not one entry per blog post. Prefer extending the existing entry with genuinely new representative claims, or skipping if it adds nothing. Flag the choice to the author rather than deciding alone, and do not create a duplicate by default
+4. **Existing-source check.** Check whether *this exact source* (same document / URL) is already extracted in `working/register-entries/`. If it is, this is a re-extraction, not a new entry — follow the filename / versioning convention (a new versioned file under the same register id), and do not create a second register row. If it is a *different* source — even another blog post or doc page from the same vendor — it gets its **own atomic entry**, provided it is in scope and carries territory-level signal. Distinct sources are kept separate; do **not** fold them together, and do **not** skip a distinct source just because it overlaps an existing entry — selecting between overlapping entries is the page-writing step's job, not this one. The only reasons to skip are out-of-scope (PROJECT §3) or purely operational how-to with no territory-level signal (see Named targets above). Flag any genuine judgement call to the author rather than deciding alone
 5. Read the source enough to fill the extraction fields below honestly — not skimming, not exhaustive
-6. Produce a register entry at `working/register-entries/<slug>.md` following the structure below (or, if extending per step 4, draft the additions against the existing entry and flag them for the author to merge)
+6. Produce a register entry following the structure below. For a new source, create `working/register-entries/<slug>.md`. For a re-extraction of a source already extracted, follow the project's filename / versioning convention (a new versioned file alongside the existing one) rather than overwriting it
 7. Do not modify the main reading register (`quarto/.../literature-evidence-register.qmd` or `working/reading-register.md`) — the author merges entries manually after review
 8. Report back with the file path of the entry and any flags raised
 
@@ -62,6 +64,9 @@ These operationalise GOVERNANCE §7 and EVIDENCE-REVIEW §4 at extraction time, 
 - **Use explicit absence tokens.** Where a field cannot be filled from the source content, write `Not stated` or `Cannot determine from source` and say briefly why. Do not infer, do not pad, do not guess to make the entry look complete.
 - **Source-quality check.** If the source is low-substance marketing with no technical content, or is out of scope per EVIDENCE-REVIEW §3 (named actors, criminal economics, broader cyber), do not extract it — flag it for skip/rejection with the reason (see Stop-and-ask).
 - **No over-claim from a single source.** Findings preserve the source's scope. A controlled study does not "prove" production behaviour; a vendor claim does not establish a capability works.
+- **Operational proximity, set honestly and orthogonally.** Record how close the source is to *observed abuse against a real target* (`capability` / `claimed` / `observed` / `measured` / `n/a`), independent of rigour. The common error is to read a rigorous controlled experiment as `observed` or `measured`; it is `capability` unless it measures real-target activity. Vendor capability docs are `capability`; vendor "we stop X" / bypass-vendor "works against Y" claims and self-report surveys are `claimed`; vendor telemetry reports are `observed` (vendor-measured); honey-site and in-the-wild studies are `measured`. Do not infer use from the existence of a capability.
+- **Dual-use, no-recipe at extraction.** For bypass, anti-detect, and evasion sources (and operational detail inside legal/victim records), extract *that* a technique or bypass class exists and its proximity — not a reproducible procedure. Do not transcribe working evasion code, step-by-step bypass sequences, or target-specific operational steps into the entry (this extends the Named-targets rule above to all attacker-side sources). Capture the signal families and detection surfaces named, the class of bypass claimed, and the framing distance; leave the recipe in the source. Publication-side enforcement of this is GOVERNANCE §4/§7.
+- **Scarce-resource abuse is not generic scraping.** If a source concerns slot sniping, appointment abuse, reservation abuse, ticket scalping, product-drop abuse, inventory hoarding, denial of inventory, queue abuse, booking-flow abuse, cancellation monitoring, limited-inventory abuse, or fast booking automation, record the scarce-resource fields separately. Availability polling may be scraping-like, but the abuse pattern is competition for a scarce transactional resource.
 
 ---
 
@@ -78,7 +83,7 @@ The entry follows this template exactly. Every field is filled. If a field genui
 - **Extraction agent**: Claude Code / Codex / Claude / ChatGPT / Gemini / other
 - **Model name + version, if known**: e.g. Claude Opus 4.x / GPT-x / not stated (do not guess a version)
 - **Source access**: full text / partial / abstract-only / paywalled — stopped
-- **Prompt version**: source-extraction-prompt v2 (2026-06)
+- **Prompt version**: source-extraction-prompt v3 (2026-06)
 
 ## Bibliographic
 
@@ -86,8 +91,9 @@ The entry follows this template exactly. Every field is filled. If a field genui
 - **Source URL or path**: Direct link to the source, or relative path if archived
 - **Date accessed**: YYYY-MM-DD
 - **Category**: One of foundations / vendor / academic / threat-surface
-- **Evidence basis**: One of empirical-academic / empirical-operational / survey / vendor-claim / capability-doc / tooling-readme / methods-taxonomy / taxonomy / threat-intel (see register appendix for definitions). This is the field that lets the register distinguish a controlled experiment from a marketing claim.
-- **Tags**: Topic tags as relevant. Include `standards` if the source is an RFC, W3C spec, or similar canonical reference. Other useful tags: `taxonomy`, `survey`, `methods`, `behavioural`, `fingerprinting`, `infrastructure`, `cloud-browser`, `ai-agent`, `tls`, `entity-resolution`, etc. Use existing tags if they fit; introduce new ones sparingly.
+- **Evidence basis**: One of empirical-academic / empirical-operational / survey / vendor-claim / capability-doc / tooling-readme / methods-taxonomy / taxonomy / threat-intel / legal-record (see register appendix for definitions). This is the field that lets the register distinguish a controlled experiment from a marketing claim.
+- **Operational proximity**: One of capability / claimed / observed / measured / n/a (see register appendix). How close the source sits to *observed abuse against a real target* — **orthogonal** to evidence basis, which records rigour. A controlled lab PoC is `capability` here however rigorous it is; vendor production telemetry is `observed`; a honey-site or in-the-wild measurement is `measured`; a taxonomy or non-bot-use foundation is `n/a`. Give the value and one sentence justifying it. If the source mixes levels, record the highest it *independently* supports and note the mix.
+- **Tags**: Topic tags as relevant. Include `standards` if the source is an RFC, W3C spec, or similar canonical reference. Other useful tags: `taxonomy`, `survey`, `methods`, `behavioural`, `fingerprinting`, `infrastructure`, `cloud-browser`, `ai-agent`, `tls`, `entity-resolution`, etc. For scarce-resource sources, include `scarce-resource-abuse` plus relevant specific tags from the register appendix. Use existing tags if they fit; introduce new ones sparingly.
 
 ## What it claims
 
@@ -112,6 +118,21 @@ This field exists so future searches across the register can find which sources 
 ## Threat types covered
 
 Which OWASP OAT categories (e.g. OAT-001 Carding, OAT-008 Credential Stuffing, OAT-011 Scraping) or similar abuse categories the source addresses. If the source does not map to OAT, describe in the project's vocabulary (credential stuffing, scalping, scraping, account takeover, click fraud, etc.). If the source is method/infrastructure-only with no specific threat type, write `Not threat-specific`.
+
+## Scarce-resource abuse fields
+
+If the source concerns scarce-resource abuse — including slot sniping, appointment abuse, reservation abuse, ticket scalping, product-drop abuse, inventory hoarding, denial of inventory, queue abuse, booking-flow abuse, cancellation monitoring, limited-inventory abuse, or fast booking automation — record the following fields separately.
+
+If the source does not concern scarce-resource abuse, write `Not applicable — source does not concern scarce-resource abuse`.
+
+- **Scarce resource targeted**: appointment / ticket / reservation / product / booking / queue position / other
+- **Abuse phase**: monitoring / account preparation / queue entry / booking / holding / transfer / resale / no-show / cancellation exploitation
+- **Website-facing action**: polling availability / entering queue / solving challenge / completing booking / holding inventory / changing booking / transferring booking / reselling
+- **Evidence of use**: measured-use / observed-use / vendor-measured / legal-record / regulatory-record / market-evidence / capability-only / controlled-PoC. This is a scarce-resource-specific classification and does not replace `Operational proximity`.
+- **Abuse outcome**: ordinary users blocked / inventory unavailable / inflated resale price / no-show / degraded fairness / distorted metrics / operational load
+- **What the source cannot show**: Be explicit about whether the source cannot show prevalence, intent, automation, hostile use, detection efficacy, or generality beyond one platform/vendor/customer.
+
+Do not collapse scarce-resource abuse into generic scraping. Availability polling may be scraping-like, but the abuse pattern is competition for a scarce transactional resource.
 
 ## Framing distance
 
@@ -154,7 +175,7 @@ A fictional but representative example showing what a good entry looks like. Use
 - **Extraction agent**: Claude Code
 - **Model name + version, if known**: Claude Opus 4.8
 - **Source access**: full text
-- **Prompt version**: source-extraction-prompt v2 (2026-06)
+- **Prompt version**: source-extraction-prompt v3 (2026-06)
 
 ## Bibliographic
 
@@ -163,6 +184,7 @@ A fictional but representative example showing what a good entry looks like. Use
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Evidence basis**: empirical-academic (controlled study)
+- **Operational proximity**: capability — a controlled study on a custom test site; demonstrates the detection is feasible in a lab, not that this abuse is observed against real targets (rigour is captured by evidence basis, not here)
 - **Tags**: behavioural, methods, advanced-bots, mouse-dynamics
 
 ## What it claims
@@ -222,7 +244,7 @@ In any of these situations, stop and report back rather than proceeding:
 - The source's category is unclear — it doesn't fit cleanly into foundations / vendor / academic / threat-surface
 - A required extraction field genuinely cannot be filled from the source content
 - The source claims something that contradicts another entry already in `working/register-entries/` — flag the contradiction rather than silently resolving
-- The source belongs to a vendor / tool / site family already extracted (e.g. another blog post from a vendor already in the register, another page of the same docs) — flag whether to extend the existing entry or extract separately rather than creating a duplicate by default (EVIDENCE-REVIEW §4: representative claims per source, then stop)
+- It is ambiguous whether this is the *same* source as an existing entry (so you cannot tell whether to version it or create a new entry) — ask. (Distinct sources from the same vendor are kept as their own entries; never fold them, and do not skip a distinct source for overlapping with another)
 - The source is a target-specific how-to (e.g. "how to scrape `<named site>`") that is purely operational with no territory-level signal — flag for skip per EVIDENCE-REVIEW §3 rather than extracting operational steps
 - The source appears to be out of scope per `PROJECT.md` Section 3
 - The source contains material from a category explicitly out of scope (named threat actors, criminal economics, broader cyber) — flag rather than extract
@@ -245,7 +267,7 @@ Do not invent answers. Do not skip fields. Do not make scope judgements on the a
 | Do | Don't |
 |---|---|
 | Read all three scope documents before starting | Skip context-reading because the task seems clear |
-| Check whether the source's vendor/tool/site family is already in the register, and extend rather than duplicate | Create a fresh entry per blog post of a source already extracted |
+| Give each distinct source its own atomic entry; version a re-extraction of the same source | Fold two distinct sources into one entry, or skip a distinct source because it overlaps another |
 | Record extraction agent, model, date, and access status in the run-metadata block | Leave provenance blank or guess a model version |
 | Use the source's own framing in "What it claims" | Insert project opinion into the claims field |
 | Attribute every claim to this one source | Blend in field knowledge or other sources' claims |
@@ -257,6 +279,8 @@ Do not invent answers. Do not skip fields. Do not make scope judgements on the a
 | Use existing tags where possible | Invent new tags casually |
 | Flag contradictions with prior entries | Silently resolve disagreements between sources |
 | Cite by stable identifier where available (DOI, archived URL) | Cite by transient links that may rot |
+| Set `Operational proximity` orthogonally to evidence basis | Read a rigorous controlled study as `observed`/`measured`, or infer use from capability |
+| Extract that a bypass technique exists and its proximity | Transcribe working evasion code or step-by-step bypass recipes into the entry |
 | Report runtime and any access issues | Optimise for appearing successful |
 
 ---
@@ -270,6 +294,8 @@ The extraction is complete when:
 - The slug is descriptive (e.g. `iliou-2022-thesis.md`, `cloudflare-bot-management-2024.md`)
 - Every claim in "What it claims" is something the source actually says
 - `Evidence basis` is set and matches what the source actually is
+- `Operational proximity` is set (`capability` / `claimed` / `observed` / `measured` / `n/a`), justified in one sentence, and not conflated with evidence basis
+- Scarce-resource abuse fields are filled when relevant, or explicitly marked not applicable
 - "Framing distance" is specific, not generic
 - Bibliographic metadata is complete and accurate, and any unverifiable citation is flagged
 - The author can read the entry and know whether to read the source themselves

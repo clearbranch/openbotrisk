@@ -94,6 +94,8 @@ For each piece, the author checks:
 
 **Consistent editorial viewpoint.** The project does not require a literary authorial voice. It does require a consistent editorial viewpoint: demystification, methods before actors, public-data limits, careful treatment of vendor claims. Pieces that drift from this viewpoint are pushed back.
 
+**Dual-use containment.** Where a piece draws on bypass, anti-detect, or evasion sources (or operational detail inside legal/victim records), the author confirms it records *that* a technique exists and its operational proximity, not a working procedure. Specifically: no step-by-step bypass or working evasion code is reproduced; the piece does not synthesise details from several sources into a more complete how-to than any single source provides (the **aggregation hazard** — the specific risk for a project that reads widely across attacker-side material); and where a source cannot be used without an operational recipe, the piece summarises the claim and links out. A piece that fails this stays in working notes. This is the publication-side counterpart to the extraction-time no-recipe rule (`source-extraction-prompt`) and the scope rule in `EVIDENCE-REVIEW.md` §3.
+
 ### Editorial review note
 
 Every published page has an editorial review note recorded in working notes (PR description or `working/review-notes/`). The template:
@@ -105,6 +107,7 @@ Every published page has an editorial review note recorded in working notes (PR 
 - Sources rejected or treated cautiously:
 - Main limitation:
 - What this page adds beyond source summary:
+- Dual-use containment (no reproduced recipe; aggregation hazard checked):
 ```
 
 The "What this page adds" answer also appears as a single visible line on the page itself — at the top or bottom, depending on flow — so readers can see the project's claim about why the page exists. The other fields stay in working notes.
@@ -224,6 +227,8 @@ Honest assessment of failure modes specific to the agent-assisted approach.
 **Source quality drift.** Agents may cite weak sources (low-quality blogs, marketing material, content farms) where stronger sources exist. Mitigation: editorial check on source quality is part of the review; prompts include source-quality guidance.
 
 **Over-claim from synthesis.** Agent synthesis across multiple sources can produce confident-sounding claims that no single source actually supports. Mitigation: synthesised claims are checked against the underlying sources; "the literature suggests X" gets pushed back unless X is genuinely traceable.
+
+**Aggregation into a how-to (dual-use).** A demystification project that reads widely across scraper-side, bypass, and evasion material can, by synthesising scattered operational details, end up a more complete bypass guide than any single source it cites — even when each source individually is within scope. This is distinct from over-claim: the synthesis may be *accurate* and still be the problem. Mitigation: the §4 dual-use containment check; record technique existence and operational proximity, not procedure; never aggregate operational steps across sources; link out rather than reproduce. The `operational proximity` axis in the register makes the attacker-side sources easy to find and audit for this.
 
 ---
 

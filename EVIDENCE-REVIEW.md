@@ -76,6 +76,16 @@ Specific items worth mentioning as starting points:
 
 Output: the Browser-native automation parts of the Technical territory section, citations throughout.
 
+### 2.5 Observed-use evidence (cross-cutting lane)
+
+A distinction the first four categories blur: *capability evidence* ("this tool or technique exists") is weaker than *use evidence* ("it is observed against real sites"). The register tracks this with the `operational proximity` field (register appendix), **not** as a fifth category — observed-use material is not a single source silo, it is drawn from across the others:
+
+- **Vendor telemetry** stays in §2.2 but is read for what it *observes in production* (proximity `observed`, vendor-measured), kept distinct from vendor *capability claims* (`capability` / `claimed`).
+- **Measurement studies** stay in §2.3 but are the highest-value use evidence (proximity `measured`, independent) — bot, credential-stuffing, and ad-fraud measurement in the wild.
+- **Victim-side engineering postmortems** and **enforcement / legal records** are the genuinely new source types this lane admits. They sit under §2.4 threat-surface, with the cautions in §3.
+
+The lane is first-class because the project must not let "a mature bypass and automation tooling market exists" stand in for "these tools are used against real sites at scale." The first is well-supported by public sources; the second is mostly held in vendor and platform telemetry and, for prevalence specifically, is largely unenterable from outside. That boundary is itself a finding to state plainly, not an obstacle to work around.
+
 ### Standards and protocols as a cross-cutting tag
 
 Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 reference material) are not a separate category but recur across categories. Sources are tagged `standards` in the reading register when they belong to this class. Used for canonical reference rather than treated as evidence to be analysed.
@@ -91,6 +101,7 @@ Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 referen
 - What defenders detect and how
 - What's known about the limits of public-data research
 - How the threat surface is shifting (browser-native automation, AI agents)
+- Observed-use evidence: vendor production telemetry, independent measurement studies, victim engineering postmortems, and enforcement / legal records — read for technique and operational proximity (the `operational proximity` axis)
 
 ### What's out of scope
 
@@ -104,6 +115,10 @@ Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 referen
 - Legal and regulatory aspects of bot management (mentioned briefly if at all)
 
 The methods-not-actors framing is sharp. A technique described abstractly is in; a campaign described with named actors is out. A vendor explaining how they detect credential stuffing is in; a threat intel report attributing a campaign to a named group is out.
+
+**Legal and enforcement records: technique, not attribution.** Court filings, indictments, and enforcement actions are admitted *only* for the technique and operational proximity they evidence (e.g. "automated account creation with proxy rotation was used against a booking flow"). The named actor, the campaign, the victim's identity where sensitive, and the prosecutorial narrative are all out of scope. A legal record that cannot be used without retelling the campaign is not used. This admits the observed-use lane (§2.5) while keeping the methods-not-actors line intact.
+
+**Dual-use sources: evidence, not recipe.** Bypass, anti-detect, and evasion sources — and the operational detail inside some legal and victim records — describe how controls are circumvented. The project cites them as evidence of the adversary's capability and mental model, and records *that* a technique exists and its operational proximity. It does **not** reproduce step-by-step bypass procedures or working evasion code, and it does **not** synthesise scattered details from several sources into a more complete how-to than any single source provides (the aggregation hazard — the real risk for a demystification site that reads widely across attacker-side material). Where a source's value cannot be captured without reproducing an operational recipe, summarise the claim and proximity and link out. Editorial enforcement of this lives in `GOVERNANCE.md`.
 
 ### Sources to read carefully or skip
 
@@ -141,6 +156,10 @@ Read with awareness of source provenance. Scraper-side material describes what a
 
 The reading rule: cover the major vendors of scraper tooling and the major detection writeups, but don't over-invest in either side.
 
+### Observed-use and legal / enforcement material
+
+Read for proximity first: what did the source actually *observe or measure* against a real target, versus assert? Separate vendor telemetry (`observed`, vendor-measured) from vendor capability claims (`capability` / `claimed`). For legal, enforcement, and victim postmortems, extract the technique and operational proximity and strip attribution per §3. Maintain prevalence humility throughout — even good observed-use evidence rarely supports market-wide prevalence claims, and the honest position is usually "observed in these settings," not "common across the web." Apply the dual-use no-recipe discipline (§3) on what gets reproduced.
+
 ---
 
 ## 5. Extraction fields per source
@@ -154,8 +173,10 @@ Every source read produces a register entry. The required fields:
 | Tags | Including `standards` where relevant, plus topic tags |
 | What it claims | The substantive claim(s) the source makes, in extracted form |
 | What evidence it provides | What the source offers to support its claims |
+| Operational proximity | How close the source sits to *observed abuse against a real target*: `capability` / `claimed` / `observed` / `measured` / `n/a`. Orthogonal to evidence basis (which records source type and rigour) — recorded separately so a lab result and a vendor blog are not flattened onto one axis. Defined in the register appendix |
 | What signals or techniques it mentions | Specific signals (TLS fingerprint, click cadence, etc.) and methods (XGBoost, autoencoder, etc.) |
 | What threat type it covers | Which OAT categories or similar |
+| Scarce-resource abuse fields | Conditional fields for appointment, ticketing, reservation, product-drop, queueing, cancellation-monitoring, booking-flow, inventory-hoarding, and limited-inventory abuse. Defined in the register appendix. The scarce-resource-specific `evidence_of_use` field does not replace `operational proximity`; it classifies use evidence inside this narrower abuse pattern while `operational proximity` remains the broader corpus-level capability-to-use axis |
 | Framing distance | What real-world bot/abuse problem this source approximates; what it fails to represent; what additional evidence would be needed to go further |
 | What it cannot show | The limits of the source — what readers should not conclude from it alone |
 | Project impact | How this source affects the project's writing or taxonomy |

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "kaggle-standardized-agent-exam": {
+      "source": "Kaggle/kaggle-skills",
+      "sourceType": "github",
+      "skillPath": "kaggle-standardized-agent-exam/SKILL.md",
+      "computedHash": "cb9d0a8f47e4e13b49f08a77b7b3881d65f74be5af6d8c37396cef1d8806f367"
+    },
+    "template-skill": {
+      "source": "Kaggle/kaggle-skills",
+      "sourceType": "github",
+      "skillPath": "template-skill/SKILL.md",
+      "computedHash": "8734d86fc9372cbb3df6c83fc35f54fcc879a7c06570c8a3c40f312fff7e174f"
+    },
+    "write-kaggle-benchmarks": {
+      "source": "Kaggle/kaggle-skills",
+      "sourceType": "github",
+      "skillPath": "write-kaggle-benchmarks/SKILL.md",
+      "computedHash": "27b10c6633413af37bbc85b694185a5c9d58e57b7fedeae064ad96ed620946a6"
+    }
+  }
+}
