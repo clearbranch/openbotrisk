@@ -1,5 +1,7 @@
 # HTTP headers, User-Agent, and browser claims
 
+![Diagram showing User-Agent, headers and protocol details being checked for consistency.](../assets/foundations/headers-consistency.svg)
+
 ## Plain explanation
 
 When a browser asks a website for a page, it sends an HTTP request. That request includes headers: small pieces of information about the request.
@@ -26,6 +28,8 @@ That is the key point: User-Agent is a claim, not proof.
 ## Client hints
 
 Modern browsers may also send client hints, which provide structured information about the browser, platform, device, or preferences. These can be useful, but they are also part of the fingerprinting and consistency problem.
+
+A site may compare User-Agent, client hints, ordinary headers, JavaScript-visible browser features, and protocol behaviour. A mismatch can matter more than any one field.
 
 ## Why headers matter for bot detection
 
@@ -57,11 +61,26 @@ So headers are useful mainly when combined with other signals:
 - timing and behaviour
 - account/session history
 
+::: {.callout-tip}
+## Simple rule
+
+Do not ask “what does the User-Agent say?” in isolation. Ask “does the whole request look like the browser it claims to be?”
+:::
+
+## What the newer evidence adds
+
+The newer evidence gives this page a clearer role. It is not just “what is a header?” It is the start of **claim checking**.
+
+MDN gives the neutral vocabulary for headers and User-Agent. Cloudflare Detection IDs and related bot-management sources show why claimed-browser consistency, header order, verified-bot classification, and anomaly tags matter in operational bot management. Scraper-side sources show the opposing pressure: tooling tries to make headers, fingerprints, TLS, and browser behaviour line up.
+
+That supports the project’s main framing: bot detection often checks coherence across weak signals, not one obvious marker.
+
 ## Project use
 
 Use this note before discussing:
 
 - User-Agent spoofing
+- User-Agent reduction and Client Hints
 - browser fingerprint inconsistency
 - Cloudflare Detection IDs
 - header-order mismatch
@@ -69,8 +88,16 @@ Use this note before discussing:
 - stealth plugins
 - why bot detection checks consistency, not just one field
 
-## Sources
+## Sources and evidence anchors
 
 - MDN, “HTTP headers”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers
 - MDN, “User-Agent header”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent
 - Wikipedia, “User-Agent header”: https://en.wikipedia.org/wiki/User-Agent_header
+- Evidence register anchors: MDN HTTP headers (`SRC-064`); MDN User-Agent header (`SRC-063`); Cloudflare Detection IDs (`SRC-056`).
+
+---
+
+**Foundations navigation**
+
+Previous: [02. Cookies and sessions](02-cookies-and-sessions.md)  
+Next: [04. Browser and device fingerprinting](04-browser-and-device-fingerprinting.md)

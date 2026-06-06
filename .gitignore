@@ -59,3 +59,6 @@ data/
 .secrets.baseline
 
 **/*.quarto_ipynb
+
+# Local review artifacts
+working/register-entry-html/

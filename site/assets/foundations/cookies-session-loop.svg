@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="970" height="430" viewBox="0 0 970 430" role="img" aria-label="Cookies turn separate requests into a session">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#555" /></marker></defs>
+<rect width="100%" height="100%" fill="#fbfbfd"/>
+<text x="485.0" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2937">Cookies turn separate requests into a session</text>
+<rect x="70" y="120" width="200" height="110" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="170.0" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">1. Login/request</text>
+<text x="170.0" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">browser asks</text>
+<text x="170.0" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">for a page</text>
+<rect x="360" y="120" width="220" height="110" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="470.0" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">2. Server response</text>
+<text x="470.0" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">sets a cookie</text>
+<text x="470.0" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">with session ID</text>
+<rect x="675" y="120" width="220" height="110" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="785.0" y="152" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">3. Later request</text>
+<text x="785.0" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">browser sends</text>
+<text x="785.0" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">the cookie back</text>
+<rect x="360" y="285" width="220" height="90" rx="16" fill="#eef6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="470.0" y="317" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Session history</text>
+<text x="470.0" y="347" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">seen before?</text>
+<text x="470.0" y="369" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">logged in?</text>
+<text x="470.0" y="391" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">passed challenge?</text>
+<line x1="270" y1="165" x2="360" y2="165" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="580" y1="165" x2="675" y2="165" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="785" y1="230" x2="500" y2="285" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="470" y1="285" x2="170" y2="230" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="320.0" y="249.5" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#374151">links requests</text>
+<text x="485.0" y="406" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6b7280">The cookie identifies browser/session state, not necessarily a person.</text>
+</svg>

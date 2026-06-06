@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="440" viewBox="0 0 1080 440" role="img" aria-label="Browser fingerprinting: many weak details become a profile">
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#555" /></marker></defs>
+<rect width="100%" height="100%" fill="#fbfbfd"/>
+<text x="540.0" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2937">Browser fingerprinting: many weak details become a profile</text>
+<rect x="45" y="100" width="170" height="90" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="130.0" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Browser</text>
+<text x="130.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">version</text>
+<text x="130.0" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">features</text>
+<rect x="250" y="100" width="170" height="90" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="335.0" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Device</text>
+<text x="335.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">screen</text>
+<text x="335.0" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">CPU hints</text>
+<rect x="455" y="100" width="170" height="90" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="540.0" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Environment</text>
+<text x="540.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">timezone</text>
+<text x="540.0" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">language</text>
+<rect x="660" y="100" width="170" height="90" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="745.0" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Rendering</text>
+<text x="745.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">canvas</text>
+<text x="745.0" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">WebGL / audio</text>
+<rect x="865" y="100" width="170" height="90" rx="16" fill="#ffffff" stroke="#6b7280" stroke-width="2"/>
+<text x="950.0" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Automation</text>
+<text x="950.0" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">webdriver</text>
+<text x="950.0" y="184" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">quirks</text>
+<rect x="320" y="275" width="440" height="110" rx="16" fill="#eef6ff" stroke="#2563eb" stroke-width="2"/>
+<text x="540.0" y="307" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">Fingerprint / consistency profile</text>
+<text x="540.0" y="337" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">useful, but not certain</text>
+<text x="540.0" y="359" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">can change, collide, or be spoofed</text>
+<line x1="130" y1="190" x2="390" y2="275" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="335" y1="190" x2="455" y2="275" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="540" y1="190" x2="540" y2="275" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="745" y1="190" x2="625" y2="275" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<line x1="950" y1="190" x2="690" y2="275" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="540.0" y="416" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6b7280">Distinctive is not the same as personal identity.</text>
+</svg>

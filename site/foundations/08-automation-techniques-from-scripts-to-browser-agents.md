@@ -1,5 +1,7 @@
 # Automation techniques: from scripts to browser agents
 
+![Diagram showing the automation ladder from HTTP scripts through userscripts, extensions, Selenium, Playwright, stealth tooling, cloud APIs and AI browser agents.](../assets/foundations/automation-ladder.svg)
+
 ## Plain explanation
 
 Not all bots work the same way.
@@ -7,6 +9,12 @@ Not all bots work the same way.
 Some bots are simple scripts that send HTTP requests. Others control a real browser. Others use cloud browser services, stealth plugins, proxies, CAPTCHA solvers, or AI agents.
 
 A useful taxonomy should explain the ladder from simple to complex.
+
+::: {.callout-note}
+## Capability is not intent
+
+The same technique can be used for testing, accessibility, monitoring, personal automation, research, scraping, fraud, or abuse. This page classifies capability. It does not say every use is malicious.
+:::
 
 ## 1. HTTP request scripts
 
@@ -53,6 +61,7 @@ Detection implications:
 
 - traffic may come from a real browser and real user session
 - automation may be partly hidden inside normal browsing
+- it is harder to classify from network traffic alone
 - but the script is limited to what it can do inside the page/browser context
 
 ## 3. Browser extensions
@@ -117,6 +126,7 @@ Detection implications:
 - vanilla automation may be detectable
 - stealth plugins and wrappers try to reduce inconsistencies
 - Playwright/Puppeteer are common bases for cloud-browser and AI-agent stacks
+- preserved browser contexts and cookies can make automation look less like a fresh script
 
 ## 6. Stealth plugins and undetected drivers
 
@@ -165,7 +175,7 @@ They may manage:
 
 Detection implications:
 
-- often used in multi-accounting, affiliate fraud, ad fraud, scraping, and grey-market automation
+- often discussed in relation to multi-accounting, affiliate fraud, ad fraud, scraping, and grey-market automation
 - also used for testing and privacy
 - stronger evidence would need specific product/docs or studies
 
@@ -263,6 +273,18 @@ Detection implications:
 | Web unlocker API | Hidden/managed | High | Often | provider bypass stack |
 | AI browser agent | Usually | Medium/high | Yes | agent intent and browser substrate |
 
+## What the newer evidence adds
+
+The newer evidence supports this page as the taxonomy bridge.
+
+The project now has foundation sources for HTTP, cookies, headers, User-Agent, authentication, CORS, caching, and browser fingerprinting. It also has evidence from defender products, scraper-side vendors, cloud browser providers, stealth tooling, and AI-agent traffic sources.
+
+That means the automation taxonomy should do one specific job:
+
+> connect the simple web foundations to the realistic ways automation is built and packaged.
+
+It should not overclaim that the existence of a tool proves abuse. It should show why defenders need multiple weak signals and why the project separates capability evidence from harm/prevalence evidence.
+
 ## Project use
 
 This page should be the simple taxonomy bridge.
@@ -279,7 +301,7 @@ The key message is:
 
 > Modern bot activity is not one thing. It ranges from simple scripts to real-browser automation, stealth tooling, managed cloud browsers, scraping APIs, and AI agents. Detection therefore combines many weak signals rather than relying on one obvious marker.
 
-## Sources
+## Sources and evidence anchors
 
 - Wikipedia, “Userscript”: https://en.wikipedia.org/wiki/Userscript
 - Wikipedia, “Tampermonkey”: https://en.wikipedia.org/wiki/Tampermonkey
@@ -288,3 +310,10 @@ The key message is:
 - Selenium documentation: https://www.selenium.dev/documentation/
 - puppeteer-extra-plugin-stealth: https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth
 - undetected-chromedriver: https://github.com/ultrafunkamsterdam/undetected-chromedriver
+- Evidence register anchors: Playwright cookies (`SRC-028`); scraping practice/tooling sources (`SRC-041`–`SRC-046`); cloud browser and web unlocker sources; HUMAN agentic traffic sources (`SRC-036`–`SRC-038`).
+
+---
+
+**Foundations navigation**
+
+Previous: [07. How visitor recognition becomes bot detection](07-how-this-becomes-bot-detection.md)

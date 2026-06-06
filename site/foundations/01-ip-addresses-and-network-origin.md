@@ -1,17 +1,19 @@
 # IP addresses and network origin
 
+![Diagram showing a user device connecting through shared networks, VPNs or proxies before a website sees a source IP address.](../assets/foundations/ip-network-origin.svg)
+
 ## Plain explanation
 
 An IP address is the network address that lets computers send data to each other over the Internet.
 
 When your browser requests a web page, the website receives a request from an IP address. That address is not the same thing as your name, your device, or your account. It is closer to a return address for network traffic.
 
-In practice, an IP address can tell a website things like:
+In practice, an IP address can help a website infer:
 
 - which network the request came from
-- roughly where the network is located
-- whether the address belongs to a home broadband provider, mobile network, cloud provider, VPN, proxy, company network, or hosting provider
-- whether similar addresses have been seen doing suspicious things before
+- roughly where that network is located
+- whether the address belongs to home broadband, mobile, cloud, VPN, proxy, company, university, or hosting infrastructure
+- whether the same address or nearby addresses have a history of suspicious traffic
 
 ## Why IP addresses can be grouped
 
@@ -25,7 +27,7 @@ That means a website or security provider can group traffic by:
 - autonomous system number (ASN)
 - country or region
 - residential, mobile, datacentre, VPN, proxy, or hosting network
-- previous reputation of that IP or network
+- previous reputation of that IP, range, or network
 
 ## Why IP alone is weak evidence
 
@@ -34,6 +36,25 @@ An IP address does not reliably identify one person.
 Several people can share one public IP address because of household routers, workplaces, universities, public Wi-Fi, mobile networks, or network address translation. One person can also appear from many IP addresses because they move between home broadband, mobile data, work, VPNs, proxies, or cloud services.
 
 So IP is useful, but it should be treated as one signal, not proof.
+
+::: {.callout-tip}
+## Simple rule
+
+Use IP address as **network-origin evidence**, not as **person identity evidence**.
+:::
+
+## What the newer evidence adds
+
+The later evidence makes this page more important, not less important.
+
+Modern bot and scraping discussions often distinguish between datacentre, residential, mobile, VPN, and proxy traffic. Defender-side sources treat network origin and reputation as part of a risk bundle. Scraper-side and proxy-side sources show why IP rotation and residential exits matter operationally.
+
+That does not make IP evidence decisive. It means the project should be careful with both extremes:
+
+- “same IP = same person” is wrong
+- “different IP = different person” is also wrong
+- “residential IP = normal user” is too strong
+- “datacentre IP = bad bot” is also too strong
 
 ## Why this matters for bot detection
 
@@ -54,8 +75,15 @@ Use this note before discussing:
 - rate limiting by IP
 - why “same IP” does not always mean “same person”
 
-## Sources
+## Sources and evidence anchors
 
 - Wikipedia, “IP address”: https://en.wikipedia.org/wiki/IP_address
 - Wikipedia, “Network address translation”: https://en.wikipedia.org/wiki/Network_address_translation
 - Wikipedia, “Autonomous system (Internet)”: https://en.wikipedia.org/wiki/Autonomous_system_(Internet)
+- Evidence register anchors: MDN Overview of HTTP (`SRC-065`); proxy and residential proxy sources such as RoundProxies Rnet (`SRC-029`); vendor bot-management sources that use network reputation as one signal.
+
+---
+
+**Foundations navigation**
+
+Next: [02. Cookies and sessions](02-cookies-and-sessions.md)

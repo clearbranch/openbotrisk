@@ -1,5 +1,7 @@
 # How websites recognise visitors
 
+![Diagram showing visitor recognition as layers of network, request, state, browser, behaviour and account context.](../assets/foundations/visitor-recognition-stack.svg)
+
 ## Plain explanation
 
 A website rarely recognises a visitor from one signal.
@@ -62,7 +64,7 @@ For logged-in areas, the site can compare current activity with account history:
 Each signal is weak alone.
 
 - IP address can be shared or changed.
-- Cookies can be deleted or stolen.
+- Cookies can be deleted, stolen, copied, or preserved by automation.
 - Headers can be spoofed.
 - Fingerprints can change or be faked.
 - Behaviour can vary between real users.
@@ -87,6 +89,16 @@ But:
 
 No single fact proves it is a bot. Together, they make the session riskier.
 
+## What the newer evidence adds
+
+The newer evidence supports this page as the bridge from “web basics” to “bot detection”.
+
+The MDN sources explain the mechanics of HTTP, cookies, authentication, headers, CORS, and caching. The Cloudflare, DataDome, HUMAN, Kasada, Arkose, and similar sources show these mechanics being reused as risk signals. Academic fingerprinting and behavioural sources explain narrower technical mechanisms. Scraper-side sources show why attackers and automation providers try to align those same signals.
+
+This means the page should keep repeating one discipline:
+
+> Recognition is a bundle of clues. It is not personal identity, and it is not proof of abuse by itself.
+
 ## Project use
 
 This is the bridge between the foundations notes and the bot-detection evidence.
@@ -101,3 +113,14 @@ Use this before introducing:
 - residential proxies
 - cloud browsers
 - AI browser agents
+
+## Sources and evidence anchors
+
+- Evidence register anchors: MDN Overview of HTTP (`SRC-065`); MDN cookies (`SRC-062`); MDN HTTP headers (`SRC-064`); MDN User-Agent (`SRC-063`); Cloudflare Bot Management (`SRC-003`); Cloudflare detection engines (`SRC-057`); Cloudflare Detection IDs (`SRC-056`).
+
+---
+
+**Foundations navigation**
+
+Previous: [05. Proxies, VPNs, NAT, and shared addresses](05-proxies-vpns-nat-and-shared-addresses.md)  
+Next: [07. How visitor recognition becomes bot detection](07-how-this-becomes-bot-detection.md)

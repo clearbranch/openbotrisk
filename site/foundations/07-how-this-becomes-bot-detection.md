@@ -1,5 +1,7 @@
 # How visitor recognition becomes bot detection
 
+![Diagram showing recognition signals becoming a risk score and then allow, challenge, rate-limit, block or log-only actions.](../assets/foundations/bot-risk-decision.svg)
+
 ## Plain explanation
 
 Bot detection is not usually a perfect yes/no decision.
@@ -76,7 +78,7 @@ This is why many systems use risk scores and graduated responses instead of alwa
 
 A false negative means abusive automation is allowed through.
 
-That can lead to scraping, account takeover, fake accounts, payment fraud, scalping, or inflated infrastructure cost.
+That can lead to scraping, account takeover, fake accounts, payment fraud, scalping, inventory hoarding, or inflated infrastructure cost.
 
 ## Why attackers adapt
 
@@ -94,14 +96,43 @@ If a website blocks obvious scripts, attackers may move to:
 
 That is why the project needs a simple-to-complex automation taxonomy.
 
+::: {.callout-note}
+## Boundary of the evidence
+
+A vendor saying it uses a signal is useful evidence that the signal exists in production products. It is not, by itself, proof of accuracy, prevalence, false-positive rate, or real-world harm.
+:::
+
+## What the newer evidence adds
+
+The newer evidence broadens this page from classic “bot detection” into **traffic governance**.
+
+Cloudflare sources add bot scores, Detection IDs, Turnstile, verified bots, AI-bot controls, and endpoint-specific policy. DataDome, HUMAN, Kasada, Arkose, Thales, and Akamai-style sources add production-facing categories of abuse and mitigation. OWASP provides the broad threat taxonomy. Academic studies help explain specific signals such as fingerprinting and behavioural checks.
+
+The page should therefore avoid a simplistic story where bot detection means “find bots and block them”. The better framing is:
+
+> classify traffic, estimate risk, choose a proportionate response, and keep the cost of mistakes visible.
+
 ## Project use
 
 This page should introduce the advanced evidence set:
 
-- Cloudflare bot scores and detection IDs
+- OWASP automated-threat categories
+- Cloudflare bot scores and Detection IDs
+- Cloudflare Turnstile and AI-bot controls
 - DataDome intent-based detection
 - HUMAN cyberfraud and agentic traffic
 - Kasada proof-of-execution and retooling
 - Arkose dynamic challenges
 - academic behavioural and fingerprinting studies
 - automation supply-side sources
+
+## Sources and evidence anchors
+
+- Evidence register anchors: OWASP Automated Threat Handbook (`SRC-027`); Cloudflare Bot Management (`SRC-003`); Cloudflare Turnstile (`SRC-055`); Cloudflare Detection IDs (`SRC-056`); Cloudflare bot solutions overview (`SRC-058`); relevant DataDome, HUMAN, Kasada, Arkose, Thales and Akamai entries.
+
+---
+
+**Foundations navigation**
+
+Previous: [06. How websites recognise visitors](06-how-websites-recognise-visitors.md)  
+Next: [08. Automation techniques: from scripts to browser agents](08-automation-techniques-from-scripts-to-browser-agents.md)

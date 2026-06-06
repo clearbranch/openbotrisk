@@ -15,8 +15,28 @@ website:
         text: Home
       - href: site/orientation/index.qmd
         text: Orientation
-      - href: site/foundations/index.qmd
-        text: Foundations
+      - text: Foundations
+        menu:
+          - href: site/foundations/index.qmd
+            text: Overview
+          - href: site/foundations/01-ip-addresses-and-network-origin.md
+            text: "01. IP addresses and network origin"
+          - href: site/foundations/02-cookies-and-sessions.md
+            text: "02. Cookies and sessions"
+          - href: site/foundations/03-http-headers-user-agent-and-client-hints.md
+            text: "03. HTTP headers and browser claims"
+          - href: site/foundations/04-browser-and-device-fingerprinting.md
+            text: "04. Browser and device fingerprinting"
+          - href: site/foundations/05-proxies-vpns-nat-and-shared-addresses.md
+            text: "05. Proxies, VPNs, NAT, and shared addresses"
+          - href: site/foundations/06-how-websites-recognise-visitors.md
+            text: "06. How websites recognise visitors"
+          - href: site/foundations/07-how-this-becomes-bot-detection.md
+            text: "07. How this becomes bot detection"
+          - href: site/foundations/08-automation-techniques-from-scripts-to-browser-agents.md
+            text: "08. Automation techniques"
+          - href: site/foundations/09-types-of-automated-threats.md
+            text: "09. Types of automated threats"
       - href: site/background/index.qmd
         text: Background
       - href: site/techniques/index.qmd

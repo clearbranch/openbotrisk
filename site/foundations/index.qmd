@@ -8,6 +8,10 @@ Bot and abuse prevention can become confusing quickly because many ordinary web 
 
 The pages here are written as on-ramps. They are not meant to be exhaustive protocol documentation. They give enough shared vocabulary to understand later sections on bot scores, browser automation, fingerprint inconsistencies, behavioural detection, residential proxies, cloud browsers, and AI browser agents.
 
+![Selected OWASP Automated Threat examples: scraping, credential stuffing, scalping, sniping, account creation, and CAPTCHA defeat.](images/oat-selected-threats-strip.png){fig-alt="A strip of selected OWASP Automated Threat examples, including scraping, credential stuffing, scalping, sniping, account creation, and CAPTCHA defeat."}
+
+The final foundation page uses these OWASP examples to show why bot activity needs classification. Automated abuse is not just scraping; it can involve account attacks, payment abuse, scarcity abuse, metric distortion, reconnaissance, or defence bypass.
+
 ## Reading order
 
 Read these in order if the category is new to you. If you already know the basics, use this page as a glossary-style index.
@@ -35,6 +39,9 @@ Read these in order if the category is new to you. If you already know the basic
 
 8. [Automation techniques: from scripts to browser agents](08-automation-techniques-from-scripts-to-browser-agents.md)  
    A simple taxonomy from HTTP scripts through browser automation, stealth tooling, cloud browsers, web unlockers, and AI browser agents.
+
+9. [Types of automated threats](09-types-of-automated-threats.md)  
+   How OWASP groups unwanted automation into threat categories such as scraping, credential stuffing, scalping, sniping, account creation, denial of inventory, and CAPTCHA defeat.
 
 ## The core idea
 
