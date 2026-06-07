@@ -17,6 +17,5 @@ Suggested order:
 3. booking-style-system.qmd
 4. adversary-model.qmd
 5. economics-of-automation.qmd
-6. commercial-automation-cost-stack-2026-scraping-proxies-captcha-sms.md
-7. commercial-defender-landscape.qmd
-8. ai-agent-shift.qmd
+6. commercial-defender-landscape.qmd
+7. ai-agent-shift.qmd

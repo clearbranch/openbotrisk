@@ -40,7 +40,6 @@ This section also has deliberate boundaries. It does not cover named threat-acto
 - **[Booking-style example](booking-style-system.qmd)** — grounds the abstract threat model in ticketing, appointments, reservations, and other scarce-inventory services.
 - **[Adversary model](adversary-model.qmd)** — describes attackers by motivation and capability, not by named groups.
 - **[Economics of automation](economics-of-automation.qmd)** — looks at the cost structure of automation: tooling, proxies, CAPTCHA solvers, cloud browsers, and managed scraping infrastructure.
-- **[Commercial automation cost stack](commercial-automation-cost-stack-2026-scraping-proxies-captcha-sms.md)** — preserves the source-cluster note behind the economics page: scraping APIs, proxies, CAPTCHA solving, managed scraping, and temporary SMS verification.
 - **[Commercial defender landscape](commercial-defender-landscape.qmd)** — reads vendor material as evidence about the field's vocabulary and claimed controls, not as vendor evaluation.
 - **[AI-agent shift](ai-agent-shift.qmd)** — explains why browser-native automation and AI agents weaken the old boundary between human user and bot.
 

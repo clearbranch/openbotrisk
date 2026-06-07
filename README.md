@@ -4,7 +4,7 @@ A long-horizon, open, written investigation of the bot and abuse prevention cate
 
 - **Full scope:** [PROJECT.md](PROJECT.md)
 - **Repo structure and todos:** [REPO.md](REPO.md)
-- **Rendered site:** [https://clearbranch.github.io/openbotrisk/](https://https://clearbranch.github.io/openbotrisk/) *(domain not yet live)*
+- **Rendered site:** [clearbranch.github.io/openbotrisk/](https://clearbranch.github.io/openbotrisk/)
 
 ## What this project is not
 

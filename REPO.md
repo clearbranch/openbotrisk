@@ -81,7 +81,7 @@ Concrete commitments. Versions pinned in dependency files as work begins; this s
 | Pre-commit | pre-commit framework | ruff, detect-secrets, large-file checks |
 | Site framework | Quarto | ORR convention; matches the writing-led project shape |
 | Site hosting | GitHub Pages from `gh-pages` branch | Free; standard Quarto deployment |
-| Domain | `https://clearbranch.github.io/openbotrisk/` pointed at GitHub Pages | Stable URL, simple setup |
+| Public URL | `https://clearbranch.github.io/openbotrisk/` on GitHub Pages | Stable URL, simple setup |
 | CI | GitHub Actions | Run ruff, pytest, and Quarto build on PRs |
 | Branch protection | Required on `main` | PR-based workflow; no direct commits |
 | Issue tracking | GitHub Issues | Sufficient for solo-with-possible-contributors |
@@ -118,7 +118,7 @@ The CC BY 4.0 choice means anyone can reuse, adapt, and republish the writing wi
 - [ ] Set up `.pre-commit-config.yaml` with ruff, detect-secrets, large-file checks
 - [ ] Set up `pyproject.toml` and `environment.yml` (minimal initial dependencies)
 - [ ] Set up GitHub Actions for ruff and pre-commit on PRs
-- [ ] Register `https://clearbranch.github.io/openbotrisk/` domain
+- [ ] Confirm `https://clearbranch.github.io/openbotrisk/` as the public GitHub Pages URL
 - [ ] Set up `_quarto.yml` with site skeleton
 - [ ] Configure GitHub Pages deployment from a `gh-pages` branch
 - [ ] Verify site builds locally and deploys to `https://clearbranch.github.io/openbotrisk/`
