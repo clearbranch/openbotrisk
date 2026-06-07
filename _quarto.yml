@@ -73,3 +73,8 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    grid:
+      body-width: 950px
+      margin-width: 260px
+      sidebar-width: 260px
+      gutter-width: 1.5rem

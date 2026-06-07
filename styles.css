@@ -1,0 +1,25 @@
+body {
+  line-height: 1.6;
+}
+
+#quarto-content {
+  padding-top: 1.25rem;
+}
+
+#title-block-header.quarto-title-block.default .quarto-title .title {
+  line-height: 1.15;
+}
+
+.content p,
+.content li {
+  max-width: 72rem;
+}
+
+.content table {
+  width: 100%;
+}
+
+.content table,
+.content pre {
+  overflow-x: auto;
+}
