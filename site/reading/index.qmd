@@ -1,6 +1,12 @@
 ---
 title: "Reading list and primary sources"
+
+image: ../assets/openbotrisk_banner_panel_03.png
+title-block-banner: ../assets/openbotrisk_banner_panel_03.png
+title-block-banner-color: "#ffffff"
 ---
+
+
 
 This section records the sources behind the project: academic papers, vendor documentation, threat-surface material, standards, surveys, and sources read and rejected.
 

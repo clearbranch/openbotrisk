@@ -1,5 +1,9 @@
 ---
 title: "Orientation"
+
+image: ../assets/openbotrisk_banner_panel_02.png
+title-block-banner: ../assets/openbotrisk_banner_panel_02.png
+title-block-banner-color: "#ffffff"
 ---
 
 openbotrisk is a long-horizon, open investigation of bot and abuse prevention: the commercial and technical territory concerned with detecting and mitigating automated adversarial activity against legitimate web-facing systems.
@@ -66,7 +70,7 @@ The site is organised by question rather than by vendor.
 
 [What can and cannot be replicated from public data](../boundaries/) is where the project names the boundary between open reproducible work and commercial telemetry.
 
-[Reading list and primary sources](../reading/) records the literature, vendor publications, conference talks, and threat-intelligence material the project draws on.
+[Evidence Register](../reading/evidence-register.qmd) records the literature, vendor publications, conference talks, threat-intelligence material, and reading decisions the project draws on.
 
 [Open questions and gaps](../open-questions/) collects places where the territory remains genuinely unsettled.
 

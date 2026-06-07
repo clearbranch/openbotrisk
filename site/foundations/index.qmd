@@ -1,5 +1,9 @@
 ---
 title: "Foundations"
+
+image: ../assets/openbotrisk_banner_panel_04.png
+title-block-banner: ../assets/openbotrisk_banner_panel_04.png
+title-block-banner-color: "#ffffff"
 ---
 
 This section explains the basic technical ideas that the rest of the site relies on.

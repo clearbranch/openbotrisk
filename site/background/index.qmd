@@ -1,12 +1,19 @@
 ---
 title: "Background and landscape"
+description: "Threat model, adversary model, automation economics, commercial defender landscape, and AI-agent traffic."
 format:
     html:
         toc: true
         toc-depth: 2
         number-sections: false
         css: background.css
+
+image: ../assets/openbotrisk_banner_panel_01.png
+title-block-banner: ../assets/openbotrisk_banner_panel_01.png
+title-block-banner-color: "#ffffff"
 ---
+
+
 
 ::: {.lead}
 This page introduces the background section and links to the detailed pages on threat models, adversaries, automation economics, vendor claims, and AI-agent traffic.

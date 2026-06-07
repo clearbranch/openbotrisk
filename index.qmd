@@ -1,6 +1,9 @@
 ---
 title: "openbotrisk"
 subtitle: "Bot and abuse prevention — demystified."
+image: site/assets/openbotrisk_banner_01-cold-future-continuous.png
+title-block-banner: site/assets/openbotrisk_banner_01-cold-future-continuous.png
+title-block-banner-color: "#ffffff"
 ---
 
 A public investigation into the bot and abuse prevention category: what techniques exist, what the evidence says, and what can be independently verified from public data.
@@ -10,5 +13,5 @@ A public investigation into the bot and abuse prevention category: what techniqu
 - [Technical territory](site/techniques/index.qmd) — technique families, how they work, their limits
 - [Methodology investigations](site/methodology/index.qmd) — concrete experiments on public datasets
 - [What can and cannot be replicated](site/boundaries/index.qmd) — the honest boundary of public-data work
-- [Reading list and primary sources](site/reading/index.qmd) — literature, vendor publications, threat intel, and the [Evidence Register](site/reading/evidence-register.qmd)
+- [Evidence Register](site/reading/evidence-register.qmd) — structured source register for literature, vendor publications, threat intel, and reading decisions
 - [Open questions and gaps](site/open-questions/index.qmd) — genuinely unmapped territory

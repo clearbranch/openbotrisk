@@ -15,8 +15,14 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: site/orientation/index.qmd
-        text: Orientation
+      - text: Orientation
+        menu:
+          - href: site/orientation/index.qmd
+            text: Overview
+          - href: site/reading/index.qmd
+            text: Reading list
+          - href: site/reading/evidence-register.qmd
+            text: Evidence register
       - text: Foundations
         menu:
           - href: site/foundations/index.qmd
@@ -61,8 +67,6 @@ website:
         text: Techniques
       - href: site/methodology/index.qmd
         text: Methodology
-      - href: site/reading/index.qmd
-        text: Reading
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;

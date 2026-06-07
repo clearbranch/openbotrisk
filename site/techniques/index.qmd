@@ -6,6 +6,9 @@ format:
    toc: true
    toc-depth: 3
    number-sections: false
+image: ../assets/openbotrisk_banner_panel_05.png
+title-block-banner: ../assets/openbotrisk_banner_panel_05.png
+title-block-banner-color: "#ffffff"
 ---
 
 ## What this section claims
