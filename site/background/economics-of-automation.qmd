@@ -18,6 +18,32 @@ The supply side is corroborated, in a softer sense, by the existence and positio
 
 A vendor-measured snapshot also reports proxy and solver use as standard inputs in the current "agentic age" of bot activity ([Thales/Imperva 2026]{.source-ref}). That these products exist as polished commercial offerings is itself evidence that the cost of entry to large-scale automation has collapsed. It says much less about how often they are used for abuse versus legitimate data collection, a distinction the vendors are careful to draw and the project should not blur.
 
+## Automation as a supply chain
+
+The clearest way to read the supply side is that a modern operator rarely builds an end-to-end bypass from scratch. The capability is assembled from modular, off-the-shelf services — sold openly as "dual-use" data-collection tooling — so the operator behaves more like a systems integrator than a reverse-engineer, and the market increasingly sells the *management* too: buyers outsource because keeping automation running past anti-bot defences is itself ongoing operational work ([Commercial automation cost stack 2026]{.source-ref}). The register grounds four such layers.
+
+The **proxy-transport layer** sources clean network identity. Residential and mobile IP space is built by embedding connectivity SDKs in consumer apps and reselling the idle bandwidth of opt-in users ([Infatica, peer-to-business SDK]{.source-ref}), then sold as rotating or sticky residential proxies with geo-targeting and explicit limited-stock (sneaker/ticket) use cases ([Bright Data, residential proxies]{.source-ref}). Both are vendor-marketing sources whose consent and compliance claims are not independently validated. The reason this matters for detection is the part that has independent grounding: an empirical study of the proxy ecosystem shows residential and open proxies overlap heavily with ordinary address space and reputation blacklists, so static IP-reputation blocking degrades when adversary traffic originates from the same network blocks as real users ([Choi et al. 2020]{.source-ref}) — though that measurement is from 2020 and predates the current market.
+
+The **challenge-abstraction layer** outsources CAPTCHA and Turnstile handling to specialised API farms that combine machine-vision models with low-cost human solver routing, turning a cognitive defence into a metered utility ([CAPTCHA-solving market]{.source-ref}); separately, GUI agents have been trained to solve modern interactive CAPTCHA variants in a benchmark setting ([Chen et al. 2026]{.source-ref}). Both are capability evidence — that the service is openly marketed, and that the technique works in controlled conditions — not evidence of how often either defeats a given production target.
+
+The **turnkey-bypass layer** sits on top: managed web-unlocking APIs that abstract TLS fingerprints, header alignment, cookie handling, and proxy rotation, and charge per successful response ([ScrapFly, anti-scraping bypass]{.source-ref}; [Bright Data]{.source-ref}).
+
+A fourth layer supplies **account enablement** for flows that gate on identity: bulk temporary-SMS and verification services advertise large pools of disposable numbers with stock counts and delivery-success rates, which is what lets account-creation and verification steps be cleared at volume ([Commercial automation cost stack 2026]{.source-ref}). As with the others, this is market-availability evidence — the service is sold and stocked — not proof that it clears a given site's checks or is used for abuse.
+
+The economic shape is a **metering model**: each input is sold by a unit that makes cost scale with volume, and within each layer a cheap commodity option shades into a dearer high-evasion one. The structure below is grounded in the cost-stack sources; specific per-unit prices are deliberately not tabulated, because they are vendor-advertised and fast-ageing, and a full price matrix would be both unverifiable here and closer to an operational shopping list than this review should provide ([Commercial automation cost stack 2026]{.source-ref}).
+
+| Priced input | How it is metered | Commodity → high-evasion axis |
+|---|---|---|
+| Scraping APIs / platforms | per ~1k requests, or monthly credit tiers | raw HTML cheap → JS-rendering and premium proxies dearer |
+| Proxies | per GB, or per IP | datacenter cheap → residential / mobile dearest |
+| CAPTCHA solving | per ~1k solves | model/OCR cheap → human- or AI-hybrid dearer |
+| Account enablement | per temporary number / verified account | open registration ≈ free → phone-verified costs |
+| Execution compute | cloud CPU/RAM time | raw HTTP/TLS scripts cheap → headless-browser emulation dearer |
+
+For order-of-magnitude grounding without reproducing a price list: scraping platforms advertise entry rates from roughly $0.13 per 1,000 requests and monthly plans from around $49 ([Commercial automation cost stack 2026]{.source-ref}) — illustrative, vendor-advertised, and fast-ageing, not a current quote. What pushes an operator up each axis is the defence itself: reputation- and behaviour-based limits force the move from datacenter to residential bandwidth, dynamic challenges raise the per-solve cost, and cross-layer fingerprint coherence checks force full browser emulation — each defensive layer converts directly into adversary cost.
+
+Two implications follow, both inferences from the managed-service model rather than measured findings. First, the technical barrier is largely gone: an operator pays a vendor for guaranteed delivery instead of needing reverse-engineering skill. Second, there is centralised feature parity — when a defender ships a new countermeasure, the bypass R&D is handled once, upstream, by the managed-tooling vendor and propagates to many operators through a single API update rather than being re-solved by each ([niespodd]{.source-ref}). The defensive consequence is the attacker-cost model the page opened with ([Arkose]{.source-ref}; [Kasada]{.source-ref}): a defence cannot "stop" a commoditised adversary with a binary fix, only raise the cost per successful request — so its success is measured economically, by how far it pushes that cost toward the value of the target, not by whether bots are blocked outright.
+
 What this section deliberately does **not** cover: who profits from abuse, how proceeds are laundered or moved, or the structure of the criminal markets behind it. That is the out-of-scope "criminal economics" boundary noted in the landing page.
 
 ::: {.next-page}
@@ -30,6 +56,12 @@ What this section deliberately does **not** cover: who profits from abuse, how p
 
 - **Arkose** — Arkose Labs (2023–2026). *Bot Manager; ACTIR; Agentic AI Security Report*.
 - **Bright Data** — Bright Data (2026). *Web Unlocker, Browser API, proxies, agentic web execution*.
+- **Bright Data, residential proxies** — Bright Data / Zanini (2026). *Residential Proxies: Definition, Use Cases, and Best Providers*. Vendor market map; not independent measurement.
+- **CAPTCHA-solving market** — CapSolver; Hayes; HasData / Skakun (2025–2026). *Commercial CAPTCHA-solving API ecosystem*. Vendor/tutorial/benchmark; capability, not prevalence.
+- **Chen et al. 2026** — Chen et al. (2026). *CAPTCHA Solving for Native GUI Agents (ReCAP)*. Preprint; benchmark/synthetic setting.
+- **Choi et al. 2020** — Choi et al. (2020). *Understanding the Proxy Ecosystem: A Comparative Analysis of Residential and Open Proxies on the Internet*. Independent measurement; 2020 dataset vintage.
+- **Commercial automation cost stack 2026** — Apify; The Web Scraping Club; Ficstar; ScrapingBee; ZenRows; Crawlbase; Bright Data; AIMultiple; Proxy-Cheap; a CAPTCHA-solver pricing page; 5SIM (2026). *Commercial automation cost stack: scraping APIs, proxies, CAPTCHA solving, managed scraping, and SMS verification*. Aggregated vendor / vendor-adjacent pricing snapshots; market-availability, not abuse prevalence or audited pricing.
+- **Infatica, peer-to-business SDK** — Infatica (2025). *How the Peer-to-Business Model Redefines App Monetization*. Vendor marketing; consent/compliance claims not independently validated.
 - **Kasada** — Kasada (2025–2026). *Bot Defense; Adversarial Techniques; AI Agent Trust; 2026 Benchmark*.
 - **niespodd** — niespodd (n.d./ongoing). *Avoiding bot detection: How to scrape the web without getting blocked?* (browser-fingerprinting notes).
 - **ScrapFly, anti-scraping bypass** — ScrapFly (2025–2026). *Anti-scraping bypass, stealth, proxies, fingerprints, Cloudflare bypass*.

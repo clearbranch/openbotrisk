@@ -47,7 +47,7 @@ Use IP address as **network-origin evidence**, not as **person identity evidence
 
 The later evidence makes this page more important, not less important.
 
-Modern bot and scraping discussions often distinguish between datacentre, residential, mobile, VPN, and proxy traffic. Defender-side sources treat network origin and reputation as part of a risk bundle. Scraper-side and proxy-side sources show why IP rotation and residential exits matter operationally.
+Modern bot and scraping discussions often distinguish between datacentre, residential, mobile, VPN, and proxy traffic. Defender-side sources treat network origin and reputation as part of a risk bundle ([Cloudflare Bot Management]{.source-ref}). Scraper-side and proxy-side sources show why IP rotation and residential exits matter operationally ([RoundProxies, Rnet]{.source-ref}).
 
 That does not make IP evidence decisive. It means the project should be careful with both extremes:
 
@@ -75,12 +75,18 @@ Use this note before discussing:
 - rate limiting by IP
 - why “same IP” does not always mean “same person”
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Wikipedia, “IP address”: https://en.wikipedia.org/wiki/IP_address
-- Wikipedia, “Network address translation”: https://en.wikipedia.org/wiki/Network_address_translation
-- Wikipedia, “Autonomous system (Internet)”: https://en.wikipedia.org/wiki/Autonomous_system_(Internet)
-- Evidence register anchors: MDN Overview of HTTP (`SRC-065`); proxy and residential proxy sources such as RoundProxies Rnet (`SRC-029`); vendor bot-management sources that use network reputation as one signal.
+::: {.sources-used}
+
+- **Wikipedia, IP address** — Wikipedia contributors. *IP address*.
+- **Wikipedia, Network address translation** — Wikipedia contributors. *Network address translation*.
+- **Wikipedia, Autonomous system** — Wikipedia contributors. *Autonomous system (Internet)*.
+- **MDN, Overview of HTTP** — MDN Web Docs (2026). *An overview of HTTP* (`SRC-065`).
+- **RoundProxies, Rnet** — RoundProxies / Bernard, M. (2025). *How to Use Rnet: The Blazing-Fast Python HTTP Client* (`SRC-029`).
+- **Cloudflare Bot Management** — Cloudflare (2026). *Bot Management documentation* (`SRC-003`).
+
+:::
 
 ---
 

@@ -277,7 +277,7 @@ Detection implications:
 
 The newer evidence supports this page as the taxonomy bridge.
 
-The project now has foundation sources for HTTP, cookies, headers, User-Agent, authentication, CORS, caching, and browser fingerprinting. It also has evidence from defender products, scraper-side vendors, cloud browser providers, stealth tooling, and AI-agent traffic sources.
+The project now has foundation sources for HTTP, cookies, headers, User-Agent, authentication, CORS, caching, and browser fingerprinting ([MDN web foundations]{.source-ref}). It also has evidence from defender products, scraper-side vendors, cloud browser providers, stealth tooling, and AI-agent traffic sources ([Playwright / Puppeteer / Selenium docs]{.source-ref}; [stealth tooling]{.source-ref}; [scraping and cloud-browser sources]{.source-ref}; [HUMAN agentic traffic sources]{.source-ref}).
 
 That means the automation taxonomy should do one specific job:
 
@@ -301,16 +301,20 @@ The key message is:
 
 > Modern bot activity is not one thing. It ranges from simple scripts to real-browser automation, stealth tooling, managed cloud browsers, scraping APIs, and AI agents. Detection therefore combines many weak signals rather than relying on one obvious marker.
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Wikipedia, “Userscript”: https://en.wikipedia.org/wiki/Userscript
-- Wikipedia, “Tampermonkey”: https://en.wikipedia.org/wiki/Tampermonkey
-- Playwright documentation: https://playwright.dev/docs/intro
-- Puppeteer documentation: https://pptr.dev/
-- Selenium documentation: https://www.selenium.dev/documentation/
-- puppeteer-extra-plugin-stealth: https://github.com/berstend/puppeteer-extra/tree/master/packages/puppeteer-extra-plugin-stealth
-- undetected-chromedriver: https://github.com/ultrafunkamsterdam/undetected-chromedriver
-- Evidence register anchors: Playwright cookies (`SRC-028`); scraping practice/tooling sources (`SRC-041`–`SRC-046`); cloud browser and web unlocker sources; HUMAN agentic traffic sources (`SRC-036`–`SRC-038`).
+::: {.sources-used}
+
+- **Wikipedia, Userscript** — Wikipedia contributors. *Userscript*.
+- **Wikipedia, Tampermonkey** — Wikipedia contributors. *Tampermonkey*.
+- **Playwright / Puppeteer / Selenium docs** — Playwright, Puppeteer, Selenium (2026). *Official project documentation*.
+- **Playwright cookies** — Playwright (2026). *Authentication / cookie and session-state documentation* (`SRC-028`).
+- **stealth tooling** — `puppeteer-extra-plugin-stealth`; `undetected-chromedriver`; related Selenium and browser-automation evasion tooling.
+- **scraping and cloud-browser sources** — ScrapingBee, ScrapFly, Bright Data, Browserless, Browserbase, Hyperbrowser, and related managed automation material (`SRC-041`-`SRC-046` plus cloud-browser/web-unlocker entries).
+- **HUMAN agentic traffic sources** — HUMAN Security material on OpenClaw, agentic visibility, and state of agentic traffic (`SRC-036`-`SRC-038`).
+- **MDN web foundations** — MDN Web Docs (2026). HTTP, cookies, headers, authentication, CORS, caching, and User-Agent foundation material.
+
+:::
 
 ---
 

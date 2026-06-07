@@ -71,7 +71,7 @@ Do not ask “what does the User-Agent say?” in isolation. Ask “does the who
 
 The newer evidence gives this page a clearer role. It is not just “what is a header?” It is the start of **claim checking**.
 
-MDN gives the neutral vocabulary for headers and User-Agent. Cloudflare Detection IDs and related bot-management sources show why claimed-browser consistency, header order, verified-bot classification, and anomaly tags matter in operational bot management. Scraper-side sources show the opposing pressure: tooling tries to make headers, fingerprints, TLS, and browser behaviour line up.
+MDN gives the neutral vocabulary for headers and User-Agent ([MDN, HTTP headers]{.source-ref}; [MDN, User-Agent header]{.source-ref}). Cloudflare Detection IDs and related bot-management sources show why claimed-browser consistency, header order, verified-bot classification, and anomaly tags matter in operational bot management ([Cloudflare Detection IDs]{.source-ref}). Scraper-side sources show the opposing pressure: tooling tries to make headers, fingerprints, TLS, and browser behaviour line up.
 
 That supports the project’s main framing: bot detection often checks coherence across weak signals, not one obvious marker.
 
@@ -88,12 +88,16 @@ Use this note before discussing:
 - stealth plugins
 - why bot detection checks consistency, not just one field
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- MDN, “HTTP headers”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers
-- MDN, “User-Agent header”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent
-- Wikipedia, “User-Agent header”: https://en.wikipedia.org/wiki/User-Agent_header
-- Evidence register anchors: MDN HTTP headers (`SRC-064`); MDN User-Agent header (`SRC-063`); Cloudflare Detection IDs (`SRC-056`).
+::: {.sources-used}
+
+- **MDN, HTTP headers** — MDN Web Docs (2026). *HTTP headers* (`SRC-064`).
+- **MDN, User-Agent header** — MDN Web Docs (2026). *User-Agent header* (`SRC-063`).
+- **Wikipedia, User-Agent header** — Wikipedia contributors. *User-Agent header*.
+- **Cloudflare Detection IDs** — Cloudflare (2026). *Detection IDs* (`SRC-056`).
+
+:::
 
 ---
 

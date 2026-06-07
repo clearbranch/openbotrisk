@@ -51,6 +51,8 @@ website:
             text: Adversary model
           - href: site/background/economics-of-automation.qmd
             text: Economics of automation
+          - href: site/background/commercial-automation-cost-stack-2026-scraping-proxies-captcha-sms.md
+            text: Commercial automation cost stack
           - href: site/background/commercial-defender-landscape.qmd
             text: Commercial defender landscape
           - href: site/background/ai-agent-shift.qmd

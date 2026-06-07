@@ -73,7 +73,7 @@ Cookies are strong evidence of **session continuity**. They are weak evidence of
 
 The newer evidence makes cookie/session state a bridge between foundations and automation capability.
 
-MDN gives the neutral mechanics. PortSwigger-style authentication sources explain why sessions matter for login security and account abuse. Browser automation sources show that automated tools can extract, reuse, or preserve cookie state. Cloud browser platforms and persistent browser profiles make this more than a theoretical point.
+MDN gives the neutral mechanics ([MDN, Using HTTP cookies]{.source-ref}). PortSwigger-style authentication sources explain why sessions matter for login security and account abuse ([PortSwigger authentication foundations]{.source-ref}). Browser automation sources show that automated tools can extract, reuse, or preserve cookie state ([Playwright cookies]{.source-ref}). Cloud browser platforms and persistent browser profiles make this more than a theoretical point.
 
 That means this page should prepare the reader for two later ideas:
 
@@ -94,11 +94,17 @@ Use this note before discussing:
 - persistent sessions in cloud-browser platforms
 - why deleting cookies can make a user look “new”
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- MDN, “Using HTTP cookies”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Cookies
-- Wikipedia, “HTTP cookie”: https://en.wikipedia.org/wiki/HTTP_cookie
-- Evidence register anchors: MDN cookies (`SRC-062`); MDN HTTP authentication (`SRC-061`); Playwright cookie/session-state example (`SRC-028`); PortSwigger authentication sources (`SRC-069`–`SRC-072`).
+::: {.sources-used}
+
+- **MDN, Using HTTP cookies** — MDN Web Docs (2026). *Using HTTP cookies* (`SRC-062`).
+- **MDN, HTTP authentication** — MDN Web Docs (2026). *HTTP authentication* (`SRC-061`).
+- **Wikipedia, HTTP cookie** — Wikipedia contributors. *HTTP cookie*.
+- **Playwright cookies** — Playwright (2026). *Authentication / cookie and session-state documentation* (`SRC-028`).
+- **PortSwigger authentication foundations** — PortSwigger Web Security Academy. *Authentication, OAuth, and password-login foundation material* (`SRC-069`-`SRC-072`).
+
+:::
 
 ---
 

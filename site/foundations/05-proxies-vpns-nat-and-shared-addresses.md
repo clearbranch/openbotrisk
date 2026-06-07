@@ -64,7 +64,7 @@ Network origin can make traffic more or less suspicious. It cannot prove identit
 
 The newer evidence makes the proxy discussion less theoretical.
 
-Proxy-side and scraping-side sources show that proxy rotation, residential exits, and managed scraping infrastructure are part of the supply side. Defender-side sources show that network reputation, ASN, datacentre/residential classification, and rate history are common parts of risk scoring.
+Proxy-side and scraping-side sources show that proxy rotation, residential exits, and managed scraping infrastructure are part of the supply side ([RoundProxies, Rnet]{.source-ref}; [ScrapFly and Bright Data]{.source-ref}). Defender-side sources show that network reputation, ASN, datacentre/residential classification, and rate history are common parts of risk scoring ([Cloudflare Bot Management]{.source-ref}; [DataDome / HUMAN]{.source-ref}).
 
 The careful framing is:
 
@@ -88,12 +88,19 @@ Use this note before discussing:
 - why “same IP = same person” is wrong
 - why “different IP = different person” is also wrong
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Wikipedia, “Network address translation”: https://en.wikipedia.org/wiki/Network_address_translation
-- Wikipedia, “Proxy server”: https://en.wikipedia.org/wiki/Proxy_server
-- Wikipedia, “Virtual private network”: https://en.wikipedia.org/wiki/Virtual_private_network
-- Evidence register anchors: RoundProxies Rnet tutorial (`SRC-029`); ScrapFly/Bright Data/managed scraping sources; Cloudflare/DataDome/HUMAN bot-management sources using network-origin and reputation signals.
+::: {.sources-used}
+
+- **Wikipedia, Network address translation** — Wikipedia contributors. *Network address translation*.
+- **Wikipedia, Proxy server** — Wikipedia contributors. *Proxy server*.
+- **Wikipedia, Virtual private network** — Wikipedia contributors. *Virtual private network*.
+- **RoundProxies, Rnet** — RoundProxies / Bernard, M. (2025). *How to Use Rnet: The Blazing-Fast Python HTTP Client* (`SRC-029`).
+- **ScrapFly and Bright Data** — ScrapFly / Bright Data managed scraping and proxy material.
+- **Cloudflare Bot Management** — Cloudflare (2026). *Bot Management documentation* (`SRC-003`).
+- **DataDome / HUMAN** — DataDome and HUMAN bot-management sources using network-origin and reputation signals.
+
+:::
 
 ---
 

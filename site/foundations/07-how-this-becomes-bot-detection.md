@@ -106,7 +106,7 @@ A vendor saying it uses a signal is useful evidence that the signal exists in pr
 
 The newer evidence broadens this page from classic “bot detection” into **traffic governance**.
 
-Cloudflare sources add bot scores, Detection IDs, Turnstile, verified bots, AI-bot controls, and endpoint-specific policy. DataDome, HUMAN, Kasada, Arkose, Thales, and Akamai-style sources add production-facing categories of abuse and mitigation. OWASP provides the broad threat taxonomy. Academic studies help explain specific signals such as fingerprinting and behavioural checks.
+Cloudflare sources add bot scores, Detection IDs, Turnstile, verified bots, AI-bot controls, and endpoint-specific policy ([Cloudflare Bot Management]{.source-ref}; [Cloudflare Turnstile]{.source-ref}; [Cloudflare Detection IDs]{.source-ref}). DataDome, HUMAN, Kasada, Arkose, Thales, and Akamai-style sources add production-facing categories of abuse and mitigation ([DataDome / HUMAN / Kasada / Arkose]{.source-ref}; [Thales / Akamai]{.source-ref}). OWASP provides the broad threat taxonomy ([OWASP Automated Threat Handbook]{.source-ref}). Academic studies help explain specific signals such as fingerprinting and behavioural checks.
 
 The page should therefore avoid a simplistic story where bot detection means “find bots and block them”. The better framing is:
 
@@ -126,9 +126,19 @@ This page should introduce the advanced evidence set:
 - academic behavioural and fingerprinting studies
 - automation supply-side sources
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Evidence register anchors: OWASP Automated Threat Handbook (`SRC-027`); Cloudflare Bot Management (`SRC-003`); Cloudflare Turnstile (`SRC-055`); Cloudflare Detection IDs (`SRC-056`); Cloudflare bot solutions overview (`SRC-058`); relevant DataDome, HUMAN, Kasada, Arkose, Thales and Akamai entries.
+::: {.sources-used}
+
+- **OWASP Automated Threat Handbook** — OWASP / Watson, C., & Zaw, T. (2026). *Automated Threat Handbook: Web Applications v1.3* (`SRC-027`).
+- **Cloudflare Bot Management** — Cloudflare (2026). *Bot Management documentation* (`SRC-003`).
+- **Cloudflare Turnstile** — Cloudflare (2026). *Turnstile — Overview* (`SRC-055`).
+- **Cloudflare Detection IDs** — Cloudflare (2026). *Detection IDs* (`SRC-056`).
+- **Cloudflare bot solutions overview** — Cloudflare (2026). *Bot solutions — Overview* (`SRC-058`).
+- **DataDome / HUMAN / Kasada / Arkose** — Defender-vendor material on bot management, intent, challenges, proof-of-execution, and agentic traffic.
+- **Thales / Akamai** — Vendor telemetry and trend reports on bad-bot and financial-services attack activity.
+
+:::
 
 ---
 

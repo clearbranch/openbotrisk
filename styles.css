@@ -23,3 +23,17 @@ body {
 .content pre {
   overflow-x: auto;
 }
+
+.source-ref {
+  color: #526f9f;
+  font-size: 0.94em;
+  white-space: nowrap;
+}
+
+.source-ref:hover {
+  color: #2f5597;
+}
+
+.sources-used {
+  font-size: 0.95rem;
+}

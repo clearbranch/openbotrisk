@@ -75,9 +75,9 @@ That means fingerprinting is useful but not certain. A good bot-detection system
 
 The newer evidence gives this page two jobs.
 
-First, it needs to explain the simple mechanism: many observable browser details can be combined. The older EFF and browser-fingerprinting sources are enough for that.
+First, it needs to explain the simple mechanism: many observable browser details can be combined. The older EFF and browser-fingerprinting sources are enough for that ([EFF, Cover Your Tracks]{.source-ref}; [Laperdrix et al.]{.source-ref}).
 
-Second, it needs to prepare the reader for the arms race. Academic papers and surveys cover uniqueness, inconsistencies, privacy, and evasion. Defender-side sources use fingerprints and browser checks as part of detection. Scraper-side and stealth-tool sources explicitly talk about changing or hiding automation fingerprints.
+Second, it needs to prepare the reader for the arms race. Academic papers and surveys cover uniqueness, inconsistencies, privacy, and evasion ([Berke et al.]{.source-ref}; [Martinez Llamas et al. 2025]{.source-ref}). Defender-side sources use fingerprints and browser checks as part of detection. Scraper-side and stealth-tool sources explicitly talk about changing or hiding automation fingerprints ([niespodd]{.source-ref}).
 
 The safest wording is therefore:
 
@@ -97,12 +97,19 @@ Use this note before discussing:
 - ScrapFly/Bright Data fingerprint management
 - privacy and regulatory questions around bot detection
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Wikipedia, “Device fingerprint”: https://en.wikipedia.org/wiki/Device_fingerprint
-- EFF, “Cover Your Tracks”: https://coveryourtracks.eff.org/
-- MDN, “Browser detection using the user agent”: https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
-- Evidence register anchors: Laperdrix et al. browser fingerprinting survey; Berke et al. browser uniqueness/demographics; Martínez Llamas et al. privacy/GDPR/AI Act review (`SRC-047`); scraper-side anti-detection taxonomy (`SRC-046`).
+::: {.sources-used}
+
+- **Wikipedia, Device fingerprint** — Wikipedia contributors. *Device fingerprint*.
+- **EFF, Cover Your Tracks** — Electronic Frontier Foundation. *Cover Your Tracks*.
+- **MDN, Browser detection using the user agent** — MDN Web Docs. *Browser detection using the user agent*.
+- **Laperdrix et al.** — Laperdrix et al. *Browser fingerprinting survey* (`SRC-066`).
+- **Berke et al.** — Berke et al. *Browser uniqueness / demographics study* (`SRC-067`).
+- **Martinez Llamas et al. 2025** — Martinez Llamas et al. (2025). *Balancing Security and Privacy: Web Bot Detection, Privacy Challenges, and Regulatory Compliance under the GDPR and AI Act* (`SRC-047`).
+- **niespodd** — niespodd (n.d./ongoing). *Avoiding bot detection: How to scrape the web without getting blocked?* (`SRC-046`).
+
+:::
 
 ---
 

@@ -93,7 +93,7 @@ No single fact proves it is a bot. Together, they make the session riskier.
 
 The newer evidence supports this page as the bridge from “web basics” to “bot detection”.
 
-The MDN sources explain the mechanics of HTTP, cookies, authentication, headers, CORS, and caching. The Cloudflare, DataDome, HUMAN, Kasada, Arkose, and similar sources show these mechanics being reused as risk signals. Academic fingerprinting and behavioural sources explain narrower technical mechanisms. Scraper-side sources show why attackers and automation providers try to align those same signals.
+The MDN sources explain the mechanics of HTTP, cookies, authentication, headers, CORS, and caching ([MDN web foundations]{.source-ref}). The Cloudflare, DataDome, HUMAN, Kasada, Arkose, and similar sources show these mechanics being reused as risk signals ([Cloudflare Bot Management]{.source-ref}; [Cloudflare detection engines]{.source-ref}; [Cloudflare Detection IDs]{.source-ref}). Academic fingerprinting and behavioural sources explain narrower technical mechanisms. Scraper-side sources show why attackers and automation providers try to align those same signals.
 
 This means the page should keep repeating one discipline:
 
@@ -114,9 +114,16 @@ Use this before introducing:
 - cloud browsers
 - AI browser agents
 
-## Sources and evidence anchors
+## Sources used on this page
 
-- Evidence register anchors: MDN Overview of HTTP (`SRC-065`); MDN cookies (`SRC-062`); MDN HTTP headers (`SRC-064`); MDN User-Agent (`SRC-063`); Cloudflare Bot Management (`SRC-003`); Cloudflare detection engines (`SRC-057`); Cloudflare Detection IDs (`SRC-056`).
+::: {.sources-used}
+
+- **MDN web foundations** — MDN Web Docs (2026). *Overview of HTTP; Using HTTP cookies; HTTP headers; User-Agent header* (`SRC-062`-`SRC-065`).
+- **Cloudflare Bot Management** — Cloudflare (2026). *Bot Management documentation* (`SRC-003`).
+- **Cloudflare detection engines** — Cloudflare (2026). *Bot detection engines* (`SRC-057`).
+- **Cloudflare Detection IDs** — Cloudflare (2026). *Detection IDs* (`SRC-056`).
+
+:::
 
 ---
 

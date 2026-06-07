@@ -6,7 +6,7 @@ Bots are not one problem.
 
 Automated traffic can be used to scrape data, test stolen credentials, create accounts, reserve scarce goods, distort metrics, submit spam, probe applications, or bypass defences. Calling all of this "bot traffic" is useful shorthand, but it hides important differences.
 
-This page uses the OWASP Automated Threats vocabulary as a simple classification layer. OWASP calls these **automated threat events** and gives them OAT identifiers.
+This page uses the OWASP Automated Threats vocabulary as a simple classification layer. OWASP calls these **automated threat events** and gives them OAT identifiers ([OWASP]{.source-ref}; [OWASP Automated Threat Handbook]{.source-ref}).
 
 ![Selected OWASP Automated Threat categories: scraping, credential stuffing, scalping, sniping, account creation, and CAPTCHA defeat.](images/oat-selected-threats-grid.png){fig-alt="Six selected OWASP Automated Threat tiles showing scraping, credential stuffing, scalping, sniping, account creation, and CAPTCHA defeat."}
 
@@ -156,8 +156,12 @@ This page answers:
 
 That makes it a bridge from technical foundations into the evidence register and later technique pages.
 
-## Sources
+## Sources used on this page
 
-- OWASP Foundation, *OWASP Automated Threats to Web Applications*: <https://owasp.org/www-project-automated-threats-to-web-applications/>
-- Colin Watson and Tin Zaw, *OWASP Automated Threat Handbook: Web Applications*, version 1.3, OWASP Foundation, 2026.
-- OWASP Automated Threats Reference Chart - Web Applications - 20260302. Poster tiles adapted under Creative Commons Attribution-ShareAlike 3.0.
+::: {.sources-used}
+
+- **OWASP** — OWASP Foundation (n.d.). *Automated Threats to Web Applications*.
+- **OWASP Automated Threat Handbook** — OWASP / Watson, C., & Zaw, T. (2026). *Automated Threat Handbook: Web Applications v1.3*.
+- **OWASP Automated Threats Reference Chart** — OWASP Foundation (2026). *Automated Threats Reference Chart - Web Applications - 20260302*. Poster tiles adapted under Creative Commons Attribution-ShareAlike 3.0.
+
+:::

@@ -32,7 +32,7 @@ Two editorial commitments follow from that.
 
 **Methods before actors.** A technique described in the abstract is in scope. A campaign attributed to a named group is not. Where a source's value is buried inside actor attribution, the project extracts the technique and discards the attribution.
 
-This section also has deliberate boundaries. It does not cover named threat actors and campaigns, criminal revenue flows, specific high-profile incidents, vendor ranking, the mechanics of individual detection techniques, or the build-versus-buy decision.
+This section also has deliberate boundaries. It does not cover named threat-actor attribution, criminal revenue flows, or a comprehensive catalogue of incidents. High-profile public cases are used only where they clarify a wider pattern of automated abuse, such as scarcity exploitation, credential attacks, scraping, or inventory hoarding.
 
 ## What this section covers
 
@@ -40,6 +40,7 @@ This section also has deliberate boundaries. It does not cover named threat acto
 - **[Booking-style example](booking-style-system.qmd)** — grounds the abstract threat model in ticketing, appointments, reservations, and other scarce-inventory services.
 - **[Adversary model](adversary-model.qmd)** — describes attackers by motivation and capability, not by named groups.
 - **[Economics of automation](economics-of-automation.qmd)** — looks at the cost structure of automation: tooling, proxies, CAPTCHA solvers, cloud browsers, and managed scraping infrastructure.
+- **[Commercial automation cost stack](commercial-automation-cost-stack-2026-scraping-proxies-captcha-sms.md)** — preserves the source-cluster note behind the economics page: scraping APIs, proxies, CAPTCHA solving, managed scraping, and temporary SMS verification.
 - **[Commercial defender landscape](commercial-defender-landscape.qmd)** — reads vendor material as evidence about the field's vocabulary and claimed controls, not as vendor evaluation.
 - **[AI-agent shift](ai-agent-shift.qmd)** — explains why browser-native automation and AI agents weaken the old boundary between human user and bot.
 
