@@ -3,7 +3,7 @@
 ## Access
 Source: Kaggle competition `talkingdata-adtracking-fraud-detection` (via `kaggle competitions download`).
 
-Local path: `/home/tsispace/Documents/GitHub/openbotrisk/data/talkingdata-adtracking-fraud-detection`
+Local path: `data/talkingdata-adtracking-fraud-detection`
 
 File format: CSV.
 

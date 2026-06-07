@@ -40,6 +40,8 @@
 - IP→ASN resolution via MaxMind GeoLite2 ASN database as the lookup mechanism.
 - Prior (rejected) signals: social-login gating (Facebook/Google), generic behavioural detection, a paid commercial reputation API.
 
+> **Tooling-dependency note (added 2026-06-06):** the README's IP→ASN step depends on MaxMind GeoLite2, but the README's link is stale and the access model has changed. GeoLite2 now requires a free MaxMind account + license key (since Dec 2019), is download-capped (30 DB downloads/day), and is governed by the GeoLite End User License Agreement (must keep data current; redistribution restricted) — so it generally **cannot be bundled in a public/reproducible repo** without complying. For a fully-open ASN→datacenter mapping, alternatives include RouteViews/CAIDA BGP data, Team Cymru IP-to-ASN, or `pyasn`; GeoLite2 ASN is also less authoritative than paid GeoIP2 and drifts over time. (See the separate MaxMind GeoIP/GeoLite KB entry for the accuracy/methodology detail.)
+
 ## Threat types covered
 
 Primary: **fake account creation** (OAT-019 / account-creation abuse) on a signup flow. The datacenter-origin signal itself is **cross-cutting** — the same network-origin heuristic is a standard input signal across credential stuffing, scraping, scalping, ATO, and carding, so the technique generalises well beyond the fake-account context the README describes.

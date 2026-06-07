@@ -3,7 +3,7 @@
 ## Access
 Source: Kaggle competition `ieee-fraud-detection` (via `kaggle competitions download`).
 
-Local path: `/home/tsispace/Documents/GitHub/openbotrisk/data/ieee-fraud-detection`
+Local path: `data/ieee-fraud-detection`
 
 File format: CSV.
 

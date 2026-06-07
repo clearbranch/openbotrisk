@@ -3,7 +3,7 @@
 ## Access
 Source: CTU-13 dataset, Czech Technical University (Stratosphere Lab) — `https://mcfp.felk.cvut.cz/publicDatasets/CTU-13-Dataset/`.
 
-Local path: `/home/tsispace/Documents/GitHub/openbotrisk/data/CTU-13-Dataset`
+Local path: `data/CTU-13-Dataset`
 
 File format: per-scenario `.binetflow` CSV (Argus bidirectional NetFlow export).
 

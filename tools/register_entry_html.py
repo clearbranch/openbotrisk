@@ -339,6 +339,9 @@ def entry_filename(row: RegisterRow) -> str:
 
 def render_entry_page(row: RegisterRow, output_dir: Path) -> str:
     filename = entry_filename(row)
+    entry_file_display = (
+        row.entry_file.relative_to(ROOT).as_posix() if row.entry_file else row.entry_cell
+    )
     metadata_rows = [
         ("Register id", row.register_id),
         ("Source", row.source),
@@ -349,7 +352,7 @@ def render_entry_page(row: RegisterRow, output_dir: Path) -> str:
         ("Operational proximity", row.operational_proximity),
         ("Review state", row.review_state),
         ("Description", row.project_impact),
-        ("Entry file", str(row.entry_file) if row.entry_file else row.entry_cell),
+        ("Entry file", entry_file_display),
     ]
     metadata = "\n".join(
         f"<tr><th>{html.escape(key)}</th><td>{inline_markdown(value)}</td></tr>"

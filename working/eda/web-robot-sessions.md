@@ -5,7 +5,7 @@ Source: Figshare dataset 3477932 (web robot detection, session-level features + 
 
 Underlying logs are from the Aristotle University of Thessaloniki library OPAC (`search.lib.auth.gr`), captured in early 2018 (per timestamps in `public_v2.json`).
 
-Local path: `/home/tsispace/Documents/GitHub/openbotrisk/data/web-robot-sessions`
+Local path: `data/web-robot-sessions`
 
 File formats: CSV (engineered session features) + JSON (raw per-request log).
 
