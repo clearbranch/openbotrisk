@@ -1,0 +1,46 @@
+---
+title: "AI-agent shift"
+format:
+    html:
+        toc: false
+        toc-depth: 3
+        number-sections: false
+        css: background.css
+---
+
+::: {.lead}
+This page explains why browser-native automation and AI agents complicate the old bot/human boundary.
+:::
+
+The older bot-detection framing assumed a clean line between "human in a real browser" and "script pretending to be one." Browser-native automation erodes that line. Cloud-browser infrastructure runs automation inside real, instrumented browsers; browser extensions and userscripts operate *inside* otherwise-legitimate human sessions; and AI browser agents act on a user's behalf in ways that are neither classically human nor classically bot ([cloud-browser/agent vendor docs]{.source-ref}; [Arkose]{.source-ref}; [Kasada]{.source-ref}; [HUMAN]{.source-ref}).
+
+This is the part of the territory that is genuinely moving. The defender-vendor view is substantial: HUMAN's account of exposed autonomous-agent gateways producing browser-automation traffic ([HUMAN, OpenClaw]{.source-ref}), its agentic-visibility/trust-classification model ([HUMAN, Agentic Visibility]{.source-ref}), and a monthly telemetry snapshot of agentic traffic by sector and route ([HUMAN, State of Agentic Traffic]{.source-ref}); Thales/Imperva framing the same shift as the "agentic age" ([Thales/Imperva 2026]{.source-ref}); Akamai on AI-labelled botnets and API-visibility gaps in financial services ([Akamai 2026]{.source-ref}); and Cloudflare's productisation of AI-crawler blocking ([Cloudflare, Block AI Bots]{.source-ref}).
+
+All of this is vendor-visible traffic with opaque classification. Importantly, agentic traffic is **not** the same as malicious traffic, a caveat the sources themselves make.
+
+Two non-vendor anchors exist: an independent academic measurement of AI-agent fingerprintability ([Wang et al. 2026, FP-Agent]{.source-ref}), and a first-party operator account of AI-crawler pressure and residential-proxy evasion from a named platform ([Wikimedia 2026]{.source-ref}). The Wikimedia source is useful because it is first-party operational evidence, but it is an open-knowledge platform, not a commercial booking or e-commerce target, so its generality is limited.
+
+What remains absent is the agent-*builder* side: primary material from Anthropic, OpenAI, and others building these agents. So the evidence is no longer one-sided between *defenders* and *independents*, but the people *building* the agents have not yet been given the same treatment in the register.
+
+::: {.next-page}
+**End of background sequence:** return to [Background and landscape](index.qmd), or continue to the next site section.
+:::
+
+## Sources used on this page
+
+::: {.sources-used}
+
+- **Akamai 2026** — Akamai Security (2026). *AI-Empowered Botnets and API Visibility Gaps: Attack Trends in Financial Services*.
+- **Arkose** — Arkose Labs (2023–2026). *Bot Manager; ACTIR; Agentic AI Security Report*.
+- **cloud-browser/agent vendor docs** — Browserless / Browserbase / Hyperbrowser (2026). *Cloud-browser & agent documentation*.
+- **Cloudflare, Block AI Bots** — Cloudflare (2026). *Block AI Bots* (bot solutions docs).
+- **HUMAN** — HUMAN Security / PerimeterX (2026). *Sightline; AI Agent Detection; OpenClaw; 2026 benchmark*.
+- **HUMAN, Agentic Visibility** — HUMAN Security / McArtney (2026). *Agentic Visibility: How to See AI Agents in Your Traffic*.
+- **HUMAN, OpenClaw** — HUMAN Security / Kaiserman & Cirlig (2026). *OpenClaw in the wild: How autonomous agents can drive abuse at scale*.
+- **HUMAN, State of Agentic Traffic** — HUMAN Security / Kaiserman (2026). *State of Agentic Traffic – May 2026*.
+- **Kasada** — Kasada (2025–2026). *Bot Defense; Adversarial Techniques; AI Agent Trust; 2026 Benchmark*.
+- **Thales/Imperva 2026** — Thales / Imperva (2026). *2026 Thales Bad Bot Report: Bad Bots in the Agentic Age*.
+- **Wang et al. 2026, FP-Agent** — Wang, Shafiq & Vekaria (2026). *FP-Agent: Fingerprinting AI Browsing Agents*.
+- **Wikimedia 2026** — Wikimedia Foundation (2026). *Quo vadis, crawlers? Progress and what’s next on safeguarding our infrastructure*.
+
+:::

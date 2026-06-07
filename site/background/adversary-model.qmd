@@ -1,0 +1,52 @@
+---
+title: "Adversary model"
+format:
+    html:
+        toc: false
+        toc-depth: 3
+        number-sections: false
+        css: background.css
+---
+
+::: {.lead}
+This page describes the adversary in terms of motivation and capability, without relying on named actor attribution.
+:::
+
+Because naming actors is out of scope, the adversary is described by two axes that *are* in scope: **what they want** and **how capable they are**.
+
+**Motivation** sorts roughly into resale (scalping, scraping for competitive or commercial data), monetisation of compromised assets (credential stuffing → account takeover → cashing out), fraud against value flows (ad fraud, carding, promotion abuse), and extraction for downstream use (content and data scraping, including for AI training). These are not exclusive, and the same tooling serves several.
+
+**Capability** is the more analytically useful axis, and the project anchors it to the sophistication gradient from the Iliou work — the single genuinely controlled academic anchor in the register ([Iliou 2022]{.source-ref}). The gradient runs from simple bots (basic HTTP scripts, no browser, easily separated on request-level signals) through moderate bots (real browser engines, some evasion) to advanced bots (full browser automation with stealth layering, behavioural mimicry, and adaptation under pressure).
+
+The important and uncomfortable finding the project leans on is that **detection metrics measured against simple bots hide how weak detection is against advanced ones**. On the same web-log framework, the Iliou work reports simple-bot AUC = 1.00 but advanced-bot AUC = 0.64; at a low false-positive rate (FPR = 0.01), it catches only 18 of 123 advanced bots, about 55% balanced accuracy ([Iliou et al. 2019]{.source-ref}; [Iliou 2022]{.source-ref}). This is the honest figure behind headline numbers that look much better. This gradient, not actor identity, is the structure the rest of the project hangs detection claims on. A more recent academic review corroborates the signal-family/evasion-class structure of this gradient, though as a review it adds taxonomy rather than new measurement ([Martínez Llamas et al. 2025]{.source-ref}).
+
+The gradient does not cleanly accommodate the newest adversary class: **AI browser agents** acting inside real, instrumented browsers. These are neither "simple HTTP script" nor "stealth-layered headless browser". They are genuine browsers driven by a model, and the one independent measurement in the register finds they are nonetheless distinguishable from humans on browser and behavioural fingerprints in a controlled setting ([Wang et al. 2026, FP-Agent]{.source-ref}). That is a benign-task, closed-world, point-in-time result against known agents, not evidence about adversarial humanisation or production prevalence — but it is the cleanest non-vendor anchor the project has for where AI agents sit relative to the gradient.
+
+At the landscape level, the adversary's **tooling** forms a stack: a base automation layer such as Playwright, Puppeteer, or Selenium ([Playwright/Puppeteer/Selenium docs]{.source-ref}); evasion layers added on top ([undetected-chromedriver]{.source-ref}; [puppeteer-extra-plugin-stealth]{.source-ref}); browser-like HTTP-client impersonation at the network level ([RoundProxies, Rnet]{.source-ref}); and, increasingly, managed infrastructure that abstracts the whole stack — anti-scraping APIs, residential proxy pools, CAPTCHA-solving, and cloud browsers ([ScrapFly, anti-scraping bypass]{.source-ref}; [Bright Data]{.source-ref}; [cloud-browser/agent vendor docs]{.source-ref}; [ScrapingBee, web-scraping API]{.source-ref}).
+
+The register now also documents the public *mental model* for bypassing named commercial defenders as multi-layer signal alignment across IP, TLS, HTTP, fingerprint, session, and behaviour ([ScrapingBee, PerimeterX bypass]{.source-ref}; [niespodd]{.source-ref}). These are scraper-side claims, not verified bypass success, and are high dual-use, so they are cited at technique-family level only. The mechanism of each — what signal each layer adds or hides — belongs in the Techniques section. What matters here is that the capability gradient is now substantially a function of *which tooling tier* an adversary buys into, not only of bespoke skill.
+
+::: {.next-page}
+**Next:** [Economics of automation](economics-of-automation.qmd)
+:::
+
+## Sources used on this page
+
+::: {.sources-used}
+
+- **Bright Data** — Bright Data (2026). *Web Unlocker, Browser API, proxies, agentic web execution*.
+- **cloud-browser/agent vendor docs** — Browserless / Browserbase / Hyperbrowser (2026). *Cloud-browser & agent documentation*.
+- **Iliou 2022** — Iliou, C. (2022). *Machine Learning Based Detection and Evasion Techniques for Advanced Web Bots*. PhD thesis, Bournemouth University.
+- **Iliou et al. 2019** — Iliou, C., et al. (2019). *Towards a framework for detecting advanced web bots*. ARES 2019.
+- **Martínez Llamas et al. 2025** — Martínez Llamas, et al. (2025). *Balancing Security and Privacy: Web Bot Detection, Privacy Challenges, and Regulatory Compliance under the GDPR and AI Act*.
+- **niespodd** — niespodd (n.d./ongoing). *Avoiding bot detection: How to scrape the web without getting blocked?* (browser-fingerprinting notes).
+- **Playwright/Puppeteer/Selenium docs** — Playwright, Puppeteer, Selenium (2026). *Official project documentation*.
+- **puppeteer-extra-plugin-stealth** — berstend (2018–2023). *puppeteer-extra-plugin-stealth* (GitHub/npm).
+- **RoundProxies, Rnet** — RoundProxies / Bernard, M. (2025). *How to Use Rnet: The Blazing-Fast Python HTTP Client*.
+- **ScrapFly, anti-scraping bypass** — ScrapFly (2025–2026). *Anti-scraping bypass, stealth, proxies, fingerprints, Cloudflare bypass*.
+- **ScrapingBee, PerimeterX bypass** — ScrapingBee / Krukowski (2026). *How To Bypass PerimeterX Anti-Bot Protection System In 2026*.
+- **ScrapingBee, web-scraping API** — ScrapingBee (2026). *The Best Web Scraping API to Avoid Getting Blocked*.
+- **undetected-chromedriver** — ultrafunkamsterdam (2021–2024). *undetected-chromedriver* (GitHub/PyPI).
+- **Wang et al. 2026, FP-Agent** — Wang, Shafiq & Vekaria (2026). *FP-Agent: Fingerprinting AI Browsing Agents*.
+
+:::

@@ -1,0 +1,50 @@
+---
+title: "Threat model"
+format:
+    html:
+        toc: false
+        toc-depth: 3
+        number-sections: false
+        css: background.css
+---
+
+::: {.lead}
+This page defines the abuse types and threat vocabulary used in the background section.
+:::
+
+The underlying problem is constant across every abuse type the project covers: **automated activity at scale, directed at endpoints and flows built for human users, to extract value or cause harm**. The web or mobile interface is the attack surface; the automation is the adversary; the asset is whatever the flow protects — inventory, credentials, content, ad budget, account state.
+
+The field's nearest thing to a shared vocabulary for this is the **OWASP Automated Threats to Web Applications** project, which the project adopts as the spine for threat-type naming ([OWASP]{.source-ref}). The full **Automated Threat Handbook v1.3** is now extracted, giving all 21 OAT categories plus the handbook's countermeasure classes ([OWASP, Automated Threat Handbook v1.3]{.source-ref}). A few properties of OAT matter for how it is used here:
+
+- It defines a fixed set of automated-threat *events* — currently 21, codes OAT-001 to OAT-021. The handbook gives each a description, the sectors it targets, the parties affected, and cross-mappings to CAPEC and WASC.
+- It is explicitly an **ontology, not a ranked list**. The identification numbers were assigned arbitrarily, which is why the events are usually written alphabetically — there is no implied ordering or severity. This is a useful corrective to the instinct to read any security list as a Top-N.
+- It names *abuse of intended functionality by automated means*, not implementation vulnerabilities. This is the right frame for the project: the flows under attack are working as designed; the problem is that they were designed for humans.
+
+The abuse types in the project's scope map onto OAT cleanly, which is part of why OAT is the spine.
+
+- **Credential abuse.** Credential stuffing — replaying breached username/password pairs against a login (OAT-008) — and credential cracking — brute-forcing or guessing credentials against the auth flow (OAT-007). The distinction matters: stuffing tests *known* pairs, cracking searches a space. Both terminate in account takeover. This is now one of the better-evidenced areas: an end-to-end vendor-measured account of the credential-stuffing landscape ([F5 Labs 2021]{.source-ref}) and an independent honey-identity measurement of leaked-credential use ([Wardle 2019]{.source-ref}) sit alongside the OAT mapping — though the F5 telemetry is 2020-era tooling and Wardle's experiment is small, dated, and paste-site-only.
+- **Account creation.** Mass creation of fake accounts (OAT-019), as the entry point for spam, fraud, and abuse that wears the appearance of a different "user" each time.
+- **Scraping.** Bulk extraction of content or data for use elsewhere (OAT-011) — including, increasingly, for LLM training and retrieval, which OWASP's own scraping entry now lists among the scraper types.
+- **Scarcity and scalping.** Acquiring limited inventory ahead of legitimate buyers (scalping, OAT-005) and depleting it without ever purchasing (denial of inventory, OAT-021). The two differ in whether the goods are actually acquired. This is the one OAT area where the register now carries evidence beyond taxonomy: a public-sector appointment-abuse account ([DVSA 2023]{.source-ref}) and a US enforcement record ([FTC 2021]{.source-ref}) document automated monitoring, holding, and resale of scarce slots/tickets — cited as platform-reported behaviour and FTC allegations/orders respectively, not as prevalence.
+- **Ad and click fraud.** Falsifying impressions or clicks to drain or siphon ad spend (ad fraud, OAT-003).
+- **Payment-flow abuse.** Carding and card-cracking — validating or brute-forcing stolen card data against payment forms — sit here. A vendor-measured snapshot now lists payment-flow/carding abuse among observed bot activity ([Thales/Imperva 2026]{.source-ref}).
+- **Reconnaissance.** Footprinting (OAT-018) and related probing that precedes the rest.
+- **Loyalty, promotion, and stored-value abuse**, and **API / business-logic abuse**, which OWASP treats partly through the events above and partly as cross-cutting.
+
+::: {.next-page}
+**Next:** [Booking-style example](booking-style-system.qmd)
+:::
+
+## Sources used on this page
+
+::: {.sources-used}
+
+- **DVSA 2023** — DVSA / Ryder (2023). *How we’re dealing with bots and the reselling of driving tests*.
+- **F5 Labs 2021** — F5 Labs / Vinberg, S., & Overson, J. (2021). *2021 Credential Stuffing Report*.
+- **FTC 2021** — Federal Trade Commission (2021). *FTC Brings First-Ever Cases Under the BOTS Act*.
+- **OWASP** — OWASP Foundation (n.d.). *Automated Threats to Web Applications* (project page).
+- **OWASP, Automated Threat Handbook v1.3** — OWASP / Watson, C., & Zaw, T. (2026). *Automated Threat Handbook: Web Applications v1.3*.
+- **Thales/Imperva 2026** — Thales / Imperva (2026). *2026 Thales Bad Bot Report: Bad Bots in the Agentic Age*.
+- **Wardle 2019** — Wardle (2019). *How long does it take to get owned?* (honey-identity leaked-credential experiment).
+
+:::

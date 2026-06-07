@@ -1,0 +1,40 @@
+---
+title: "Economics of automation"
+format:
+    html:
+        toc: false
+        toc-depth: 3
+        number-sections: false
+        css: background.css
+---
+
+::: {.lead}
+This page looks at the adversary-side cost structure of web automation, not the criminal markets behind it.
+:::
+
+The economics the project can speak to honestly is the **cost the adversary faces**, because that is what defences are trying to move. The clearest framing in the register is the attacker-cost model: defences that raise the per-request or per-success cost of automation — challenges, proof-of-execution, fingerprint friction — aim to make abuse uneconomic rather than impossible ([Arkose]{.source-ref}; [Kasada]{.source-ref}). Kasada's material in particular puts concrete prices on the inputs to an attack — solver services, proxy bandwidth, CAPTCHA-solving — as evidence of how cheap and commoditised the supply side has become; these pricing claims are vendor-reported and not independently audited ([Kasada]{.source-ref}).
+
+The supply side is corroborated, in a softer sense, by the existence and positioning of the managed-tooling vendors themselves. Anti-scraping-as-a-service, residential proxy networks, and cloud-browser platforms are sold openly with compliance-framed marketing ([ScrapFly, anti-scraping bypass]{.source-ref}; [Bright Data]{.source-ref}). The register now widens this picture: scraping is packaged as a routine commercial workflow with anti-bot handling sold as a core buying criterion ([ScrapingBee, web-scraping API]{.source-ref}; [ScrapingBee, price-scraping tools]{.source-ref}), and the scraper-side anti-detection ecosystem is mapped as a tooling market in its own right ([niespodd]{.source-ref}).
+
+A vendor-measured snapshot also reports proxy and solver use as standard inputs in the current "agentic age" of bot activity ([Thales/Imperva 2026]{.source-ref}). That these products exist as polished commercial offerings is itself evidence that the cost of entry to large-scale automation has collapsed. It says much less about how often they are used for abuse versus legitimate data collection, a distinction the vendors are careful to draw and the project should not blur.
+
+What this section deliberately does **not** cover: who profits from abuse, how proceeds are laundered or moved, or the structure of the criminal markets behind it. That is the out-of-scope "criminal economics" boundary noted in the landing page.
+
+::: {.next-page}
+**Next:** [Commercial defender landscape](commercial-defender-landscape.qmd)
+:::
+
+## Sources used on this page
+
+::: {.sources-used}
+
+- **Arkose** — Arkose Labs (2023–2026). *Bot Manager; ACTIR; Agentic AI Security Report*.
+- **Bright Data** — Bright Data (2026). *Web Unlocker, Browser API, proxies, agentic web execution*.
+- **Kasada** — Kasada (2025–2026). *Bot Defense; Adversarial Techniques; AI Agent Trust; 2026 Benchmark*.
+- **niespodd** — niespodd (n.d./ongoing). *Avoiding bot detection: How to scrape the web without getting blocked?* (browser-fingerprinting notes).
+- **ScrapFly, anti-scraping bypass** — ScrapFly (2025–2026). *Anti-scraping bypass, stealth, proxies, fingerprints, Cloudflare bypass*.
+- **ScrapingBee, price-scraping tools** — ScrapingBee (2026). *Best Price Scraping Tools for 2026: Top Services Compared*.
+- **ScrapingBee, web-scraping API** — ScrapingBee (2026). *The Best Web Scraping API to Avoid Getting Blocked*.
+- **Thales/Imperva 2026** — Thales / Imperva (2026). *2026 Thales Bad Bot Report: Bad Bots in the Agentic Age*.
+
+:::

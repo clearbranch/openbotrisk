@@ -1,0 +1,34 @@
+---
+title: "Booking-style example"
+format:
+    html:
+        toc: false
+        toc-depth: 3
+        number-sections: false
+        css: background.css
+---
+
+::: {.lead}
+This page gives a worked example for scarce-inventory transactional systems: appointments, ticketing, reservations, and similar services.
+:::
+
+Throughout the project a mid-sized company running a **booking-style transactional system** — ticketing, reservations, appointment scheduling — anchors the abstract claims. It has the properties that make bot pressure an operational problem rather than a theoretical one: limited inventory or capacity, transactions with real value, a web/mobile interface as the primary surface, and limited in-house security capacity.
+
+Most of the OAT events from the threat model have a concrete reading against this system: scalping and denial of inventory against limited slots, credential stuffing against the account layer, scraping of availability and pricing, and API abuse against the booking endpoints ([OWASP]{.source-ref}; [OWASP, Automated Threat Handbook v1.3]{.source-ref}).
+
+The example is illustrative, not constitutive — the analysis aims to be general — but it keeps the threat model grounded. Two register sources give it real-world instances rather than hypotheticals: the DVSA's account of automated booking and reselling of driving-test appointments is a near-exact match for the worked example in a public-sector setting ([DVSA 2023]{.source-ref}), and the FTC's first BOTS Act cases document the same pattern against event ticketing ([FTC 2021]{.source-ref}). Both are platform/enforcement reports, not measurements, so they evidence that the pattern occurs — not how prevalent it is.
+
+::: {.next-page}
+**Next:** [Adversary model](adversary-model.qmd)
+:::
+
+## Sources used on this page
+
+::: {.sources-used}
+
+- **DVSA 2023** — DVSA / Ryder (2023). *How we’re dealing with bots and the reselling of driving tests*.
+- **FTC 2021** — Federal Trade Commission (2021). *FTC Brings First-Ever Cases Under the BOTS Act*.
+- **OWASP** — OWASP Foundation (n.d.). *Automated Threats to Web Applications* (project page).
+- **OWASP, Automated Threat Handbook v1.3** — OWASP / Watson, C., & Zaw, T. (2026). *Automated Threat Handbook: Web Applications v1.3*.
+
+:::

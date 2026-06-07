@@ -5,6 +5,8 @@ project:
     - index.qmd
     - site/**/*.qmd
     - site/**/*.md
+    - "!site/background/index-old.qmd"
+    - "!site/background/index-long-draft.qmd"
 
 website:
   title: "openbotrisk"
@@ -37,8 +39,24 @@ website:
             text: "08. Automation techniques"
           - href: site/foundations/09-types-of-automated-threats.md
             text: "09. Types of automated threats"
-      - href: site/background/index.qmd
-        text: Background
+      - text: Background
+        menu:
+          - href: site/background/index.qmd
+            text: Overview
+          - href: site/background/threat-model.qmd
+            text: Threat model
+          - href: site/background/booking-style-system.qmd
+            text: Booking-style example
+          - href: site/background/adversary-model.qmd
+            text: Adversary model
+          - href: site/background/economics-of-automation.qmd
+            text: Economics of automation
+          - href: site/background/commercial-defender-landscape.qmd
+            text: Commercial defender landscape
+          - href: site/background/ai-agent-shift.qmd
+            text: AI-agent shift
+          - href: site/background/background-status.md
+            text: Background status
       - href: site/techniques/index.qmd
         text: Techniques
       - href: site/methodology/index.qmd
