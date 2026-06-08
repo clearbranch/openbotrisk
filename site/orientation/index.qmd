@@ -1,8 +1,8 @@
 ---
 title: "Orientation"
 
-image: ../assets/openbotrisk_banner_panel_02.png
-title-block-banner: ../assets/openbotrisk_banner_panel_02.png
+image: ../assets/openbotrisk_banner_panel_08.png
+title-block-banner: ../assets/openbotrisk_banner_panel_08.png
 title-block-banner-color: "#ffffff"
 ---
 
