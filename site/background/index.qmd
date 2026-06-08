@@ -8,8 +8,8 @@ format:
         number-sections: false
         css: background.css
 
-image: ../assets/openbotrisk_banner_panel_01.png
-title-block-banner: ../assets/openbotrisk_banner_panel_01.png
+image: ../assets/openbotrisk_banner_panel_09.png
+title-block-banner: ../assets/openbotrisk_banner_panel_09.png
 title-block-banner-color: "#ffffff"
 ---
 

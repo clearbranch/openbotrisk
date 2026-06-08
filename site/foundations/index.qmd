@@ -1,7 +1,7 @@
 ---
 title: "Foundations"
 
-image: ../assets/openbotrisk_banner_panel_04.png
+image: ../assets/openbotrisk_banner_panel_06.png
 title-block-banner: ../assets/openbotrisk_banner_panel_06.png
 title-block-banner-color: "#ffffff"
 ---

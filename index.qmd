@@ -1,8 +1,8 @@
 ---
 title: "openbotrisk"
 subtitle: "Bot and abuse prevention — demystified."
-image: site/assets/openbotrisk_banner_01-cold-future-continuous.png
-title-block-banner: site/assets/openbotrisk_banner_01-cold-future-continuous.png
+image: site/assets/openbotrisk_banner_10-cold-future-continuous.png
+title-block-banner: site/assets/openbotrisk_banner_10-cold-future-continuous.png
 title-block-banner-color: "#ffffff"
 ---
 
