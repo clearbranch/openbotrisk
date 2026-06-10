@@ -7,3 +7,7 @@ This section contains concrete experiments and reproducible demonstrations showi
 ## Investigations
 
 - **[Identifier graphs and behavioural synchrony](identifier-graph-and-synchrony.qmd)** — a synthetic experiment showing why shared identifiers and coordinated behaviour reveal different kinds of account clusters, and why both methods need false-positive controls.
+
+## Code
+
+The supporting code for the first investigation is in `experiments/identifier-synchrony/`. It is written as plain Python scripts rather than a notebook so the website page can stay narrative while the figures remain reproducible.
