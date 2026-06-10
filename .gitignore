@@ -36,6 +36,7 @@ _freeze/
 # Data (large files, often licence-restricted)
 data/
 !data/README.md
+experiments/identifier-synchrony/generated/
 
 # macOS
 .DS_Store

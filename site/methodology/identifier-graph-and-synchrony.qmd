@@ -1,0 +1,81 @@
+---
+title: "Identifier graphs and behavioural synchrony"
+description: "A synthetic experiment showing why shared identifiers and coordinated behaviour reveal different kinds of account clusters."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: false
+---
+
+::: {.lead}
+This experiment demonstrates two ways of finding coordinated account groups: linking accounts through reused identifiers, and linking accounts through repeated behaviour against the same targets at the same time.
+:::
+
+The point is methodological, not operational. The data is synthetic, and the abusive groups are detectable by construction. That makes the experiment useful for seeing the mechanics of each method, but it is not evidence that either method would achieve the same detection rates in production telemetry.
+
+## What the experiment tests
+
+The synthetic population contains five groups:
+
+| Group | Role in the experiment |
+|---|---|
+| `legit` | Ordinary users, including households and a shared university network that create benign identifier overlap. |
+| `travel_agent` | A benign tight cluster sharing an office IP and card, included as a false-positive trap. |
+| `ring_lazy` | An abusive ring with heavy reuse of cards, devices, IPs, and phones. |
+| `ring_careful` | An abusive ring with unique identifiers, but coordinated behaviour. |
+| `ring_mid` | A mixed case with partial device reuse and looser behavioural synchrony. |
+
+The generated tables are deliberately simple:
+
+- `users.csv` contains accounts, registration time, identifiers, ASN, group label, and a simulated CAPTCHA-hit flag.
+- `events.csv` contains timestamped actions against targets.
+
+The ground-truth labels are only available because this is synthetic. In a real setting, those labels would come from review outcomes, confirmed abuse cases, chargebacks, takedowns, or other imperfect feedback loops.
+
+## Method 1: shared-identifier graph
+
+The first method builds a bipartite graph of users and identifiers, then projects it into a user-user graph. Two users are connected when they share identifiers such as card, phone, device, email, or IP. The method then prunes promiscuous identifiers, weights rarer shared identifiers more strongly, and scores clusters using shrunk CAPTCHA rate and registration burstiness.
+
+![Identifier graph clustering: identifier degree distribution, user-user projection, and cluster scoring.](images/method1_identifier_graph.png){fig-alt="Three-panel chart showing the identifier degree distribution, a projected user graph coloured by synthetic ground truth, and cluster size versus shrunk CAPTCHA rate."}
+
+This catches the lazy ring because it reuses high-value identifiers. It also shows why naive graph clustering can be dangerous: a shared university egress IP creates a large benign component, and the travel-agent group is a legitimate tight cluster. The method needs pruning, weighting, scoring, and review context rather than a simple rule that any connected component is bad.
+
+The careful ring is mostly absent from this view. That is the failure mode the experiment is designed to surface: if every account has fresh identifiers, an identifier graph has little to connect.
+
+## Method 2: behavioural synchrony
+
+The second method ignores shared identifiers and instead links accounts that repeatedly perform the same action against the same target in the same time window. The script tokenises events as `(action, target, time_bucket)`, uses overlapping buckets to avoid boundary misses, drops overly popular tokens, and creates edges for account pairs with enough shared tokens and sufficient Jaccard similarity.
+
+![Behavioural synchrony clustering: event raster and method coverage by group.](images/method2_synchrony.png){fig-alt="Two-panel chart showing an event raster with coordinated vertical stripes, and a bar chart comparing identifier graph and behavioural synchrony coverage by group."}
+
+This catches the careful ring because its identifiers are unique but its behaviour is coordinated. It also complements the identifier graph: one method sees shared infrastructure, while the other sees shared timing and targets. The mixed ring is intentionally harder, because loose synchrony and partial reuse sit near the tuning boundary.
+
+## Tuning tradeoff
+
+The bucket-width sweep makes the main tuning problem visible. Narrow windows reduce coincidental co-occurrence, but can fragment coordinated groups with jitter. Wider windows recover looser rings, but admit more ordinary users who happen to touch the same target in the same period.
+
+![Sensitivity of behavioural synchrony detection to time-bucket width.](images/method2_bucket_sweep.png){fig-alt="Line chart showing share of each synthetic group detected as the behavioural synchrony time-bucket width increases."}
+
+This is the useful lesson from the experiment: behavioural synchrony is not a magic detector. It is a similarity model with parameters, and those parameters trade recall against false positives. The right setting depends on the action type, target popularity, campaign tempo, user base, and review cost.
+
+## What this demonstrates
+
+This demonstration supports three limited claims:
+
+- Identifier reuse can reveal clusters that would be missed by single-account scoring.
+- Coordinated behaviour can reveal clusters even when account identifiers are unique.
+- Both methods need false-positive controls because ordinary users can share identifiers or behaviour for benign reasons.
+
+It does not measure real-world prevalence, production false-positive rates, or adversarial effectiveness. The value is that the failure modes are visible: shared benign infrastructure can fool identifier graphs, and timing windows can make behavioural synchrony either too brittle or too broad.
+
+## Reproducibility
+
+The runnable scripts live in `experiments/identifier-synchrony/`. They generate the synthetic data, rerun both methods, and update the figures used on this page.
+
+```bash
+python experiments/identifier-synchrony/generate_data.py
+python experiments/identifier-synchrony/method1_identifier_graph.py
+python experiments/identifier-synchrony/method2_synchrony.py
+python experiments/identifier-synchrony/method2_bucket_sweep.py
+```

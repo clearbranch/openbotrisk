@@ -65,8 +65,12 @@ website:
             text: Background status
       - href: site/techniques/index.qmd
         text: Techniques
-      - href: site/methodology/index.qmd
-        text: Methodology
+      - text: Methodology
+        menu:
+          - href: site/methodology/index.qmd
+            text: Overview
+          - href: site/methodology/identifier-graph-and-synchrony.qmd
+            text: Identifier graphs and synchrony
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;
