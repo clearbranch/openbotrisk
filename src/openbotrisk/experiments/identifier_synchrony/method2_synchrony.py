@@ -25,24 +25,23 @@ the same idea. SynchroTrap itself ran as a series of daily MapReduce
 jobs aggregated over weeks.
 """
 
+# ruff: noqa: I001
+
 from collections import defaultdict
 from itertools import combinations
-
-import numpy as np
-import pandas as pd
-import networkx as nx
 import os
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
-import matplotlib
+import matplotlib  # noqa: E402
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
+import matplotlib.pyplot as plt  # noqa: E402
+import networkx as nx
+import pandas as pd
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[1]
-DATA_DIR = SCRIPT_DIR / "generated"
+REPO_ROOT = SCRIPT_DIR.parents[3]
+DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
 IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -77,7 +76,7 @@ for u, toks in user_tokens.items():
 
 pair_shared = defaultdict(int)
 dropped_tokens = 0
-for t, us in token_users.items():
+for _t, us in token_users.items():
     if len(us) < 2:
         continue
     if len(us) > TOKEN_USER_CAP:    # popular item in a popular hour: not signal

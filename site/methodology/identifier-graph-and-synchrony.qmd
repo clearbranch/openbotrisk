@@ -14,7 +14,7 @@ This experiment demonstrates two ways of finding coordinated account groups: lin
 
 The point is methodological, not operational. The data is synthetic, and the abusive groups are detectable by construction. That makes the experiment useful for seeing the mechanics of each method, but it is not evidence that either method would achieve the same detection rates in production telemetry.
 
-The code for this page lives in `experiments/identifier-synchrony/`. The scripts are kept outside the website tree so the page can stay readable while the implementation remains reproducible.
+The code for this page lives in `src/openbotrisk/experiments/identifier_synchrony/`. The scripts are kept outside the website tree so the page can stay readable while the implementation remains reproducible.
 
 ## What the experiment tests
 
@@ -40,7 +40,7 @@ The ground-truth labels are only available because this is synthetic. In a real 
 The generator creates a deliberately mixed population rather than a clean "bots versus humans" toy dataset. The important feature is that the benign and abusive groups overlap in ways that force the two methods to fail differently.
 
 ```python
-# Simplified from experiments/identifier-synchrony/generate_data.py
+# Simplified from src/openbotrisk/experiments/identifier_synchrony/generate_data.py
 users.append(dict(
     user_id=uid,
     group="ring_careful",
@@ -76,6 +76,22 @@ def campaign(uids, start, n_waves, wave_gap_h, targets_pool,
 ```
 
 That function is the source of the synchrony signal: many accounts touch the same targets in repeated waves, but with enough jitter that the bucket width matters. The legitimate users and travel-agent accounts also generate ordinary browsing events, so the methods have benign overlap to contend with.
+
+::: {.callout-note collapse="true" title="Graph terms used here"}
+This experiment uses graph language in a narrow, practical way.
+
+- **Node**: an object in the graph. Here, nodes are either accounts or identifiers.
+- **Edge**: a link between two nodes. In the first graph, an edge means "this account used this identifier."
+- **Identifier**: a value that can connect accounts, such as a card, phone, email, device ID, or IP address.
+- **Bipartite graph**: a graph with two kinds of nodes, where edges only go between the two kinds. Here, one side is accounts and the other side is identifiers. Accounts do not directly connect to accounts at this stage.
+- **User-identifier graph**: the specific bipartite graph used here: `account -> identifier`.
+- **Projection**: turning the account-identifier graph into an account-account graph. If two accounts share an identifier, the projection creates an account-account edge.
+- **Weighted edge**: an edge with a strength value. Here, a shared card is treated as stronger evidence than a shared IP, and an identifier shared by a few accounts is stronger than one shared by many.
+- **Connected component**: a set of nodes connected by some path. In an account graph, a component is a group of accounts linked directly or indirectly by shared identifiers.
+- **Community detection**: a graph method that splits a large component into denser subgroups. The script uses Louvain community detection for this when a component gets too large.
+
+The key move is the projection. The raw data says "account A used IP X" and "account B used IP X." The projected graph says "account A and account B are linked because they share IP X." That projected account graph is easier to cluster and score.
+:::
 
 ## Method 1: shared-identifier graph
 
@@ -134,6 +150,22 @@ shrunk = (grp.captcha_hit.sum() + K_SHRINK * BASE_RATE) / (n + K_SHRINK)
 ```
 
 That stops tiny clusters with one or two CAPTCHA hits from leaping to the top purely because their denominator is small. The score is intentionally simple: it is there to show the pattern, not to propose a deployable risk model.
+
+::: {.callout-note collapse="true" title="Similarity terms used here"}
+The second method uses similarity language rather than identifier-linking language.
+
+- **Event**: one recorded action by one account, such as viewing an item or starting checkout.
+- **Target**: the thing acted on, such as a product, listing, ticket, slot, page, or booking option.
+- **Behavioural token**: a compact representation of an event. In this experiment a token is `(action, target, time_bucket)`, meaning "this account did this thing to this target in this window."
+- **Time bucket**: a fixed-width time window. A one-hour bucket groups events into one-hour slices.
+- **Overlapping bucket**: a second shifted set of windows. This prevents two almost simultaneous events from being split just because they fall on opposite sides of a bucket boundary.
+- **Inverted index**: a lookup table from token to accounts. Instead of comparing every account to every other account, the script first asks "which accounts shared this token?"
+- **Candidate pair**: a pair of accounts worth comparing because they shared at least one token.
+- **Jaccard similarity**: the size of the overlap divided by the size of the union. If two accounts share many behavioural tokens relative to their total activity, their Jaccard similarity is high.
+- **Threshold**: a cutoff for turning a score into a graph edge. The synchrony graph only links accounts if they share enough tokens and their Jaccard similarity is high enough.
+
+The point of Jaccard is to avoid treating two very active accounts as similar just because they have a few coincidences. It asks whether the overlap is large relative to each account's total behaviour.
+:::
 
 ## Method 2: behavioural synchrony
 
@@ -245,23 +277,34 @@ It does not measure real-world prevalence, production false-positive rates, or a
 
 ## Reproducibility
 
-The runnable scripts live in `experiments/identifier-synchrony/`. They generate the synthetic data, rerun both methods, and update the figures used on this page.
+The runnable scripts live in `src/openbotrisk/experiments/identifier_synchrony/`. They generate the synthetic data, rerun both methods, and update the figures used on this page.
 
 ```bash
-python experiments/identifier-synchrony/generate_data.py
-python experiments/identifier-synchrony/method1_identifier_graph.py
-python experiments/identifier-synchrony/method2_synchrony.py
-python experiments/identifier-synchrony/method2_bucket_sweep.py
+python src/openbotrisk/experiments/identifier_synchrony/generate_data.py
+python src/openbotrisk/experiments/identifier_synchrony/method1_identifier_graph.py
+python src/openbotrisk/experiments/identifier_synchrony/method2_synchrony.py
+python src/openbotrisk/experiments/identifier_synchrony/method2_bucket_sweep.py
 ```
+
+::: {.callout-note collapse="true" title="Packages used"}
+The implementation uses a small Python stack:
+
+- **`pandas`**: stores the synthetic `users` and `events` tables, groups rows, calculates group-level summaries, and writes CSV outputs.
+- **`numpy`**: provides reproducible random generation and simple numeric operations.
+- **`networkx`**: builds the bipartite graph, projects it into user-user graphs, finds connected components, and runs Louvain community detection.
+- **`matplotlib`**: creates the static figures used on this page.
+
+`networkx` is a good choice for this demonstration because it is readable and widely used. It is not the right tool for production-scale account graphs with millions of accounts and high-degree identifiers. At that scale, the same method would usually move to graph databases, distributed jobs, igraph/Leiden tooling, or approximate similarity methods.
+:::
 
 The scripts are ordered because Method 2 reads the Method 1 output when producing the combined coverage comparison:
 
 | Script | Reads | Writes |
 |---|---|---|
-| `generate_data.py` | none | `generated/users.csv`, `generated/events.csv` |
-| `method1_identifier_graph.py` | `generated/users.csv` | `generated/users_m1.csv`, `site/methodology/images/method1_identifier_graph.png` |
-| `method2_synchrony.py` | `generated/events.csv`, `generated/users_m1.csv` | `generated/users_final.csv`, `site/methodology/images/method2_synchrony.png` |
-| `method2_bucket_sweep.py` | `generated/events.csv`, `generated/users.csv` | `site/methodology/images/method2_bucket_sweep.png` |
+| `generate_data.py` | none | `experiments/identifier-synchrony/generated/users.csv`, `experiments/identifier-synchrony/generated/events.csv` |
+| `method1_identifier_graph.py` | `experiments/identifier-synchrony/generated/users.csv` | `experiments/identifier-synchrony/generated/users_m1.csv`, `site/methodology/images/method1_identifier_graph.png` |
+| `method2_synchrony.py` | `experiments/identifier-synchrony/generated/events.csv`, `experiments/identifier-synchrony/generated/users_m1.csv` | `experiments/identifier-synchrony/generated/users_final.csv`, `site/methodology/images/method2_synchrony.png` |
+| `method2_bucket_sweep.py` | `experiments/identifier-synchrony/generated/events.csv`, `experiments/identifier-synchrony/generated/users.csv` | `site/methodology/images/method2_bucket_sweep.png` |
 
 The generated CSVs are ignored by Git because they are deterministic rebuild artifacts. The figures are checked into the site tree because the website needs them when rendered.
 

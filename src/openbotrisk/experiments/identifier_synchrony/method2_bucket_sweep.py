@@ -9,24 +9,23 @@ more coincidental co-occurrence from legitimate users. Sweep it and
 look at both curves.
 """
 
+# ruff: noqa: I001
+
 from collections import defaultdict
 from itertools import combinations
-
-import numpy as np
-import pandas as pd
-import networkx as nx
 import os
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
-import matplotlib
+import matplotlib  # noqa: E402
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-
+import matplotlib.pyplot as plt  # noqa: E402
+import networkx as nx
+import pandas as pd
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[1]
-DATA_DIR = SCRIPT_DIR / "generated"
+REPO_ROOT = SCRIPT_DIR.parents[3]
+DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
 IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -54,7 +53,7 @@ def run(bucket_hours):
             token_users[t].append(u)
 
     pair_shared = defaultdict(int)
-    for t, us in token_users.items():
+    for _t, us in token_users.items():
         if 2 <= len(us) <= TOKEN_USER_CAP:
             for u, v in combinations(sorted(us), 2):
                 pair_shared[(u, v)] += 1

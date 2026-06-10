@@ -21,21 +21,23 @@ users), networkx is the wrong tool -- use igraph/leidenalg or a graph DB;
 the *logic* is identical.
 """
 
-import numpy as np
-import pandas as pd
-import networkx as nx
+# ruff: noqa: I001
+
 import os
 from pathlib import Path
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
-import matplotlib
+import matplotlib  # noqa: E402
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # noqa: E402
+import networkx as nx
+import numpy as np
+import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[1]
-DATA_DIR = SCRIPT_DIR / "generated"
+REPO_ROOT = SCRIPT_DIR.parents[3]
+DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
 IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -165,7 +167,8 @@ nx.draw_networkx_nodes(sub, pos, node_size=18, ax=ax,
 nx.draw_networkx_edges(sub, pos, alpha=0.15, ax=ax)
 for g, c in palette.items():
     ax.scatter([], [], color=c, label=g, s=30)
-ax.legend(fontsize=8); ax.set_axis_off()
+ax.legend(fontsize=8)
+ax.set_axis_off()
 ax.set_title("User-user projection, coloured by ground truth\n"
              "(ring_careful absent: nothing to link)")
 

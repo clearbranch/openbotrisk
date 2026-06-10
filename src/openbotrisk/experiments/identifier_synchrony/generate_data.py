@@ -25,14 +25,16 @@ Honesty note: synthetic data demonstrates the *mechanics*, not the
 *effectiveness*, of these methods. The rings are detectable by construction.
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from pathlib import Path
 
 rng = np.random.default_rng(42)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-DATA_DIR = SCRIPT_DIR / "generated"
+REPO_ROOT = SCRIPT_DIR.parents[3]
+DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
 DATA_DIR.mkdir(exist_ok=True)
 
 T0 = pd.Timestamp("2026-01-01")
@@ -111,7 +113,9 @@ agent_uids = []
 for _ in range(25):
     uid = new_uid()
     agent_uids.append(uid)
-    email_i += 1; phone_i += 1; dev_i += 1
+    email_i += 1
+    phone_i += 1
+    dev_i += 1
     users.append(dict(
         user_id=uid, group="travel_agent",
         reg_ts=rand_ts_organic(1)[0],          # organic accumulation
@@ -125,10 +129,14 @@ for _ in range(25):
 # ----------------------------------------------------------------- ring_lazy
 # 60 accounts, 5 cards, 8 devices, 4 datacenter IPs, 3 phones. Registered in
 # two bursts. High captcha rate. Heavy identifier reuse = Method 1 fodder.
-lazy_cards   = [ident("card_", card_i + 1 + i) for i in range(5)];  card_i += 5
-lazy_devs    = [ident("dev_",  dev_i  + 1 + i) for i in range(8)];  dev_i  += 8
-lazy_ips     = [ident("ip_dc_", ip_i  + 1 + i) for i in range(4)];  ip_i   += 4
-lazy_phones  = [ident("ph_",  phone_i + 1 + i) for i in range(3)];  phone_i += 3
+lazy_cards = [ident("card_", card_i + 1 + i) for i in range(5)]
+card_i += 5
+lazy_devs = [ident("dev_", dev_i + 1 + i) for i in range(8)]
+dev_i += 8
+lazy_ips = [ident("ip_dc_", ip_i + 1 + i) for i in range(4)]
+ip_i += 4
+lazy_phones = [ident("ph_", phone_i + 1 + i) for i in range(3)]
+phone_i += 3
 lazy_uids = []
 burst_starts = [T0 + pd.Timedelta(days=20), T0 + pd.Timedelta(days=21)]
 for k in range(60):
@@ -154,7 +162,11 @@ careful_uids = []
 for k in range(50):
     uid = new_uid()
     careful_uids.append(uid)
-    card_i += 1; email_i += 1; phone_i += 1; ip_i += 1; dev_i += 1
+    card_i += 1
+    email_i += 1
+    phone_i += 1
+    ip_i += 1
+    dev_i += 1
     users.append(dict(
         user_id=uid, group="ring_careful",
         reg_ts=T0 + pd.Timedelta(days=40) + pd.Timedelta(hours=float(k * 3 + rng.uniform(0, 2))),
@@ -168,12 +180,16 @@ for k in range(50):
 
 # ------------------------------------------------------------------ ring_mid
 # 40 accounts, 12 devices reused, unique cards/IPs. Loose synchrony.
-mid_devs = [ident("dev_", dev_i + 1 + i) for i in range(12)]; dev_i += 12
+mid_devs = [ident("dev_", dev_i + 1 + i) for i in range(12)]
+dev_i += 12
 mid_uids = []
-for k in range(40):
+for _k in range(40):
     uid = new_uid()
     mid_uids.append(uid)
-    card_i += 1; email_i += 1; phone_i += 1; ip_i += 1
+    card_i += 1
+    email_i += 1
+    phone_i += 1
+    ip_i += 1
     users.append(dict(
         user_id=uid, group="ring_mid",
         reg_ts=T0 + pd.Timedelta(days=60) + pd.Timedelta(hours=float(rng.uniform(0, 96))),
