@@ -37,6 +37,7 @@ _freeze/
 data/
 !data/README.md
 experiments/identifier-synchrony/generated/
+experiments/fingerprint-identification/generated/
 
 # macOS
 .DS_Store

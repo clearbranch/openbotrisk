@@ -94,48 +94,108 @@ All four assign an ID to every visit; they differ only in how much they reason a
 
 ### A. Stateless exact hash {#sec-a}
 
-The documented open-source pattern. Concatenate all attributes, hash, done. Any drift produces a new ID; any clone shares an ID. There is no notion of a chain at all.
+The documented open-source pattern. Concatenate all attributes, hash, done. The code is trivial, and that triviality *is* the finding: there is no notion of a chain, no memory, no tolerance — the entire method is one line of string-joining.
 
 ```python
-def fp_hash(row):
-    s = "|".join(str(row[a]) for a in ATTRS)
-    return hashlib.md5(s.encode()).hexdigest()[:12]   # stand-in for murmur3
+def fp_hash(visit):
+    return hashlib.md5("|".join(str(visit[a]) for a in ATTRS).encode()).hexdigest()
 ```
+
+Any drift produces a new ID; any clone shares an ID. Everything that follows exists because of those two sentences.
 
 ### B. Constraint-chain linking {#sec-b}
 
-A reconstruction of FP-STALKER's rule-based variant. Maintain chains. A new visit joins an existing chain if hard constraints hold (same OS, browser family, device type; version never decreases) and at most `MAX_DIFFS` soft attributes differ. Ties break toward fewest differences, then recency.
+A reconstruction of FP-STALKER's rule-based variant. The mechanism — shared by every method from here on — is a sequential linking loop: each visit, in time order, either joins the best-scoring existing chain or founds a new one. The assigned ID *is* the chain.
 
 ```python
-def rule_scorer(eq, vgap, tgap):
-    diffs = (1 - eq).sum(axis=1)
-    s = -diffs - 1e-3 * tgap          # fewest diffs wins; recency breaks ties
-    s[diffs > MAX_DIFFS] = -np.inf    # too different -> not the same browser
-    return s
+# Simplified from fp_methods.py -- the loop B, C and D all share
+for visit in visits_in_time_order:
+    candidates = [ch for ch in chains
+                  if ch.hard_key == visit.hard_key           # same OS/browser/device
+                  and visit.browser_version >= ch.version]   # versions never go back
+    best = max(candidates, key=lambda ch: score(visit, ch), default=None)
+    if best is not None and accept(score(visit, best)):
+        visit.id = best.id            # join: the chain absorbs this visit
+        best.update_state(visit)      # and its stored fingerprint moves forward
+    else:
+        chains.append(new_chain(visit))   # found: a brand-new ID
 ```
+
+Two details do real work here. The *hard-key filter* encodes constraints that are never traded off — a browser does not change OS family, and versions do not decrease. And `update_state` means a chain is always compared against its **most recent** fingerprint, not its first: that is what lets a chain follow a browser through many small drifts, one step at a time.
+
+What distinguishes Method B is only its `score`: count how many soft attributes disagree, refuse beyond a budget, prefer fewer differences.
+
+```python
+def rule_score(visit, chain):
+    diffs = sum(visit[a] != chain.last[a] for a in SOFT_ATTRS)
+    return -inf if diffs > MAX_DIFFS else -diffs   # recency breaks exact ties
+```
+
+The flaw is already visible in that line: every soft attribute counts the same. A font change (drift on one machine) and a font *difference* (two distinct machines that otherwise match) both cost exactly one diff.
 
 ### C. Supervised pairwise matching {#sec-c}
 
-A reconstruction of FP-STALKER's ML variant. A classifier estimates the probability that a visit and a chain are the same browser, from per-attribute agreement plus version and time gaps. Crucially, it is trained on pairs labelled by **cookie co-occurrence** — the same way a vendor would obtain ground truth, since the vendor cannot see the true device either.
+A reconstruction of FP-STALKER's ML variant. Same linking loop; the `score` is now a classifier's estimate of *P(same browser)* for a visit–chain pair. The features are deliberately simple — per-attribute agreement plus version and time gaps — so the model's job is to learn how much each attribute's disagreement should *cost*, which is exactly what Method B fixed by fiat.
 
 ```python
-# Labels come from cookies, not from the (hidden) true browser id
-for cookie, idxs in by_cookie.items():
-    # visits sharing a cookie -> positive pairs (same browser)
-for key, idxs in by_hard.items():
-    # same hard key, different cookie -> negative pairs (different browser)
+def pair_features(visit, chain):
+    agree = [float(visit[a] == chain.last[a]) for a in SOFT_ATTRS]
+    vgap  = min(visit.browser_version - chain.version, 5) / 5
+    tgap  = min(days_between(visit, chain.last_seen), 60) / 60
+    return agree + [vgap, tgap]
+
+score = lambda visit, chain: clf.predict_proba([pair_features(visit, chain)])[0, 1]
 ```
+
+The training labels are where the vendor's epistemic situation is reproduced faithfully: the vendor cannot see the true device either, so ground truth comes from its own deterministic layer — cookies.
+
+```python
+# Positive pairs: two visits carrying the SAME cookie -> "same browser". True.
+# Negative pairs: same hard key, DIFFERENT cookies -> "different browser".
+#                 True for distinct desktops; FALSE for clones, which are
+#                 different devices that *look* identical. Every clone pair
+#                 teaches the model that identical fingerprints can differ.
+for visits in group_by(train, "cookie").values():
+    positives += sample_pairs(visits)
+for visits in group_by(train, "hard_key").values():
+    negatives += [(a, b) for a, b in sample_pairs(visits) if a.cookie != b.cookie]
+
+clf = LogisticRegression().fit(featurize(positives + negatives), labels)
+```
+
+That comment block is the seed of the label-poisoning result reported below: the negative-pair rule is correct everywhere except on clones, and clones are precisely where the matcher most needs confidence.
 
 ### D. Anchored hybrid {#sec-d}
 
-Inference from vendor documentation. If a visit carries a cookie already bound to a chain, that is the answer — the deterministic anchor wins outright. Otherwise fall back to Method C, and bind any new cookie to the resulting chain. We test two variants: anchor-as-recovery only, and anchor-plus-**veto**, where a candidate chain carrying a *different* live cookie is rejected as a possible match.
+Inference from vendor documentation. The deterministic layer (a signed cookie) and the probabilistic matcher (Method C) are composed into one decision flow, and the *order* of the steps is the design:
 
 ```python
-# Veto: two live cookies imply two devices, even if fingerprints match
-if cookie_veto and has_cookie:
-    cand = [ci for ci in cand
-            if ch_cookie[ci] is None or ch_cookie[ci] == cookies[i]]
+def identify(visit):
+    # 1. Anchor recovery: a known cookie answers the question outright,
+    #    no matter how much the fingerprint has drifted.
+    if visit.cookie in cookie_to_chain:
+        return cookie_to_chain[visit.cookie]
+
+    candidates = blocked_candidates(visit)            # same hard-key filter as B/C
+
+    # 2. Anchor veto (variant D'): a candidate chain whose most recent
+    #    visit carried a DIFFERENT live cookie is rejected -- two live
+    #    cookies imply two devices, even when the fingerprints are identical.
+    if VETO and visit.cookie:
+        candidates = [ch for ch in candidates
+                      if ch.cookie in (None, visit.cookie)]
+
+    # 3. Probabilistic fallback: Method C decides among what survives.
+    chain = best_above_threshold(candidates, score) or new_chain(visit)
+
+    # 4. Binding: this visit's cookie now anchors this chain for step 1
+    #    next time. A merge that happens before binding is permanent.
+    if visit.cookie:
+        cookie_to_chain[visit.cookie] = chain
+    return chain
 ```
+
+Steps 1 and 2 are the same evidence used in opposite directions: recovery uses a cookie *match* to defeat false splits, the veto uses a cookie *conflict* to defeat false merges. The results show these are separable — the recovery-only variant fixes splits and leaves merges untouched, because step 4's binding arrives too late to undo a merge that step 3 already made. Visits with no cookie (private mode, ~10% here) pass through unprotected in both directions, which is what the veto's residual mobile merge rate consists of.
 
 ## Results
 
@@ -212,6 +272,8 @@ It does **not** measure any real vendor's accuracy, real-world drift or clone ra
 python generate_fingerprints.py    # writes fp_visits.csv
 python fp_methods.py               # runs A–D, prints metrics, writes the figure
 ```
+
+The code shown on this page is readable pseudocode that follows the real logic step by step. The actual `fp_methods.py` vectorises the same operations — the linking loop scores all candidate chains for a visit in one batched call, and attributes are integer-encoded rather than compared as strings — which is faster but less legible. The behaviour is identical; the script is the source of truth for the numbers.
 
 | Script | Reads | Writes |
 |---|---|---|

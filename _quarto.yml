@@ -71,6 +71,8 @@ website:
             text: Overview
           - href: site/methodology/identifier-graph-and-synchrony.qmd
             text: Identifier graphs and synchrony
+          - href: site/methodology/fingerprint-identification.qmd
+            text: Fingerprints into stable IDs
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;

@@ -16,6 +16,20 @@ The point is methodological, not operational. The data is synthetic, and the abu
 
 The code for this page lives in `src/openbotrisk/experiments/identifier_synchrony/`. The scripts are kept outside the website tree so the page can stay readable while the implementation remains reproducible.
 
+## Headline result
+
+The whole experiment reduces to one table: which groups each method recovers. The two methods are near-complementary by design, and the numbers make the complementarity concrete.
+
+| Group | Identifier graph | Behavioural synchrony |
+|---|---:|---:|
+| `legit` | 0.00 | 0.00 |
+| `travel_agent` | clustered, scored benign | 0.00 |
+| `ring_lazy` | 1.00 | 0.97 |
+| `ring_careful` | 0.00 | 0.28 |
+| `ring_mid` | 0.00 | 0.00 |
+
+(Detected share = fraction of a group's accounts placed in a flagged cluster.) The lazy ring is caught by *both* — it reuses identifiers *and* coordinates. The careful ring, with unique identifiers, is invisible to the graph and only partly caught by synchrony at the default one-hour bucket. The mixed ring slips both at default settings. And the travel agent is the instructive case: the identifier graph *does* cluster it — correctly, it is a tight cluster — but the scoring step clears it. The rest of the page is the mechanism behind each cell.
+
 ## What the experiment tests
 
 The synthetic population contains five groups:
@@ -115,22 +129,20 @@ The key parameters are deliberately exposed in the script:
 | `BIG_COMPONENT` | 80 | Run community detection inside components larger than this. |
 | `K_SHRINK` | 10 | Pseudo-observations used to shrink noisy CAPTCHA rates toward the base rate. |
 
-The edge weighting is the main anti-naivety move. A shared card between three users means something different from a shared IP between fifty users:
+The edge weighting is the main anti-naivety move, and the mechanism is one line: an identifier's contribution to an edge is divided by the log of how many users share it. A card shared by three accounts produces a strong edge; the same card shared by fifty produces a weak one. Discriminativeness, not identifier type alone, sets the weight.
 
 ```python
-ID_TYPES = {"card": 3.0, "email": 2.5, "phone": 2.5, "device_id": 2.0, "ip": 1.0}
-
+# The mechanism: rarer shared identifiers weigh more (inverse frequency)
 for idn in identifier_nodes:
-    members = list(B.neighbors(idn))
-    k = len(members)
-    if k < 2:
+    members = users_sharing(idn)
+    if len(members) < 2:
         continue
-    id_type = idn.split("::")[0]
-    w = ID_TYPES[id_type] / np.log2(1 + k)
-    for i in range(k):
-        for j in range(i + 1, k):
-            add_or_increment_edge(members[i], members[j], weight=w)
+    weight = ID_TYPES[type_of(idn)] / np.log2(1 + len(members))
+    for u, v in pairs(members):
+        projected_graph.add_or_increment_edge(u, v, weight)
 ```
+
+The `ID_TYPES` base weights (card 3.0, IP 1.0, and so on) are deliberate judgement calls, not calibrated values. In a real system they would be fit against reviewed cases; here they exist to demonstrate that *some* type-aware weighting is needed, not to propose a specific schedule. The `device_id` weight in particular hides a subtlety pursued in a [companion experiment](fingerprint-identification.qmd): a vendor device ID is itself a noisy matching decision, strong when it reflects a stored cookie and near-worthless on cloned mobile hardware, so a single fixed weight for it is already an oversimplification.
 
 This is still a small-data implementation. In production-scale data, the same logic would usually move to a graph database, Spark job, igraph/Leiden pipeline, or another system that can handle large projections without materialising too many pairwise edges.
 
@@ -139,6 +151,10 @@ This is still a small-data implementation. In production-scale data, the same lo
 This catches the lazy ring because it reuses high-value identifiers. It also shows why naive graph clustering can be dangerous: a shared university egress IP creates a large benign component, and the travel-agent group is a legitimate tight cluster. The method needs pruning, weighting, scoring, and review context rather than a simple rule that any connected component is bad.
 
 The careful ring is mostly absent from this view. That is the failure mode the experiment is designed to surface: if every account has fresh identifiers, an identifier graph has little to connect.
+
+The mixed ring is absent too, and *why* is the more transferable lesson. Its accounts share only one identifier type — forty accounts spread across twelve devices, one device each — so the graph fragments it into eight small pieces of two-to-four accounts, with eighteen accounts left unclustered entirely. The lazy ring fuses into one component because its card, device, and IP edges *overlap across different member subsets*: account A shares a card with B, B shares a device with C, and so the component grows. Reuse of a single identifier type does not do this. The takeaway is sharper than "reuse is detectable": rings become visible when reuse patterns *intersect*, not merely when reuse exists.
+
+There is also a quieter risk in the scoring step. Because a cluster is scored as a unit, a legitimate account that happens to share one household-IP edge into an abusive cluster *inherits that cluster's score* — guilt by association, created entirely by one weak edge. This is the concrete reason the edge-weighting and pruning discipline above matters: it is not tidiness, it is what stops a single benign coincidence from tarring an innocent account.
 
 The cluster score uses an empirical-Bayes-style shrinkage step:
 
@@ -150,6 +166,15 @@ shrunk = (grp.captcha_hit.sum() + K_SHRINK * BASE_RATE) / (n + K_SHRINK)
 ```
 
 That stops tiny clusters with one or two CAPTCHA hits from leaping to the top purely because their denominator is small. The score is intentionally simple: it is there to show the pattern, not to propose a deployable risk model.
+
+The numbers from this run show why the scoring step, not the clustering step, is what separates the travel agent from a ring. Both are tight clusters; the graph alone cannot tell them apart. The scores can:
+
+| Cluster | Size | Shrunk CAPTCHA rate | Median registration gap |
+|---|---:|---:|---:|
+| `travel_agent` | 25 | 0.019 | 77.2 hours |
+| `ring_lazy` | 60 | 0.424 | 0.04 hours (~2.5 min) |
+
+Against a population CAPTCHA base rate of 0.066, the travel agent sits *below* baseline while the ring sits far above it, and the registration-timing gap is three orders of magnitude apart: the agent's clients accumulate organically over days, the ring's accounts are minted in bursts minutes apart. The clean separation here is partly a property of synthetic data — real benign clusters are messier — but the design principle holds: clustering is neutral entity resolution, and the judgement of *problematic versus benign* belongs entirely in a separate, behaviour-based scoring step.
 
 ::: {.callout-note collapse="true" title="Similarity terms used here"}
 The second method uses similarity language rather than identifier-linking language.
@@ -251,7 +276,9 @@ grid = [0.5, 1, 2, 4, 8, 16]
 res = pd.DataFrame({b: run(b) for b in grid}).T
 ```
 
-In this synthetic run, a one-hour window catches most of the lazy ring but only part of the careful ring. Wider windows recover more of the careful and mixed rings because their internal jitter is larger. In real data, the same widening would usually increase benign co-occurrence too, especially around popular targets, sales, outages, announcements, or high-demand inventory releases.
+In this synthetic run, a one-hour window catches most of the lazy ring but only part of the careful ring. Widening the window recovers them — the careful ring climbs from 0.28 detected at one hour to 0.96 at eight hours, the mixed ring from zero to roughly half — while `legit` and `travel_agent` stay at zero across *every* bucket width tested. In this synthetic data the benign groups never co-occur enough to be swept up; in real data, the same widening would increase benign co-occurrence too, especially around popular targets, sales, outages, announcements, or high-demand inventory releases, so that clean zero is optimistic.
+
+The sharper reading of the sweep is adversarial rather than statistical. The bucket width has to be at least as wide as the ring's internal jitter for the ring to register. That means an attacker can evade a fixed bucket simply by *spreading their actions out* — adding jitter until their coordination falls below the window's resolution. But that evasion is not free: spreading actions out is the same thing as slowing the campaign down. A ticket-scalping or inventory-hoarding bot that jitters its requests across eight hours to dodge a one-hour detector has, by construction, an eight-hour campaign instead of a one-hour one. The detector does not have to *catch* coordination so much as *tax* it: every increment of evasion is paid for in tempo, which is the link to the [economics of automation](../economics-of-automation.qmd) — the defence works by making the attack slower, not by making it impossible.
 
 ## How to read the outputs
 

@@ -1,159 +1,344 @@
-"""
-Method 2: behavioural-synchrony clustering (SynchroTrap-style,
-Cao et al. CCS 2014 -- simplified).
+"""Behavioural-synchrony clustering for the synthetic account dataset.
 
-Idea: identifiers are cheap to randomise; coordination is not. Two
-accounts that repeatedly do the same thing to the same target at the
-same time are linked even if they share zero identifiers.
+Identifiers are cheap to randomise; coordination is not. This method links
+accounts that repeatedly do the same thing to the same target at nearly the
+same time, even when they share no identifiers.
 
-Pipeline:
-  1. Discretise each event into (action, target, time_bucket). Buckets
-     are OVERLAPPING (stride = bucket/2) so a pair acting 1 minute apart
-     across a bucket boundary still co-occurs -- the classic off-by-one
-     trap with fixed windows.
-  2. Per-user set of these tokens.
-  3. Pairwise Jaccard similarity between users -- computed only for pairs
-     that co-occur in at least one token (inverted index), never all
-     n^2 pairs. Tokens touched by too many users are dropped first
-     (a flash-sale item everyone views is not coordination).
-  4. Similarity graph: edge if Jaccard >= threshold AND >= min shared
-     tokens. Connected components = synchrony clusters.
+The implementation is a simplified SynchroTrap-style pipeline:
 
-Scaling note: at real scale exact pairwise Jaccard is replaced by
-MinHash/LSH; the inverted-index trick here is the small-data version of
-the same idea. SynchroTrap itself ran as a series of daily MapReduce
-jobs aggregated over weeks.
+1. turn each event into overlapping ``(action, target, time_bucket)`` tokens;
+2. build an inverted index from token to users;
+3. count only user pairs that co-occur in at least one token;
+4. keep high-Jaccard edges and call connected components synchrony clusters.
+
+Example:
+    Run after generating the synthetic data and Method 1 clusters:
+
+    ```bash
+    python src/openbotrisk/experiments/identifier_synchrony/generate_data.py
+    python src/openbotrisk/experiments/identifier_synchrony/method1_identifier_graph.py
+    python src/openbotrisk/experiments/identifier_synchrony/method2_synchrony.py
+    ```
 """
 
-# ruff: noqa: I001
+from __future__ import annotations
 
-from collections import defaultdict
-from itertools import combinations
+# ruff: noqa: E402,I001
+
 import os
+from collections import defaultdict
+from collections.abc import Iterable
+from itertools import combinations
 from pathlib import Path
+from typing import TypeAlias
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
-import matplotlib  # noqa: E402
+import matplotlib
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+from matplotlib.axes import Axes
+
+
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parents[3]
 DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
 IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
-IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-events = pd.read_csv(DATA_DIR / "events.csv", parse_dates=["ts"])
-users = pd.read_csv(DATA_DIR / "users_m1.csv", parse_dates=["reg_ts"])  # carries Method 1 result
-
-BUCKET = pd.Timedelta(hours=1)      # match to attack tempo you care about
+BUCKET = pd.Timedelta(hours=1)
 JACCARD_MIN = 0.25
-MIN_SHARED = 5                      # >= this many shared tokens for an edge
-TOKEN_USER_CAP = 80                 # drop tokens touched by more users (trend/noise)
+MIN_SHARED = 5
+TOKEN_USER_CAP = 80
 
-# ---- 1+2. tokenise events into overlapping windows ---------------------------
-t0 = events.ts.min()
+Token: TypeAlias = tuple[str, str, int]
+UserTokens: TypeAlias = dict[str, set[Token]]
+
+PALETTE = {
+    "legit": "#b8b8b8",
+    "travel_agent": "#2a9d2a",
+    "ring_lazy": "#d62728",
+    "ring_careful": "#9467bd",
+    "ring_mid": "#ff7f0e",
+}
 
 
-def buckets(ts):
-    """Two overlapping window ids per event (stride = BUCKET/2)."""
-    off = (ts - t0) / BUCKET
-    return (int(off), int(off + 0.5) + 10**6)  # offset grid shifted by half
+def _overlapping_buckets(
+    ts: pd.Timestamp,
+    t0: pd.Timestamp,
+    bucket: pd.Timedelta = BUCKET,
+) -> tuple[int, int]:
+    """Return two overlapping window IDs for one timestamp.
+
+    Args:
+        ts: Event timestamp.
+        t0: First timestamp in the event log.
+        bucket: Width of each time bucket. The second grid is shifted by half
+            a bucket so near-boundary events still co-occur.
+
+    Returns:
+        Two integer bucket IDs.
+    """
+
+    offset = (ts - t0) / bucket
+    return int(offset), int(offset + 0.5) + 10**6
 
 
-user_tokens = defaultdict(set)
-for r in events.itertuples():
-    for b in buckets(r.ts):
-        user_tokens[r.user_id].add((r.action, r.target, b))
+def _build_user_tokens(
+    events: pd.DataFrame,
+    bucket: pd.Timedelta = BUCKET,
+) -> UserTokens:
+    """Convert events into per-user sets of synchrony tokens.
 
-# ---- 3. inverted index: token -> users, then pair counting -------------------
-token_users = defaultdict(list)
-for u, toks in user_tokens.items():
-    for t in toks:
-        token_users[t].append(u)
+    Args:
+        events: Event table containing ``user_id``, ``ts``, ``action``, and
+            ``target``.
+        bucket: Width of each time bucket.
 
-pair_shared = defaultdict(int)
-dropped_tokens = 0
-for _t, us in token_users.items():
-    if len(us) < 2:
-        continue
-    if len(us) > TOKEN_USER_CAP:    # popular item in a popular hour: not signal
-        dropped_tokens += 1
-        continue
-    for u, v in combinations(sorted(us), 2):
-        pair_shared[(u, v)] += 1
-print(f"{len(token_users)} tokens, {dropped_tokens} dropped as too popular, "
-      f"{len(pair_shared)} candidate pairs")
+    Returns:
+        Mapping from user ID to the user's distinct synchrony tokens.
+    """
 
-# ---- 4. similarity graph ------------------------------------------------------
-G = nx.Graph()
-G.add_nodes_from(users.user_id)
-for (u, v), shared in pair_shared.items():
-    if shared < MIN_SHARED:
-        continue
-    jac = shared / (len(user_tokens[u]) + len(user_tokens[v]) - shared)
-    if jac >= JACCARD_MIN:
-        G.add_edge(u, v, weight=jac)
+    t0 = events.ts.min()
+    user_tokens: defaultdict[str, set[Token]] = defaultdict(set)
+    for row in events.itertuples(index=False):
+        for bucket_id in _overlapping_buckets(row.ts, t0, bucket):
+            user_tokens[row.user_id].add((row.action, row.target, bucket_id))
+    return dict(user_tokens)
 
-clusters = {}
-cid = 0
-for comp in nx.connected_components(G):
-    if len(comp) < 3:               # require 3+ accounts to call it a group
-        continue
-    cid += 1
-    for u in comp:
-        clusters[u] = cid
-users["cluster_m2"] = users.user_id.map(clusters).astype("Int64")
-print(f"\nMethod 2: {users.cluster_m2.notna().sum()} users in {cid} synchrony clusters")
 
-# ---- evaluate ------------------------------------------------------------------
-print("\nDetection by ground-truth group (Method 2):")
-users["m2_detected"] = users.cluster_m2.notna()
-print(users.groupby("group").m2_detected.mean().to_string(float_format=lambda x: f"{x:.2f}"))
+def _count_shared_tokens(
+    user_tokens: UserTokens,
+    token_user_cap: int = TOKEN_USER_CAP,
+) -> tuple[dict[tuple[str, str], int], int, int]:
+    """Count candidate-pair token overlaps with an inverted index.
 
-print("\nCluster composition (Method 2):")
-for c, grp in users.dropna(subset=["cluster_m2"]).groupby("cluster_m2"):
-    print(f"  cluster {int(c)}: n={len(grp)}, truth={dict(grp.group.value_counts())}")
+    Args:
+        user_tokens: Per-user synchrony-token sets.
+        token_user_cap: Drop tokens touched by more users than this cap; they
+            are usually trend or flash-sale noise rather than coordination.
 
-# ---- combined view: which method sees which ring -------------------------------
-print("\nMethod 1 vs Method 2 coverage:")
-users["m1_detected"] = users.cluster_m1.notna() & users.cluster_m1.map(
-    users.cluster_m1.value_counts()).ge(5)
-cov = users.groupby("group")[["m1_detected", "m2_detected"]].mean()
-print(cov.to_string(float_format=lambda x: f"{x:.2f}"))
+    Returns:
+        ``(pair_shared, token_count, dropped_token_count)``.
+    """
 
-# ---- plots ----------------------------------------------------------------------
-fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    token_users: defaultdict[Token, list[str]] = defaultdict(list)
+    for user_id, tokens in user_tokens.items():
+        for token in tokens:
+            token_users[token].append(user_id)
 
-ax = axes[0]
-# timeline of events for a sample of users, showing lockstep waves
-palette = {"legit": "#b8b8b8", "travel_agent": "#2a9d2a",
-           "ring_lazy": "#d62728", "ring_careful": "#9467bd", "ring_mid": "#ff7f0e"}
-sample = pd.concat([
-    users[users.group == g].sample(min(12, (users.group == g).sum()), random_state=0)
-    for g in palette
-])
-ev = events[events.user_id.isin(sample.user_id)].merge(
-    users[["user_id", "group"]], on="user_id")
-ymap = {u: i for i, u in enumerate(sample.user_id)}
-ax.scatter(ev.ts, ev.user_id.map(ymap), s=4,
-           c=ev.group.map(palette), alpha=0.7)
-ax.set(yticks=[], xlabel="time", title="Event raster (12 users/group)\n"
-       "vertical stripes = lockstep waves")
-for g, c in palette.items():
-    ax.scatter([], [], color=c, label=g, s=20)
-ax.legend(fontsize=8, loc="upper left")
+    pair_shared: defaultdict[tuple[str, str], int] = defaultdict(int)
+    dropped_tokens = 0
+    for users in token_users.values():
+        if len(users) < 2:
+            continue
+        if len(users) > token_user_cap:
+            dropped_tokens += 1
+            continue
+        for user_a, user_b in combinations(sorted(users), 2):
+            pair_shared[(user_a, user_b)] += 1
+    return dict(pair_shared), len(token_users), dropped_tokens
 
-ax = axes[1]
-cov.plot.bar(ax=ax, color=["#4878a8", "#c44e52"])
-ax.set(ylabel="share of group detected", ylim=(0, 1.05),
-       title="Coverage by method:\nidentifier graph vs behavioural synchrony")
-ax.legend(["Method 1 (identifiers)", "Method 2 (synchrony)"], fontsize=9)
-ax.tick_params(axis="x", rotation=20)
 
-plt.tight_layout()
-plt.savefig(IMAGE_DIR / "method2_synchrony.png", dpi=140)
-print("\nSaved method2_synchrony.png")
-users.to_csv(DATA_DIR / "users_final.csv", index=False)
+def _build_similarity_graph(
+    users: Iterable[str],
+    user_tokens: UserTokens,
+    pair_shared: dict[tuple[str, str], int],
+    *,
+    min_shared: int = MIN_SHARED,
+    jaccard_min: float = JACCARD_MIN,
+) -> nx.Graph:
+    """Build a user graph from shared-token counts.
+
+    Args:
+        users: User IDs to include as graph nodes.
+        user_tokens: Per-user synchrony-token sets.
+        pair_shared: Candidate pair overlap counts.
+        min_shared: Minimum shared-token count before considering Jaccard.
+        jaccard_min: Minimum Jaccard similarity for an edge.
+
+    Returns:
+        A weighted ``networkx.Graph`` where edge weights are Jaccard scores.
+    """
+
+    graph = nx.Graph()
+    graph.add_nodes_from(users)
+    for (user_a, user_b), shared in pair_shared.items():
+        if shared < min_shared:
+            continue
+        denom = len(user_tokens[user_a]) + len(user_tokens[user_b]) - shared
+        jaccard = shared / denom
+        if jaccard >= jaccard_min:
+            graph.add_edge(user_a, user_b, weight=jaccard)
+    return graph
+
+
+def _cluster_components(graph: nx.Graph, min_size: int = 3) -> dict[str, int]:
+    """Assign cluster IDs to connected components.
+
+    Args:
+        graph: User similarity graph.
+        min_size: Minimum component size to call a synchrony cluster.
+
+    Returns:
+        Mapping from user ID to integer cluster ID. Small components are
+        omitted.
+    """
+
+    clusters: dict[str, int] = {}
+    cluster_id = 0
+    for component in nx.connected_components(graph):
+        if len(component) < min_size:
+            continue
+        cluster_id += 1
+        for user_id in component:
+            clusters[user_id] = cluster_id
+    return clusters
+
+
+def run_synchrony_clustering(
+    users: pd.DataFrame,
+    events: pd.DataFrame,
+) -> tuple[pd.DataFrame, nx.Graph, pd.DataFrame]:
+    """Run Method 2 and attach ``cluster_m2`` to the user table.
+
+    Args:
+        users: User table, usually the ``users_m1.csv`` output from Method 1.
+        events: Event table from ``generate_data.py``.
+
+    Returns:
+        ``(users_with_clusters, graph, coverage)``. ``coverage`` gives the
+        Method 1 and Method 2 detection share by ground-truth group.
+    """
+
+    user_tokens = _build_user_tokens(events)
+    pair_shared, token_count, dropped = _count_shared_tokens(user_tokens)
+    print(
+        f"{token_count} tokens, {dropped} dropped as too popular, "
+        f"{len(pair_shared)} candidate pairs"
+    )
+
+    graph = _build_similarity_graph(users.user_id, user_tokens, pair_shared)
+    clusters = _cluster_components(graph)
+
+    users = users.copy()
+    users["cluster_m2"] = users.user_id.map(clusters).astype("Int64")
+    print(
+        f"\nMethod 2: {users.cluster_m2.notna().sum()} users in "
+        f"{len(set(clusters.values()))} synchrony clusters"
+    )
+
+    print("\nDetection by ground-truth group (Method 2):")
+    users["m2_detected"] = users.cluster_m2.notna()
+    print(
+        users.groupby("group").m2_detected.mean().to_string(
+            float_format=lambda x: f"{x:.2f}"
+        )
+    )
+
+    print("\nCluster composition (Method 2):")
+    for cluster_id, group in users.dropna(subset=["cluster_m2"]).groupby(
+        "cluster_m2"
+    ):
+        print(
+            f"  cluster {int(cluster_id)}: n={len(group)}, "
+            f"truth={dict(group.group.value_counts())}"
+        )
+
+    print("\nMethod 1 vs Method 2 coverage:")
+    users["m1_detected"] = users.cluster_m1.notna() & users.cluster_m1.map(
+        users.cluster_m1.value_counts()
+    ).ge(5)
+    coverage = users.groupby("group")[["m1_detected", "m2_detected"]].mean()
+    print(coverage.to_string(float_format=lambda x: f"{x:.2f}"))
+    return users, graph, coverage
+
+
+def _plot_event_raster(ax: Axes, users: pd.DataFrame, events: pd.DataFrame) -> None:
+    """Plot a sample event raster to show lockstep waves."""
+
+    sample = pd.concat(
+        [
+            users[users.group == group].sample(
+                min(12, (users.group == group).sum()), random_state=0
+            )
+            for group in PALETTE
+        ]
+    )
+    sample_events = events[events.user_id.isin(sample.user_id)].merge(
+        users[["user_id", "group"]], on="user_id"
+    )
+    ymap = {user_id: idx for idx, user_id in enumerate(sample.user_id)}
+    ax.scatter(
+        sample_events.ts,
+        sample_events.user_id.map(ymap),
+        s=4,
+        c=sample_events.group.map(PALETTE),
+        alpha=0.7,
+    )
+    ax.set(
+        yticks=[],
+        xlabel="time",
+        title="Event raster (12 users/group)\nvertical stripes = lockstep waves",
+    )
+    for group, color in PALETTE.items():
+        ax.scatter([], [], color=color, label=group, s=20)
+    ax.legend(fontsize=8, loc="upper left")
+
+
+def plot_synchrony_results(
+    users: pd.DataFrame,
+    events: pd.DataFrame,
+    coverage: pd.DataFrame,
+    output_path: Path,
+) -> None:
+    """Write the Method 2 event-raster and coverage figure.
+
+    Args:
+        users: User table with Method 2 detection columns.
+        events: Event table.
+        coverage: Detection share by ground-truth group.
+        output_path: PNG path to write.
+
+    Returns:
+        ``None``. The figure is written to disk.
+    """
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5.5))
+    _plot_event_raster(axes[0], users, events)
+
+    coverage.plot.bar(ax=axes[1], color=["#4878a8", "#c44e52"])
+    axes[1].set(
+        ylabel="share of group detected",
+        ylim=(0, 1.05),
+        title="Coverage by method:\nidentifier graph vs behavioural synchrony",
+    )
+    axes[1].legend(["Method 1 (identifiers)", "Method 2 (synchrony)"], fontsize=9)
+    axes[1].tick_params(axis="x", rotation=20)
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=140)
+    plt.close(fig)
+
+
+def main() -> None:
+    """Run the Method 2 experiment and write its outputs."""
+
+    events = pd.read_csv(DATA_DIR / "events.csv", parse_dates=["ts"])
+    users = pd.read_csv(DATA_DIR / "users_m1.csv", parse_dates=["reg_ts"])
+    users, _graph, coverage = run_synchrony_clustering(users, events)
+    plot_synchrony_results(
+        users,
+        events,
+        coverage,
+        IMAGE_DIR / "method2_synchrony.png",
+    )
+    print("\nSaved method2_synchrony.png")
+    users.to_csv(DATA_DIR / "users_final.csv", index=False)
+
+
+if __name__ == "__main__":
+    main()
