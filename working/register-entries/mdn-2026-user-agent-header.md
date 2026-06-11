@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: MDN Web Docs. 2026. *User-Agent header*. Mozilla Developer Network. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/User-Agent header - HTTP _ MDN.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-063-mdn-2026-user-agent-header.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: foundations
 - **Evidence basis**: reference-doc

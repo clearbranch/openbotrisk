@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `DataDome Releases VM-Based Obfuscation_ The Next Evolution in Client-Side Detection Security - Security Boulevard.pdf`.
+- **Source access**: uploaded PDF capture `SRC-079-datadome-2026-vm-based-obfuscation-client-side-detection.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep as a standalone entry. This is the most project-relevant source in the batch because it applies VM-based obfuscation directly to client-side anti-bot detection logic.
 
 ## Bibliographic
 
 - **Citation**: Vayno, L. / DataDome. (2026). *DataDome Releases VM-Based Obfuscation: The Next Evolution in Client-Side Detection Security*. DataDome Blog, republished by Security Boulevard, 11 February 2026.
-- **Source URL or path**: uploaded PDF `DataDome Releases VM-Based Obfuscation_ The Next Evolution in Client-Side Detection Security - Security Boulevard.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-079-datadome-2026-vm-based-obfuscation-client-side-detection.pdf`.
 - **Category**: vendor / bot-management / defensive capability
 - **Evidence basis**: capability-doc / vendor product announcement / defensive architecture explanation
 - **Operational proximity**: capability — describes a concrete anti-bot vendor protection layer for browser-side detection code; not independent measurement, not detection-performance evidence, and not proof of effectiveness.

@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Iliou, C., Kostoulas, T., Tsikrika, T., Katos, V., Vrochidis, S., & Kompatsiaris, Y. (2019). Towards a framework for detecting advanced Web bots. In *Proceedings of the 14th International Conference on Availability, Reliability and Security (ARES 2019)*, Canterbury, United Kingdom. ACM. https://doi.org/10.1145/3339252.3339267
-- **Source URL or path**: paper_82.pdf
+- **Source URL or path**: SRC-012-iliou-2019-ares-detecting-advanced-web-bots.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Tags**: advanced-bots, web-logs, supervised-learning, behavioural, false-positive-rate, feature-selection, honeypot, greynoise, user-agent, evasion, public-data-limits

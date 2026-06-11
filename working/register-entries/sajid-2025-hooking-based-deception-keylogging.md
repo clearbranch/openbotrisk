@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded arXiv PDF `2508.04178v1.pdf`.
+- **Source access**: uploaded arXiv PDF `SRC-074-sajid-2025-hooking-based-deception-keylogging.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep as a smaller related entry. It is not bot-specific, but it is useful for the cyber-deception / runtime instrumentation / anti-tamper strand.
 
 ## Bibliographic
 
 - **Citation**: Sajid, M. S. I., Ahmed, S., & Sosnoski, R. (2025). *Secure Development of a Hooking-Based Deception Framework Against Keylogging Techniques*. arXiv:2508.04178v1. Posted 6 August 2025.
-- **Source URL or path**: uploaded PDF `2508.04178v1.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-074-sajid-2025-hooking-based-deception-keylogging.pdf`.
 - **Publication status**: arXiv preprint. Treat as not peer-reviewed unless later venue publication is confirmed.
 - **Category**: academic / cyber deception / endpoint instrumentation
 - **Evidence basis**: empirical-method demonstration / preprint

@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: ScrapingBee. 2026. *Best Price Scraping Tools for 2026: Top Services Compared*. ScrapingBee blog/product-comparison article. 12 January 2026.
-- **Source URL or path**: Uploaded file: `/mnt/data/Best Price Scraping Tools for 2026_ Top Services Compared.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-044-scrapingbee-2026-price-scraping-tools.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: threat-surface
 - **Evidence basis**: capability-doc

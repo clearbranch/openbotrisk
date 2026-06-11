@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Netacea. (n.d.). *Technical Showcase: Netacea’s Approach to Machine Learning in Advanced Bot Management*. Netacea report. Accessed 2026-05-31.
-- **Source URL or path**: `netacea_technical_showcase_machine_learning.pdf.pagespeed.ce.v0nd7rwm8t.pdf`
+- **Source URL or path**: `SRC-006-netacea-technical-showcase-machine-learning.pdf`
 - **Date accessed**: 2026-05-31
 - **Category**: vendor
 - **Tags**: vendor, machine-learning, behavioural, server-side, web-logs, business-logic-abuse, intent-analytics, supervised-learning, unsupervised-learning, batch-detection, real-time-detection, scalping, credential-stuffing, scraping, carding

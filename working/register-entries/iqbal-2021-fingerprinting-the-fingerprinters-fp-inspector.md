@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Iqbal, U., Englehardt, S., & Shafiq, Z. (2021). Fingerprinting the Fingerprinters: Learning to Detect Browser Fingerprinting Behaviors. *2021 IEEE Symposium on Security and Privacy (SP)*, 1143–1161. https://doi.org/10.1109/SP40001.2021.00017
-- **Source URL or path**: Fingerprinting_the_Fingerprinters_Learning_to_Detect_Browser_Fingerprinting_Behaviors.pdf
+- **Source URL or path**: SRC-016-iqbal-2021-fingerprinting-the-fingerprinters-fp-inspector.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic / foundations
 - **Tags**: browser-fingerprinting, FP-Inspector, JavaScript, static-analysis, dynamic-analysis, OpenWPM, tracking, anti-fraud, bot-detection, APIs, countermeasures, web-measurement, privacy, public-data-limits

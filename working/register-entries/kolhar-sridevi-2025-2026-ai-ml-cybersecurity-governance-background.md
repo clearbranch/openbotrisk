@@ -6,8 +6,8 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**: uploaded PDF chapters:
-  - `Secure-and-Ethically-Aligned-AI-Solutions-for-Cybersecurity-and-Threat-Detection.pdf`
-  - `Future-Trends-and-Innovation-in-Machine-Intelligence-for-Cyber-Risk-Management.pdf`
+  - `SRC-082-secure-and-ethically-aligned-ai-solutions-for-cybersecurity-and-threat-detection.pdf`
+  - `SRC-082-future-trends-and-innovation-in-machine-intelligence-for-cyber-risk-management.pdf`
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: combine as one low-priority AI/ML cybersecurity background entry. Use *Secure and Ethically Aligned AI Solutions* as the main source; treat *Future Trends and Innovation in Machine Intelligence for Cyber Risk Management* as a supporting overlapping chapter.
 
@@ -16,12 +16,12 @@
 ### Main source
 
 - **Citation**: Kolhar, A., & Sridevi. (2026). *Secure and Ethically Aligned AI Solutions for Cybersecurity and Threat Detection*. Chapter 11. IGI Global Scientific Publishing. DOI: `10.4018/979-8-3373-6038-6.ch011`.
-- **Source URL or path**: uploaded PDF `Secure-and-Ethically-Aligned-AI-Solutions-for-Cybersecurity-and-Threat-Detection.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-082-secure-and-ethically-aligned-ai-solutions-for-cybersecurity-and-threat-detection.pdf`.
 
 ### Supporting related source
 
 - **Citation**: Kolhar, A., & Sridevi. (2025). *Future Trends and Innovation in Machine Intelligence for Cyber Risk Management*. Chapter 18. IGI Global. DOI: `10.4018/979-8-3693-7540-2.ch018`.
-- **Source URL or path**: uploaded PDF `Future-Trends-and-Innovation-in-Machine-Intelligence-for-Cyber-Risk-Management.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-082-future-trends-and-innovation-in-machine-intelligence-for-cyber-risk-management.pdf`.
 
 ## Category and treatment
 

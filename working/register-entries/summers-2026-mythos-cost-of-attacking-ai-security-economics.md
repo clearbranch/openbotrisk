@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `Mythos and the cost of attacking_ AI’s new economics.pdf`.
+- **Source access**: uploaded PDF capture `SRC-101-summers-2026-mythos-cost-of-attacking-ai-security-economics.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation.
 - **Source handling decision**: create a short low-priority context entry. This is not scraping-pricing evidence and not observed bot abuse. It is useful only as a security-economics framing source if the “AI lowers attacker cost” argument comes up again.
 
 ## Bibliographic
 
 - **Citation**: Summers, G. / Netwrix. (2026). *Mythos and the cost of attacking*. Netwrix Blog. Published 24 April 2026.
-- **Source URL or path**: uploaded PDF `Mythos and the cost of attacking_ AI’s new economics.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-101-summers-2026-mythos-cost-of-attacking-ai-security-economics.pdf`.
 - **Category**: security economics / AI threat context
 - **Evidence basis**: opinion / strategic commentary / vendor blog
 - **Operational proximity**: low — useful for framing attacker cost and defender economics, but not empirical evidence, not bot-abuse telemetry, and not independently verified.

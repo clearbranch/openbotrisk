@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: ScrapingBee. 2026. *Top 15 Scraper Sites to Enhance Your Data Collection Skills*. ScrapingBee blog article. 15 January 2026.
-- **Source URL or path**: Uploaded file: `/mnt/data/Top 15 Scraper Sites to Enhance Your Data Collection Skills.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-041-scrapingbee-2026-scraper-test-sites.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: foundations
 - **Evidence basis**: capability-doc

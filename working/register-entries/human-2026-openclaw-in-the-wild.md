@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Kaiserman, Aviad, and Gabriel Cirlig / HUMAN Security. 2026. *OpenClaw in the wild: How autonomous agents can drive abuse at scale*. HUMAN Blog, 18 February 2026.
-- **Source URL or path**: local uploaded PDF: `OpenClaw in the wild_ How autonomous agents can drive abuse at scale - HUMAN Security.pdf`; original public URL not stated in the PDF export and not independently confirmed during extraction.
+- **Source URL or path**: local uploaded PDF: `SRC-036-human-2026-openclaw-in-the-wild.pdf`; original public URL not stated in the PDF export and not independently confirmed during extraction.
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: empirical-operational

@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Vinberg, S. & Overson, J. (2021). *2021 Credential Stuffing Report.* F5 Labs (Threats / Top Risks). Additional contributors: Woods, Ghosemajumder, Boddy, Pompon, Koritz. Published 2021-02-09. Prior editions were published as the *Credential Spill Report* by Shape Security (now part of F5).
-- **Source URL or path**: provided as `2021_Credential_Stuffing_Report___F5_Labs.pdf` (uploaded). Canonical URL is an F5 Labs (`f5.com/labs`) article; the exact path was **not captured in the provided file — flag as unverified**, confirm before citing on the site.
+- **Source URL or path**: provided as `SRC-034-f5-2021-credential-stuffing-report.pdf` (uploaded). Canonical URL is an F5 Labs (`f5.com/labs`) article; the exact path was **not captured in the provided file — flag as unverified**, confirm before citing on the site.
 - **Date accessed**: 2026-06-06
 - **Category**: vendor (F5/Shape; the tooling sections also carry threat-surface relevance)
 - **Evidence basis**: threat-intel; empirical-operational (vendor-measured) — a vendor threat report that combines open-source credential-spill aggregation with an operational measurement study run on the vendor's own production systems

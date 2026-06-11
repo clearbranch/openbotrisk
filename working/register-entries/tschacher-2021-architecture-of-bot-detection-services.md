@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `incolumitas.com – On the Architecture of Bot Detection Services.pdf`.
+- **Source access**: uploaded PDF capture `SRC-077-tschacher-2021-architecture-of-bot-detection-services.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep as a standalone full entry. This is a useful architecture-level source that connects directly to the DataDome VM-obfuscation entry and to the wider client/server signal taxonomy.
 
 ## Bibliographic
 
 - **Citation**: Tschacher, N. (2021). *On the Architecture of Bot Detection Services*. incolumitas.com. Published 18 July 2021.
-- **Source URL or path**: uploaded PDF `incolumitas.com – On the Architecture of Bot Detection Services.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-077-tschacher-2021-architecture-of-bot-detection-services.pdf`.
 - **Category**: public technical analysis / bot-detection architecture
 - **Evidence basis**: technical explainer / architecture analysis / attacker-aware commentary
 - **Operational proximity**: architecture — useful for explaining bot-detection signal layers and client/server trust boundaries, but not empirical telemetry, vendor performance evidence, or a validated detection design.

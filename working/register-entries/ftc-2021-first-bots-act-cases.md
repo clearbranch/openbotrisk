@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Federal Trade Commission. 2021. *FTC Brings First-Ever Cases Under the BOTS Act: Ticket brokers will face partially suspended judgment of more than $31 million in civil penalties*. FTC press release, 22 January 2021.
-- **Source URL or path**: `https://www.ftc.gov/news-events/news/press-releases/2021/01/ftc-brings-first-ever-cases-under-bots-act`; local uploaded PDF: `FTC Brings First-Ever Cases Under the BOTS Act _ Federal Trade Commission.pdf`
+- **Source URL or path**: `https://www.ftc.gov/news-events/news/press-releases/2021/01/ftc-brings-first-ever-cases-under-bots-act`; local uploaded PDF: `SRC-050-ftc-2021-first-bots-act-cases.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: threat-surface
 - **Evidence basis**: legal-record

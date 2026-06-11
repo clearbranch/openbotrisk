@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Jarad, G., & Bıçakcı, K. (2026). When Handshakes Tell the Truth: Detecting Web Bad Bots via TLS Fingerprints. arXiv:2602.09606v1.
-- **Source URL or path**: 2602.09606v1.pdf
+- **Source URL or path**: SRC-018-jarad-2026-handshakes-tell-truth-tls-fingerprints-ja4-bad-bots.pdf
 - **Date accessed**: 2026-06-01
 - **Category**: academic / threat-surface
 - **Tags**: TLS-fingerprinting, JA4, JA4DB, bot-detection, bad-bots, protocol-fingerprinting, XGBoost, CatBoost, TLS-ClientHello, machine-learning, header-spoofing, full-stack-emulation, public-data-limits

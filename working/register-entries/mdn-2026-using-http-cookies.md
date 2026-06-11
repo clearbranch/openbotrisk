@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: MDN Web Docs. 2026. *Using HTTP cookies*. Mozilla Developer Network. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/Using HTTP cookies - HTTP _ MDN.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-062-mdn-2026-using-http-cookies.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: foundations
 - **Evidence basis**: reference-doc

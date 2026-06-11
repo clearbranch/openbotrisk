@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Acien, A., Morales, A., Fierrez, J., & Vera-Rodriguez, R. (2021). BeCAPTCHA-Mouse: Synthetic Mouse Trajectories and Improved Bot Detection. arXiv:2005.00890v2.
-- **Source URL or path**: 2005.00890v2.pdf
+- **Source URL or path**: SRC-019-acien-2021-becaptcha-mouse-synthetic-mouse-trajectories.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Tags**: behavioural-biometrics, mouse-dynamics, bot-detection, CAPTCHA, BeCAPTCHA, synthetic-data, GAN, neuromotor, sigma-lognormal, Random-Forest, benchmark, public-data-limits

@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `2026-Q1 - Kasada - Quarterly Threat Report.pdf`.
+- **Source access**: uploaded PDF `SRC-100-kasada-2026-q1-threat-enablers-saasification-adversarial-infrastructure.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, scarce-resource relevance, and dual-use containment.
 - **Source handling decision**: keep as a standalone full entry. This is the bot/automated-abuse anchor for the “SaaSification of adversarial infrastructure” strand. It should sit near the commercial automation cost-stack entry.
 
 ## Bibliographic
 
 - **Citation**: KasadaIQ. (2026). *Quarterly Threat Intelligence Report: Q1 2026*. Kasada.
-- **Source URL or path**: uploaded PDF `2026-Q1 - Kasada - Quarterly Threat Report.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-100-kasada-2026-q1-threat-enablers-saasification-adversarial-infrastructure.pdf`.
 - **Category**: vendor threat intelligence / automated-threat ecosystem
 - **Evidence basis**: vendor telemetry / marketplace monitoring / threat-intelligence assessment
 - **Operational proximity**: observed-vendor-telemetry — stronger than generic commentary because it reports observed bot checkouts, account-market activity, marketplace demand signals, and threat-enabler activity; weaker than independent public datasets because collection methods and sources are not fully reproducible from the report.

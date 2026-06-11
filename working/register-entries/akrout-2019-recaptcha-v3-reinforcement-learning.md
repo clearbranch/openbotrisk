@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Akrout, I., Feriani, A., & Akrout, M. (2019). Hacking Google reCAPTCHA v3 using Reinforcement Learning. arXiv:1903.01003v3.
-- **Source URL or path**: 1903.01003v3.pdf
+- **Source URL or path**: SRC-020-akrout-2019-recaptcha-v3-reinforcement-learning.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Tags**: recaptcha-v3, CAPTCHA, reinforcement-learning, evasion, mouse-movement, behavioural, human-verification, grid-world, PyAutoGUI, Selenium-limits, public-data-limits

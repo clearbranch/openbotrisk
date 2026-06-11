@@ -6,17 +6,17 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**: uploaded pricing/report captures:
-  - `Web Scraping Pricing 2026_ 9 Platforms Compared (From $0.13_1K) _ Use Apify.pdf`
-  - `apify-state-of-web-scraping-report-2026.pdf`
-  - `Managed Web Scraping vs. DIY_ How to Choose the Right Approach.pdf`
+  - `SRC-102-web-scraping-pricing-2026-9-platforms-compared-from-0-13-1k-use-apify.pdf`
+  - `SRC-102-apify-state-of-web-scraping-report-2026.pdf`
+  - `SRC-102-managed-web-scraping-vs-diy-how-to-choose-the-right-approach.pdf`
   - `crawlbase_pricing.odt`
-  - `Pricing - ScrapingBee Web Scraping API.pdf`
-  - `Pricing - ZenRows.pdf`
-  - `Web Scraper API - Free Trial.pdf`
-  - `12 Best & Cheapest Residential Proxies in 2026 (Tested & Ranked).pdf`
-  - `Proxy-Cheap_ Affordable Services _ Buy Cheap Proxies.pdf`
-  - `AI captcha solver_ Bypass reCAPTCHA and any captchas using best auto captcha solving service API.pdf`
-  - `5SIM Statistics – Active Temp Numbers & SMS Success Rate.pdf`
+  - `SRC-102-pricing-scrapingbee-web-scraping-api.pdf`
+  - `SRC-102-pricing-zenrows.pdf`
+  - `SRC-102-web-scraper-api-free-trial.pdf`
+  - `SRC-102-12-best-and-cheapest-residential-proxies-in-2026-tested-and-ranked.pdf`
+  - `SRC-102-proxy-cheap-affordable-services-buy-cheap-proxies.pdf`
+  - `SRC-102-ai-captcha-solver-bypass-recaptcha-and-any-captchas-using-best-auto-captcha-solving-service-api.pdf`
+  - `SRC-102-5sim-statistics-active-temp-numbers-and-sms-success-rate.pdf`
 - **Prompt version**: newer register/source-extraction pattern used in this conversation.
 - **Source handling decision**: combine into one cost-of-capability entry. These sources are mostly vendor or vendor-adjacent pricing/market materials. Their value is as cost and availability signals, not abuse prevalence or effectiveness evidence.
 

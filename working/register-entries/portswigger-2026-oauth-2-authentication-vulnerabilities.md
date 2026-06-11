@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: PortSwigger Web Security Academy. 2026. *OAuth 2.0 authentication vulnerabilities*. PortSwigger.
-- **Source URL or path**: `OAuth 2.0 authentication vulnerabilities _ Web Security Academy.pdf`; likely WSA topic page `https://portswigger.net/web-security/oauth`
+- **Source URL or path**: `SRC-069-portswigger-2026-oauth-2-authentication-vulnerabilities.pdf`; likely WSA topic page `https://portswigger.net/web-security/oauth`
 - **Date accessed / captured**: uploaded 2026-06-06
 - **Category**: vendor / educational-reference
 - **Evidence basis**: methods-taxonomy

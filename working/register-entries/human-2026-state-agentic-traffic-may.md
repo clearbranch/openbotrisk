@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Kaiserman, Aviad / HUMAN Security. 2026. *State of Agentic Traffic – May 2026: Financial services agentic traffic continues to climb, more than doubling this month*. HUMAN Blog, 4 June 2026.
-- **Source URL or path**: local uploaded PDF: `State of Agentic Traffic - May 2026_ Financial services agentic traffic continues to climb, more than doubling this month - HUMAN Security.pdf`; original public URL not stated in the PDF export.
+- **Source URL or path**: local uploaded PDF: `SRC-038-human-2026-state-agentic-traffic-may.pdf`; original public URL not stated in the PDF export.
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: empirical-operational

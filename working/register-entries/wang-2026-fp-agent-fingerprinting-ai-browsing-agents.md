@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Wang, E., Shafiq, Z., & Vekaria, Y. (2026). *FP-Agent: Fingerprinting AI Browsing Agents.* arXiv:2605.01247v1 [cs.CR], 2 May 2026. University of California, Davis. NSF awards 2138139, 2103439.
-- **Source URL or path**: `arxiv.org/abs/2605.01247` (provided as `2605_01247v1.pdf`). Artifacts: code at `github.com/ethanbwang/fp-agent`; data at OSF (`osf.io/j6b5p`). URLs taken from the paper; confirm resolution before citing on site.
+- **Source URL or path**: `arxiv.org/abs/2605.01247` (provided as `SRC-033-wang-2026-fp-agent-fingerprinting-ai-browsing-agents.pdf`). Artifacts: code at `github.com/ethanbwang/fp-agent`; data at OSF (`osf.io/j6b5p`). URLs taken from the paper; confirm resolution before citing on site.
 - **Date accessed**: 2026-06-06
 - **Category**: academic
 - **Evidence basis**: empirical-academic; empirical-operational (Cloudflare case study) — a controlled honey-site measurement study, with one section testing a live deployed defender (Cloudflare free bot management) against the same agents

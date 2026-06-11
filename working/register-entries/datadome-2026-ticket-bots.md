@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Falokun, Christine / DataDome. 2026. *How to Restore Fairness in Online Ticketing by Fighting Ticket Bots*. DataDome, 30 March 2026. PDF export title: *What are ticket bots & How to stop them*.
-- **Source URL or path**: `https://datadome.co/bot-management-protection/ticket-bots/`; local uploaded PDF: `What are ticket bots & How to stop them.pdf`
+- **Source URL or path**: `https://datadome.co/bot-management-protection/ticket-bots/`; local uploaded PDF: `SRC-049-datadome-2026-ticket-bots.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: methods-taxonomy

@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded dissertation `thesis yinzhicao.pdf`.
+- **Source access**: uploaded dissertation `SRC-075-cao-2014-protecting-client-browsers-principal-based-approach.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep as a full-but-bounded foundation entry. It is older and not bot-specific, but it is directly relevant to browser principals, client-side isolation, JavaScript virtualisation, and malicious-content detection.
 
 ## Bibliographic
 
 - **Citation**: Cao, Y. (2014). *Protecting Client Browsers with a Principal-based Approach*. Doctoral dissertation, Northwestern University, Department of Computer Science. June 2014.
-- **Source URL or path**: uploaded PDF `thesis yinzhicao.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-075-cao-2014-protecting-client-browsers-principal-based-approach.pdf`.
 - **Category**: academic thesis / browser-security foundation
 - **Evidence basis**: dissertation / architecture proposal / method demonstration
 - **Operational proximity**: foundational — useful for client-browser isolation, principal boundaries, and web-content security concepts; not bot-abuse evidence, not bot-detection telemetry, and not current anti-bot product evidence.

@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: McArtney, Ian / HUMAN Security. 2026. *Agentic Visibility: How to See AI Agents in Your Traffic*. HUMAN Blog, 20 April 2026.
-- **Source URL or path**: local uploaded PDF: `Agentic Visibility_ How to See AI Agent Traffic.pdf`; original public URL not stated in the PDF export and not independently confirmed during extraction.
+- **Source URL or path**: local uploaded PDF: `SRC-037-human-2026-agentic-visibility-how-to-see-ai-agent-traffic.pdf`; original public URL not stated in the PDF export and not independently confirmed during extraction.
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: capability-doc

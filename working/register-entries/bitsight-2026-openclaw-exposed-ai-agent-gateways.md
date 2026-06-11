@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `OpenClaw Security_ Risks of Exposed AI Agents Explained _ Bitsight.pdf`.
+- **Source access**: uploaded PDF capture `SRC-086-bitsight-2026-openclaw-exposed-ai-agent-gateways.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Relationship to existing OpenClaw source**: keep separate from the existing HUMAN Security OpenClaw entry. HUMAN focuses on OpenClaw-associated traffic and abuse patterns; this Bitsight source focuses on internet exposure, configuration risk, integrations/blast radius, and exposed-agent attack surface.
 
 ## Bibliographic
 
 - **Citation**: Cruz, J. / Bitsight. (2026). *OpenClaw (ex-Moltbot (ex-Clawdbot)): The AI Butler With Its Claws On The Keys To Your Kingdom*. Bitsight Research Blog. Published 9 February 2026.
-- **Source URL or path**: uploaded PDF `OpenClaw Security_ Risks of Exposed AI Agents Explained _ Bitsight.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-086-bitsight-2026-openclaw-exposed-ai-agent-gateways.pdf`.
 - **Date accessed / captured**: uploaded 2026-06-07.
 - **Category**: vendor / threat-research
 - **Evidence basis**: empirical-exposure measurement / attack-surface analysis / threat-intelligence

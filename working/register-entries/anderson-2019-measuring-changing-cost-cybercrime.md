@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `WEIS_2019_paper_25.pdf`.
+- **Source access**: uploaded PDF `SRC-097-anderson-2019-measuring-changing-cost-cybercrime.pdf`.
 - **Source handling decision**: keep as a standalone full/medium entry. This is the best non-vendor balance source for the cost/economics strand.
 
 ## Bibliographic
 
 - **Citation**: Anderson, R., Barton, C., Böhme, R., Clayton, R., Gaňán, C., Grasso, T., Levi, M., Moore, T., & Vasek, M. (2019). *Measuring the Changing Cost of Cybercrime*. WEIS 2019.
-- **Source URL or path**: uploaded PDF `WEIS_2019_paper_25.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-097-anderson-2019-measuring-changing-cost-cybercrime.pdf`.
 - **Category**: academic / security economics
 - **Evidence basis**: literature synthesis / measurement framework / cost analysis
 - **Operational proximity**: framework — not bot-specific and not current telemetry, but highly useful for interpreting cost claims and avoiding vendor-cost overclaiming.

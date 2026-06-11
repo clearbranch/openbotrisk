@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `cta-2026-0219.pdf`.
+- **Source access**: uploaded PDF `SRC-099-recordedfuture-2026-cloud-saas-abuse-adversarial-infrastructure.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, scarce-resource relevance, and dual-use containment.
 - **Source handling decision**: keep as a separate medium/full entry. This is not bot-specific, but it is the cloud/SaaS infrastructure-abuse anchor for the same “SaaSification of adversarial infrastructure” theme.
 
 ## Bibliographic
 
 - **Citation**: Recorded Future Insikt Group. (2026). *2025 Cloud Threat Hunting and Defense Landscape*. Cyber Threat Analysis CTA-2026-0219. Published 19 February 2026.
-- **Source URL or path**: uploaded PDF `cta-2026-0219.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-099-recordedfuture-2026-cloud-saas-abuse-adversarial-infrastructure.pdf`.
 - **Category**: vendor threat intelligence / cloud and SaaS abuse
 - **Evidence basis**: threat-intelligence synthesis / observed incidents / mitigations and detections
 - **Operational proximity**: threat-intelligence synthesis — stronger than opinion because it curates observed incidents and defensive patterns; weaker than primary telemetry or case evidence because many examples are based on third-party reporting and Recorded Future analysis.

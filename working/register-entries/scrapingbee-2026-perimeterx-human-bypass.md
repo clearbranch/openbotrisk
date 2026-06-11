@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Krukowski, Ilya / ScrapingBee. 2026. *How To Bypass PerimeterX Anti-Bot Protection System In 2026*. ScrapingBee blog, 24 March 2026. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/How to bypass PerimeterX anti-bot protection system in 2026.pdf`.
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-045-scrapingbee-2026-perimeterx-human-bypass.pdf`.
 - **Date accessed**: 2026-06-06
 - **Category**: threat-surface
 - **Evidence basis**: bypass-guide

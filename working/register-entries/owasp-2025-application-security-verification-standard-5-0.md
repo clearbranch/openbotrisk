@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `OWASP_Application_Security_Verification_Standard_5.0.0_en.pdf`; current evidence register reviewed for project context.
+- **Source access**: uploaded PDF `SRC-093-owasp-2025-application-security-verification-standard-5-0.pdf`; current evidence register reviewed for project context.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
 
 - **Citation**: OWASP Foundation. (2025). *Application Security Verification Standard*. Version 5.0.0. May 2025.
-- **Source URL or path**: uploaded PDF `OWASP_Application_Security_Verification_Standard_5.0.0_en.pdf`; canonical project source should be checked against OWASP ASVS project/repository before final publication.
+- **Source URL or path**: uploaded PDF `SRC-093-owasp-2025-application-security-verification-standard-5-0.pdf`; canonical project source should be checked against OWASP ASVS project/repository before final publication.
 - **Date accessed / captured**: uploaded 2026-06-07.
 - **Licence**: Creative Commons Attribution-ShareAlike 4.0 International.
 - **Category**: foundations

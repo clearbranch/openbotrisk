@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Thales / Imperva. (2026). *2026 Thales Bad Bot Report: Bad Bots in the Agentic Age*. Thales Cybersecurity Products / Imperva. April 2026. URL verified: https://cpl.thalesgroup.com/bad-bot-report redirects to https://www.imperva.com/resources/resource-library/reports/2026-bad-bot-report/
-- **Source URL or path**: `2026-thales-bad-bot-report.pdf`; public landing page: https://cpl.thalesgroup.com/bad-bot-report
+- **Source URL or path**: `SRC-039-thales-2026-bad-bot-report.pdf`; public landing page: https://cpl.thalesgroup.com/bad-bot-report
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: empirical-operational — vendor report based on Thales / Imperva bot mitigation telemetry, blocked requests, Threat Research observations, Security Analyst Services observations, and two anonymised mitigation case studies. Vendor product recommendations and product capability statements inside the report are vendor claims rather than independent evidence.

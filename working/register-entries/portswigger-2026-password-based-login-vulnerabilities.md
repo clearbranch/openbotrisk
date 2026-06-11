@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: PortSwigger Web Security Academy. 2026. *Vulnerabilities in password-based login*. PortSwigger.
-- **Source URL or path**: `Vulnerabilities in password-based login _ Web Security Academy.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication/password-based`
+- **Source URL or path**: `SRC-071-portswigger-2026-password-based-login-vulnerabilities.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication/password-based`
 - **Date accessed / captured**: uploaded 2026-06-06
 - **Category**: vendor / educational-reference
 - **Evidence basis**: methods-taxonomy

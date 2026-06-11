@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `Hiding in Plain Sight_ Tracking Bulletproof Hosting and Abused RDP Infrastructure - Censys.pdf`.
+- **Source access**: uploaded PDF `SRC-096-censys-2026-bulletproof-hosting-abused-rdp-infrastructure.pdf`.
 - **Source handling decision**: keep as a standalone full entry. It is a useful infrastructure-measurement source for adversarial infrastructure and bulletproof hosting, and it helps balance generic vendor threat reports with internet-scale measurement style evidence.
 
 ## Bibliographic
 
 - **Citation**: Censys. (2026). *Hiding in Plain Sight: Tracking Bulletproof Hosting and Abused RDP Infrastructure*. Blog/report capture, 3 February 2026.
-- **Source URL or path**: uploaded PDF `Hiding in Plain Sight_ Tracking Bulletproof Hosting and Abused RDP Infrastructure - Censys.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-096-censys-2026-bulletproof-hosting-abused-rdp-infrastructure.pdf`.
 - **Category**: infrastructure measurement / threat infrastructure
 - **Evidence basis**: internet-scale scanning analysis / technical measurement / threat detection
 - **Operational proximity**: measured infrastructure — relevant to adversarial infrastructure, but not bot-specific and not proof of intent for any individual host.

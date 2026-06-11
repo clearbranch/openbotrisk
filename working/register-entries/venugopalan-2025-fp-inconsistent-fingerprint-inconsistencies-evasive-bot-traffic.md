@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Venugopalan, H., Munir, S., Ahmed, S., Wang, T., King, S. T., & Shafiq, Z. (2025). FP-Inconsistent: Measurement and Analysis of Fingerprint Inconsistencies in Evasive Bot Traffic. arXiv:2406.07647v3.
-- **Source URL or path**: 2406.07647v3.pdf
+- **Source URL or path**: SRC-015-venugopalan-2025-fp-inconsistent-fingerprint-inconsistencies-evasive-bot-traffic.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic / threat-surface
 - **Tags**: browser-fingerprinting, evasive-bots, fingerprint-inconsistency, anti-bot-services, DataDome, BotD, FingerprintJS, honey-site, impression-fraud, bot-services, measurement, spatial-inconsistency, temporal-inconsistency, public-data-limits

@@ -11,8 +11,8 @@
 ## Bibliographic
 
 - **Citation**: Laperdrix, P., Bielova, N., Baudry, B., & Avoine, G. (2020). *Browser Fingerprinting: A survey*. ACM Transactions on the Web, 14(2), Article 8, 1–33. https://doi.org/10.1145/3386040
-- **Canonical uploaded source**: `Lape-etal-20-TWEB.pdf`
-- **Alternate uploaded source**: `1905.01051v2.pdf` — arXiv v2 preprint, November 2019.
+- **Canonical uploaded source**: `SRC-066-lape-etal-20-tweb.pdf`
+- **Alternate uploaded source**: `SRC-066-1905-01051v2.pdf` — arXiv v2 preprint, November 2019.
 - **Category**: academic
 - **Evidence basis**: review / methods-taxonomy / foundations
 - **Operational proximity**: foundational - literature survey and taxonomy, not observed-use measurement.

@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Netacea. (n.d.). *Netacea Bot Management*. Netacea. PDF product brochure. Accessed 2026-05-31.
-- **Source URL or path**: `PU1NRT2Z0JV2.pdf`
+- **Source URL or path**: `SRC-005-netacea-bot-management-product-brochure.pdf`
 - **Date accessed**: 2026-05-31
 - **Category**: vendor
 - **Tags**: vendor, bot-management, product-brochure, server-side-detection, web-logs, APIs, mobile-apps, credential-stuffing, carding, scraping, scalping, fake-account-creation, mitigations, customer-case-study

@@ -5,14 +5,14 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `s42400-020-00049-3.pdf`.
+- **Source access**: uploaded PDF `SRC-076-xu-2020-layered-obfuscation-taxonomy-software-security.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: create a low-priority standalone foundation entry. This is not bot-specific, but it gives useful academic support for “layered obfuscation” as risk-management rather than one magic technique.
 
 ## Bibliographic
 
 - **Citation**: Xu, H., Zhou, Y., Ming, J., & Lyu, M. (2020). *Layered obfuscation: a taxonomy of software obfuscation techniques for layered security*. Cybersecurity, 3, Article 9. https://doi.org/10.1186/s42400-020-00049-3
-- **Source URL or path**: uploaded PDF `s42400-020-00049-3.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-076-xu-2020-layered-obfuscation-taxonomy-software-security.pdf`.
 - **Licence**: Open access, Creative Commons Attribution 4.0 International.
 - **Category**: academic / foundations
 - **Evidence basis**: review / taxonomy / conceptual framework

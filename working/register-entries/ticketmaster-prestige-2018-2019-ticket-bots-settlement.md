@@ -6,9 +6,9 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**: uploaded legal/case PDFs:
-  - `TicketmasterPrestigeEntertainment20180131.pdf`
-  - `Ticketmaster Reaches Settlement with Ticket Broker over Unauthorized Use of Automated Bots - Insights - Proskauer Rose LLP.pdf`
-  - `2021-01-14-GT-ACC-InternetLawYIR-Database Protection.pdf`
+  - `SRC-080-ticketmasterprestigeentertainment20180131.pdf`
+  - `SRC-080-ticketmaster-reaches-settlement-with-ticket-broker-over-unauthorized-use-of-automated-bots-insights.pdf`
+  - `SRC-080-2021-01-14-gt-acc-internetlawyir-database-protection.pdf`
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep as a separate case entry from the 2023 U.S. Senate / Taylor Swift case. This is earlier chronologically, but stronger as legal case evidence of alleged ticket-bot purchase activity and court/settlement treatment.
 
@@ -17,17 +17,17 @@
 ### Primary legal source
 
 - **Citation**: *Ticketmaster L.L.C. v. Prestige Entertainment, Inc., Prestige Entertainment West, Inc., Renaissance Ventures LLC, Nicholas Lombardi, and Steven K. Lichtman*, Case No. 2:17-cv-07232-ODW (JCx), Order Granting in Part and Denying in Part Defendants’ Motion to Dismiss, Central District of California, 31 January 2018.
-- **Source URL or path**: uploaded PDF `TicketmasterPrestigeEntertainment20180131.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-080-ticketmasterprestigeentertainment20180131.pdf`.
 
 ### Settlement summary source
 
 - **Citation**: Neuburger, J. (2019). *Ticketmaster Reaches Settlement with Ticket Broker over Unauthorized Use of Automated Bots*. New Media and Technology Law Blog / Proskauer Rose LLP, 24 July 2019.
-- **Source URL or path**: uploaded PDF `Ticketmaster Reaches Settlement with Ticket Broker over Unauthorized Use of Automated Bots - Insights - Proskauer Rose LLP.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-080-ticketmaster-reaches-settlement-with-ticket-broker-over-unauthorized-use-of-automated-bots-insights.pdf`.
 
 ### Legal context source
 
 - **Citation**: Ballon, I. C. (2021). *Data Scraping, Database Protection and the Use of Bots and Artificial Intelligence to Gather Content and Information*. Excerpt from *E-Commerce and Internet Law: Treatise with Forms*, 2nd ed., ACC Internet Law Year in Review, 14 January 2021.
-- **Source URL or path**: uploaded PDF `2021-01-14-GT-ACC-InternetLawYIR-Database Protection.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-080-2021-01-14-gt-acc-internetlawyir-database-protection.pdf`.
 
 ## Category and treatment
 

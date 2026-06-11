@@ -6,10 +6,10 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**: uploaded public-hearing PDFs and press PDF:
-  - `Testimony - Berchtold - 2023-01-24.pdf`
-  - `Bradish_SJC-Hearing_Live-Events_1.24.23.pdf`
-  - `Microsoft Word - Bradish_SJC Hearing_Live Events_1.24.23.doc - Bradish_SJC-Hearing_Live-Events_1.24.23.pdf`
-  - `Scalper bots caused Taylor Swift ticket chaos, Senate panel hears in testimony _ US Senate _ The Guardian.pdf`
+  - `SRC-081-testimony-berchtold-2023-01-24.pdf`
+  - `SRC-081-bradish-sjc-hearing-live-events-1-24-23.pdf`
+  - `Microsoft Word - Bradish_SJC Hearing_Live Events_1.24.23.doc - SRC-081-bradish-sjc-hearing-live-events-1-24-23.pdf`
+  - `SRC-081-scalper-bots-caused-taylor-swift-ticket-chaos-senate-panel-hears-in-testimony-us-senate-the-guardian.pdf`
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: combine as one case entry. The two Bradish files are the same testimony/source family, so keep only one canonical Bradish citation. Use Berchtold’s Live Nation testimony as the primary bot-traffic claim source, Bradish/AAI as the competition/market-structure counter-frame, and the Guardian article as secondary press reporting of the hearing.
 
@@ -18,18 +18,18 @@
 ### Main source
 
 - **Citation**: Berchtold, J. (2023). *Opening Statement of Joe Berchtold, President and Chief Financial Officer, Live Nation Entertainment, Inc.* United States Senate Judiciary Committee, 24 January 2023.
-- **Source URL or path**: uploaded PDF `Testimony - Berchtold - 2023-01-24.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-081-testimony-berchtold-2023-01-24.pdf`.
 
 ### Supporting public-hearing source
 
 - **Citation**: Bradish, K. (2023). *That’s the Ticket: Promoting Competition and Protecting Consumers in Live Entertainment*. Testimony before the United States Senate Committee on the Judiciary, 24 January 2023.
-- **Source URL or path**: uploaded PDF `Bradish_SJC-Hearing_Live-Events_1.24.23.pdf`.
-- **Duplicate note**: `Microsoft Word - Bradish_SJC Hearing_Live Events_1.24.23.doc - Bradish_SJC-Hearing_Live-Events_1.24.23.pdf` appears to be the same testimony/source family and should not be a separate register row.
+- **Source URL or path**: uploaded PDF `SRC-081-bradish-sjc-hearing-live-events-1-24-23.pdf`.
+- **Duplicate note**: `Microsoft Word - Bradish_SJC Hearing_Live Events_1.24.23.doc - SRC-081-bradish-sjc-hearing-live-events-1-24-23.pdf` appears to be the same testimony/source family and should not be a separate register row.
 
 ### Supporting press source
 
 - **Citation**: Aratani, L. (2023). *Scalper bots caused Taylor Swift ticket chaos, Senate panel hears in testimony*. The Guardian, 24 January 2023.
-- **Source URL or path**: uploaded PDF `Scalper bots caused Taylor Swift ticket chaos, Senate panel hears in testimony _ US Senate _ The Guardian.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-081-scalper-bots-caused-taylor-swift-ticket-chaos-senate-panel-hears-in-testimony-us-senate-the-guardian.pdf`.
 
 ## Category and treatment
 

@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Wardle, D. 2019. *How long does it take to get owned?* Technical Report RHUL-ISG-2019-4, Information Security Group, Royal Holloway University of London, 27 March 2019. Submitted as part of the MSc in Information Security. Supervisor: Jorge Blasco Alis.
-- **Source URL or path**: local uploaded PDF: `techreport-davidwardle.pdf`
+- **Source URL or path**: local uploaded PDF: `SRC-048-wardle-2019-how-long-does-it-take-to-get-owned.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: academic
 - **Evidence basis**: empirical-academic

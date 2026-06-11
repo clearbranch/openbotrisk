@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Akamai Security. (2026). *AI-Empowered Botnets and API Visibility Gaps: Attack Trends in Financial Services*. State of the Internet/Security, V12 Issue 02. Akamai. Public URL not stated in the uploaded PDF; footer gives `Akamai.com/security`.
-- **Source URL or path**: `financial-services-security-trends.pdf`
+- **Source URL or path**: `SRC-040-akamai-2026-financial-services-security-trends.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: vendor
 - **Evidence basis**: empirical-operational — the report is primarily based on Akamai's internal operational telemetry from protected web application, API, and DDoS traffic. Some API-risk claims are survey-based and some AI/bot claims rely on private threat-intelligence data; those are noted separately below.

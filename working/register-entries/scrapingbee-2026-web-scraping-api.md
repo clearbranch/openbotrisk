@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: ScrapingBee. 2026. *The Best Web Scraping API to Avoid Getting Blocked*. ScrapingBee product page. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/ScrapingBee – The Best Web Scraping API.pdf`. Related uploaded pages include ScrapingBee HTML API documentation, data extraction documentation, Amazon API documentation, general scraping-without-blocking guidance, Cloudflare guidance, PerimeterX/HUMAN guidance, rotating/residential proxy comparison, Booking.com tutorial, and Playwright/Selenium comparison.
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-053-scrapingbee-2026-web-scraping-api.pdf`. Related uploaded pages include ScrapingBee HTML API documentation, data extraction documentation, Amazon API documentation, general scraping-without-blocking guidance, Cloudflare guidance, PerimeterX/HUMAN guidance, rotating/residential proxy comparison, Booking.com tutorial, and Playwright/Selenium comparison.
 - **Date accessed**: 2026-06-06
 - **Category**: threat-surface
 - **Evidence basis**: capability-doc

@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `Detecting Post-Compromise Threat Activity in Microsoft Cloud Environments _ CISA.pdf`.
+- **Source access**: uploaded PDF `SRC-094-cisa-2021-post-compromise-microsoft-cloud-identity-api-access.pdf`.
 - **Source handling decision**: keep as a smaller supporting entry. It is official and relevant to cloud identity compromise, but archived/older and SolarWinds/SVR-linked, so it should not be treated as current trend evidence.
 
 ## Bibliographic
 
 - **Citation**: CISA. (2021). *Detecting Post-Compromise Threat Activity in Microsoft Cloud Environments*. Cybersecurity Advisory AA21-008A, last revised 15 April 2021.
-- **Source URL or path**: uploaded PDF `Detecting Post-Compromise Threat Activity in Microsoft Cloud Environments _ CISA.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-094-cisa-2021-post-compromise-microsoft-cloud-identity-api-access.pdf`.
 - **Category**: official guidance / cloud identity post-compromise
 - **Evidence basis**: government advisory / detection guidance / incident-linked TTPs
 - **Operational proximity**: observed-guidance — relevant to real post-compromise cloud activity, but historical and archived.

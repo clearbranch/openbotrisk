@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Iliou, C., Kostoulas, T., Tsikrika, T., Katos, V., Vrochidis, S., & Kompatsiaris, I. (2021). Web Bot Detection Evasion Using Generative Adversarial Networks. *IEEE International Conference on Cyber Security and Resilience (CSR 2021)*. IEEE.
-- **Source URL or path**: Web_bot_detection_evasion_using_Generative_Adversarial_Networks_R1_v1.pdf
+- **Source URL or path**: SRC-013-iliou-2021-csr-web-bot-detection-evasion-gans.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Tags**: advanced-bots, evasion, GAN, DCGAN, mouse-biometrics, touchscreen-biometrics, behavioural, CNN, adversarial-evaluation, humanlike-behaviour, public-data-limits

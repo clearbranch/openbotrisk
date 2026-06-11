@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Netacea. (2023). *Death by a Billion Bots: The Accumulating Business Cost of Malicious Automation*. Netacea report.
-- **Source URL or path**: `netacea_2023_death_a_billion_bots_report.pdf`
+- **Source URL or path**: `SRC-007-netacea-2023-death-by-a-billion-bots.pdf`
 - **Date accessed**: 2026-05-31
 - **Category**: vendor
 - **Tags**: vendor, survey, business-impact, malicious-automation, credential-stuffing, scraping, scalping, sniping, fake-account-creation, gift-card-fraud, api-abuse, mobile-apps, bot-management, detection-lag, threat-surface

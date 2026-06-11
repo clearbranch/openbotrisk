@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded arXiv PDF `2603.23559v1.pdf`.
+- **Source access**: uploaded arXiv PDF `SRC-085-chen-2026-recap-captcha-native-gui-agents.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
 
 - **Citation**: Chen, Y., Zhai, H., Wang, C., Yang, R., Zhang, L., Wang, G., & Zhang, H. (2026). *CAPTCHA Solving for Native GUI Agents: Automated Reasoning-Action Data Generation and Self-Corrective Training*. arXiv:2603.23559v1. Posted March 2026.
-- **Source URL or path**: uploaded PDF `2603.23559v1.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-085-chen-2026-recap-captcha-native-gui-agents.pdf`.
 - **Publication status**: arXiv preprint. Treat as not peer-reviewed unless later publication is confirmed.
 - **Category**: academic
 - **Evidence basis**: empirical-measurement / method demonstration / preprint

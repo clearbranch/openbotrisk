@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Andriamilanto, N., Allard, T., Le Guelvouit, G., & Garel, A. (2021). A Large-scale Empirical Analysis of Browser Fingerprints Properties for Web Authentication. *ACM Transactions on the Web*. https://doi.org/10.1145/3478026
-- **Source URL or path**: 2006.09511v2.pdf
+- **Source URL or path**: SRC-017-andriamilanto-2021-large-scale-browser-fingerprints-web-authentication.pdf
 - **Date accessed**: 2026-06-01
 - **Category**: academic / foundations
 - **Tags**: browser-fingerprinting, authentication, web-authentication, multi-factor-authentication, fingerprint-stability, fingerprint-distinctiveness, canvas, audio-fingerprint, WebGL, dynamic-attributes, privacy, public-data-limits

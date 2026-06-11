@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `How the Peer-to-Business Model Redefines App Monetization _ Infatica SDK.pdf`.
+- **Source access**: uploaded PDF capture `SRC-087-infatica-2025-peer-to-business-app-monetization-sdk.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
 
 - **Citation**: Infatica SDK Experts. (2025). *How the Peer-to-Business Model Redefines App Monetization*. Infatica SDK Blog. Published 18 July 2025.
-- **Source URL or path**: uploaded PDF `How the Peer-to-Business Model Redefines App Monetization _ Infatica SDK.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-087-infatica-2025-peer-to-business-app-monetization-sdk.pdf`.
 - **Date accessed / captured**: uploaded 2026-06-07.
 - **Category**: vendor / commercial proxy ecosystem
 - **Evidence basis**: capability-doc / business-model description / vendor marketing

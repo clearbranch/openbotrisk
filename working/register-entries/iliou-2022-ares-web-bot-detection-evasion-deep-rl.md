@@ -3,7 +3,7 @@
 ## Bibliographic
 
 - **Citation**: Iliou, C., Kostoulas, T., Tsikrika, T., Katos, V., Vrochidis, S., & Kompatsiaris, I. (2022). Web Bot Detection Evasion Using Deep Reinforcement Learning. In *Proceedings of the 17th International Conference on Availability, Reliability and Security (ARES 2022)*, Vienna, Austria. ACM, Article 15, 1–10. https://doi.org/10.1145/3538969.3538994
-- **Source URL or path**: Web_Bot_Detection_Evasion_Using_Deep_Reinforcement_Learning_zenodo.pdf
+- **Source URL or path**: SRC-014-iliou-2022-ares-web-bot-detection-evasion-deep-rl.pdf
 - **Date accessed**: 2026-05-31
 - **Category**: academic
 - **Tags**: advanced-bots, evasion, reinforcement-learning, deep-reinforcement-learning, DQN, web-logs, behavioural, adversarial-evaluation, scraping, adaptive-adversary, public-data-limits

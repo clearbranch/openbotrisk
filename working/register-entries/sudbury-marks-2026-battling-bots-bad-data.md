@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Sudbury, A. W., & Marks, M. (2026). *Battling bots and bad data: enhancing data quality in online surveys*. Quality & Quantity. https://doi.org/10.1007/s11135-026-02749-3
-- **Source URL or path**: `Battling_bots_and_bad_data_enhancing_data_quality_.pdf`
+- **Source URL or path**: `SRC-068-sudbury-marks-2026-battling-bots-bad-data.pdf`
 - **Publication status**: peer-reviewed journal article. Received 14 April 2025; accepted 28 March 2026.
 - **Category**: academic
 - **Evidence basis**: empirical-methods / review-informed case study

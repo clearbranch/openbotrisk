@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `Understanding_the_Proxy_Ecosystem_A_Comparative_An.pdf`.
+- **Source access**: uploaded PDF `SRC-089-choi-2020-understanding-proxy-ecosystem.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
 
 - **Citation**: Choi, J., Abuhamad, M., Abusnaina, A., Anwar, A., Alshamrani, S., Park, J., Nyang, D., & Mohaisen, D. (2020). *Understanding the Proxy Ecosystem: A Comparative Analysis of Residential and Open Proxies on the Internet*. IEEE Access. https://doi.org/10.1109/ACCESS.2020.3000959
-- **Source URL or path**: uploaded PDF `Understanding_the_Proxy_Ecosystem_A_Comparative_An.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-089-choi-2020-understanding-proxy-ecosystem.pdf`.
 - **Publication status**: accepted IEEE Access article; PDF text notes it had been accepted for publication and not fully edited at capture.
 - **Category**: academic
 - **Evidence basis**: empirical-measurement / infrastructure-analysis

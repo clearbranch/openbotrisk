@@ -5,7 +5,7 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded arXiv PDF `Pushan_Trace-Free_Deobfuscation_of_Virtualization-.pdf`; supporting academic PDF `Enhance_virtual-machine-based_code_obfuscation_sec.pdf`; public tutorial PDF `Hiding Code Like a Spy_ VM-Based Code Obfuscation in C (with Runtime Decryption) _ by Piyush _ Medium.pdf`.
+- **Source access**: uploaded arXiv PDF `SRC-078-pushan-trace-free-deobfuscation-of-virtualization.pdf`; supporting academic PDF `SRC-078-enhance-virtual-machine-based-code-obfuscation-sec.pdf`; public tutorial PDF `SRC-078-hiding-code-like-a-spy-vm-based-code-obfuscation-in-c-with-runtime-decryption-by-piyush-medium.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: keep Pushan as a standalone academic entry. Use Kuang et al. 2018 as supporting background on stronger VM obfuscation. Do not create a standalone entry for the Medium tutorial.
 
@@ -14,18 +14,18 @@
 ### Main source
 
 - **Citation**: Sudhir, A., Basque, Z. L., Gibbs, W., Bajaj, A. P., Singaria, P. S., Zakocs, M., Hu, J., Schloegel, M., Bao, T., Doupe, A., Shoshitaishvili, Y., & Wang, R. (2026). *Pushan: Trace-Free Deobfuscation of Virtualization-Obfuscated Binaries*. arXiv:2603.18355v1. Posted 18 March 2026.
-- **Source URL or path**: uploaded PDF `Pushan_Trace-Free_Deobfuscation_of_Virtualization-.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-078-pushan-trace-free-deobfuscation-of-virtualization.pdf`.
 - **Publication status**: arXiv preprint. Treat as not peer-reviewed unless later venue publication is confirmed.
 
 ### Supporting background source
 
 - **Citation**: Kuang, K., Tang, Z., Gong, X., Fang, D., Chen, X., & Wang, Z. (2018). *Enhance virtual-machine-based code obfuscation security through dynamic bytecode scheduling*. Computers & Security, 74, 202–220. https://doi.org/10.1016/j.cose.2018.01.008
-- **Source URL or path**: uploaded PDF `Enhance_virtual-machine-based_code_obfuscation_sec.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-078-enhance-virtual-machine-based-code-obfuscation-sec.pdf`.
 
 ### Weak contextual source not separately registered
 
 - **Citation**: Piyush. (2025). *Hiding Code Like a Spy: VM-Based Code Obfuscation in C (with Runtime Decryption)*. Medium. Published 23 April 2025.
-- **Source URL or path**: uploaded PDF `Hiding Code Like a Spy_ VM-Based Code Obfuscation in C (with Runtime Decryption) _ by Piyush _ Medium.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-078-hiding-code-like-a-spy-vm-based-code-obfuscation-in-c-with-runtime-decryption-by-piyush-medium.pdf`.
 
 ## Category and treatment
 

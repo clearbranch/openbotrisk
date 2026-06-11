@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Berke, A., Bacis, E., Ghazi, B., Kamath, P., Kumar, R., Lassonde, R., Manurangsi, P., & Syed, U. (2025). *How Unique is Whose Web Browser? The Role of Demographics in Browser Fingerprinting among US Users*. Proceedings on Privacy Enhancing Technologies, 2025(1), 720–758. https://doi.org/10.56553/popets-2025-0038
-- **Source URL or path**: `popets-2025-0038.pdf`
+- **Source URL or path**: `SRC-067-berke-2025-how-unique-whose-web-browser-demographics.pdf`
 - **Publication venue**: Proceedings on Privacy Enhancing Technologies.
 - **Publication year**: 2025.
 - **Category**: academic

@@ -6,9 +6,9 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**: uploaded PDF captures:
-  - `What Is a CAPTCHA Solving API_ How It Works and When to Use It.pdf`
-  - `Solving modern CAPTCHA for AI Agent and Automation Workflow _ by Matthew Hayes _ Medium.pdf`
-  - `We Benchmarked CAPTCHA Solving Services to Find the Best One - DEV Community.pdf`
+  - `SRC-084-what-is-a-captcha-solving-api-how-it-works-and-when-to-use-it.pdf`
+  - `SRC-084-solving-modern-captcha-for-ai-agent-and-automation-workflow-by-matthew-hayes-medium.pdf`
+  - `SRC-084-we-benchmarked-captcha-solving-services-to-find-the-best-one-dev-community.pdf`
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 - **Source handling decision**: combine these into one entry. CapSolver is the main source; the Medium and DEV/HasData articles are supporting sources showing AI-agent framing and benchmark/tutorial culture.
 
@@ -17,15 +17,15 @@
 ### Main source
 
 - **Citation**: Fujimoto, S. / CapSolver. (2026). *What Is a CAPTCHA Solving API? How It Works and When to Use It*. CapSolver Blog. Published 2 April 2026.
-- **Source URL or path**: uploaded PDF `What Is a CAPTCHA Solving API_ How It Works and When to Use It.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-084-what-is-a-captcha-solving-api-how-it-works-and-when-to-use-it.pdf`.
 
 ### Supporting sources
 
 - **Citation**: Hayes, M. (2025). *Solving modern CAPTCHA for AI Agent and Automation Workflow*. Medium. Published 20 November 2025.
-- **Source URL or path**: uploaded PDF `Solving modern CAPTCHA for AI Agent and Automation Workflow _ by Matthew Hayes _ Medium.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-084-solving-modern-captcha-for-ai-agent-and-automation-workflow-by-matthew-hayes-medium.pdf`.
 
 - **Citation**: Skakun, V. / HasData. (2026). *We Benchmarked CAPTCHA Solving Services to Find the Best One*. DEV Community. Posted 16 February 2026; edited 18 February 2026.
-- **Source URL or path**: uploaded PDF `We Benchmarked CAPTCHA Solving Services to Find the Best One - DEV Community.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-084-we-benchmarked-captcha-solving-services-to-find-the-best-one-dev-community.pdf`.
 
 ## Category and treatment
 

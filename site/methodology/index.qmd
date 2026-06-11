@@ -7,7 +7,8 @@ This section contains concrete experiments and reproducible demonstrations showi
 ## Investigations
 
 - **[Identifier graphs and behavioural synchrony](identifier-graph-and-synchrony.qmd)** — a synthetic experiment showing why shared identifiers and coordinated behaviour reveal different kinds of account clusters, and why both methods need false-positive controls.
+- **[How vendors turn fingerprints into stable IDs](fingerprint-identification.qmd)** — a synthetic experiment reconstructing browser-fingerprint identification at four levels of sophistication, showing why the "accuracy" vendors publish is only one of two error modes, and why cloned mobile devices set a hard floor on what fingerprinting can achieve.
 
 ## Code
 
-The supporting code for the first investigation is in `src/openbotrisk/experiments/identifier_synchrony/`. It is written as plain Python scripts rather than a notebook so the website page can stay narrative while the figures remain reproducible.
+The supporting code for the first investigation is in `src/openbotrisk/experiments/identifier_synchrony/`. The second investigation's code is in `src/openbotrisk/experiments/fingerprint_identification/`. Both are written as plain Python scripts rather than notebooks so the website pages can stay narrative while the figures remain reproducible.

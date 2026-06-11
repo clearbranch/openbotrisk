@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: PortSwigger Web Security Academy. 2026. *Authentication vulnerabilities*. PortSwigger.
-- **Source URL or path**: `Authentication vulnerabilities _ Web Security Academy.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication`
+- **Source URL or path**: `SRC-072-portswigger-2026-authentication-vulnerabilities.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication`
 - **Date accessed / captured**: uploaded 2026-06-06
 - **Category**: vendor / educational-reference
 - **Evidence basis**: vulnerability-taxonomy

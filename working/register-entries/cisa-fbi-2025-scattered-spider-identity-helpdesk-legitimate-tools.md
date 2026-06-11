@@ -6,14 +6,14 @@
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
 - **Source access**:
-  - canonical uploaded PDF `aa23-320a-scattered-spider-508c.pdf` dated 29 July 2025;
-  - older uploaded PDF `aa23-320a_scattered_spider_0.pdf` dated 16 November 2023, used only as historical/source-family context.
+  - canonical uploaded PDF `SRC-095-aa23-320a-scattered-spider-508c.pdf` dated 29 July 2025;
+  - older uploaded PDF `SRC-095-aa23-320a-scattered-spider-0.pdf` dated 16 November 2023, used only as historical/source-family context.
 - **Source handling decision**: use the 2025 updated advisory as canonical. Fold the 2023 advisory into this entry only if comparing evolution.
 
 ## Bibliographic
 
 - **Citation**: FBI, CISA, RCMP, ASD’s ACSC, AFP, CCCS, and NCSC-UK. (2025). *Scattered Spider*. Joint Cybersecurity Advisory AA23-320A, updated 29 July 2025.
-- **Source URL or path**: uploaded PDF `aa23-320a-scattered-spider-508c.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-095-aa23-320a-scattered-spider-508c.pdf`.
 - **Category**: official government advisory / actor TTPs
 - **Evidence basis**: government advisory / investigation-derived TTPs / MITRE ATT&CK mapping
 - **Operational proximity**: observed-investigative — strong non-vendor evidence for identity/social-engineering/legitimate-tool abuse, but actor-specific and not bot-specific.

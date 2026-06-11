@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: Martínez Llamas, J., Vranckaert, K., Preuveneers, D., & Joosen, W. (2025). *Balancing Security and Privacy: Web Bot Detection, Privacy Challenges, and Regulatory Compliance under the GDPR and AI Act* [version 1; peer review: 2 approved]. *Open Research Europe*, 5:76. https://doi.org/10.12688/openreseurope.19347.1
-- **Source URL or path**: https://doi.org/10.12688/openreseurope.19347.1; local uploaded PDF: `53bd845a-4be2-4f15-9f8a-48606e96e78b_19347_-_davy_preuveneers.pdf`
+- **Source URL or path**: https://doi.org/10.12688/openreseurope.19347.1; local uploaded PDF: `SRC-047-martinez-llamas-2025-web-bot-detection-privacy-gdpr-ai-act.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: academic
 - **Evidence basis**: methods-taxonomy

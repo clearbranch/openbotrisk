@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: MDN Web Docs. 2026. *Cross-Origin Resource Sharing (CORS)*. Mozilla Developer Network. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/Cross-Origin Resource Sharing (CORS) - HTTP _ MDN.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-059-mdn-2026-cors.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: foundations
 - **Evidence basis**: reference-doc

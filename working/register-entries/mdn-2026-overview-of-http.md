@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: MDN Web Docs. 2026. *Overview of HTTP*. Mozilla Developer Network. Accessed via uploaded PDF capture, 2026-06-06.
-- **Source URL or path**: Uploaded file: `/mnt/data/Overview of HTTP - HTTP _ MDN.pdf`
+- **Source URL or path**: Uploaded file: `/mnt/data/SRC-065-mdn-2026-overview-of-http.pdf`
 - **Date accessed**: 2026-06-06
 - **Category**: foundations
 - **Evidence basis**: reference-doc

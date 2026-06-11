@@ -5,7 +5,7 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF `NIST.SP.800-63b-4.pdf`.
+- **Source access**: uploaded PDF `SRC-073-nist-2025-sp-800-63b-4-authentication-authenticator-management.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
@@ -13,7 +13,7 @@
 - **Citation**: Temoshok, D., Fenton, J. L., Choong, Y.-Y., Lefkovitz, N., Regenscheid, A., Galluzzo, R., & Richer, J. P. (2025). *Digital Identity Guidelines: Authentication and Authenticator Management*. NIST Special Publication 800-63B-4. National Institute of Standards and Technology. https://doi.org/10.6028/NIST.SP.800-63B-4
 - **Publication date**: July 2025.
 - **Publication status**: Final NIST Special Publication; approved 2025-05-30.
-- **Source URL or path**: uploaded PDF `NIST.SP.800-63b-4.pdf`; DOI `10.6028/NIST.SP.800-63B-4`.
+- **Source URL or path**: uploaded PDF `SRC-073-nist-2025-sp-800-63b-4-authentication-authenticator-management.pdf`; DOI `10.6028/NIST.SP.800-63B-4`.
 - **Category**: foundations
 - **Evidence basis**: standards-reference / authentication-guidance / control-requirements
 - **Operational proximity**: control — normative guidance for authentication, authenticator management, reauthentication, and session management. It is not bot-abuse telemetry, not detection-performance evidence, and not a vendor product source.

@@ -5,13 +5,13 @@
 - **Extraction date**: 2026-06-07
 - **Extraction agent**: ChatGPT
 - **Model name + version, if known**: GPT-5.5 Thinking
-- **Source access**: uploaded PDF capture `What are Residential Proxies_ Definition, Use Cases, and More.pdf`.
+- **Source access**: uploaded PDF capture `SRC-088-brightdata-2026-residential-proxies-definition-use-cases-best-providers.pdf`.
 - **Prompt version**: newer register/source-extraction pattern used in this conversation, including evidence basis, operational proximity, framing distance, limits, project impact, and dual-use containment.
 
 ## Bibliographic
 
 - **Citation**: Zanini, A. / Bright Data. (2026). *Residential Proxies: Definition, Use Cases, and Best Providers*. Bright Data Blog / Proxy 101.
-- **Source URL or path**: uploaded PDF `What are Residential Proxies_ Definition, Use Cases, and More.pdf`.
+- **Source URL or path**: uploaded PDF `SRC-088-brightdata-2026-residential-proxies-definition-use-cases-best-providers.pdf`.
 - **Date accessed / captured**: uploaded 2026-06-07.
 - **Publication date note**: the capture shows Bright Data copyright 2026, but no clear article publication date in the extracted text.
 - **Category**: vendor / commercial proxy ecosystem

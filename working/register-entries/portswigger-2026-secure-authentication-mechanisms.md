@@ -11,7 +11,7 @@
 ## Bibliographic
 
 - **Citation**: PortSwigger Web Security Academy. 2026. *How to secure your authentication mechanisms*. PortSwigger.
-- **Source URL or path**: `How to secure your authentication mechanisms _ Web Security Academy.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication/securing`
+- **Source URL or path**: `SRC-070-portswigger-2026-secure-authentication-mechanisms.pdf`; likely WSA topic page `https://portswigger.net/web-security/authentication/securing`
 - **Date accessed / captured**: uploaded 2026-06-06
 - **Category**: vendor / defensive-guidance
 - **Evidence basis**: control-guidance
