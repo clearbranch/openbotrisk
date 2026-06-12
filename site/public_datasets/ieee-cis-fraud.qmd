@@ -12,7 +12,7 @@ format:
 A two-table payment-transaction dataset (transaction + identity, joined on `TransactionID`) with a binary `isFraud` label and a rich set of card, address, email-domain, and device/browser identifiers. It is the closest public data to the project's identifier-graph method — and its label, propagated across a card/account chain after the first reported fraud, is the same entity-resolution subtlety that method is about.
 :::
 
-This is a **dataset-reference page**: what the resource is, what it approximates, what it cannot show. Running the identifier-graph method against it would be a separate investigation — and a natural one, already flagged in the live-site TODO.
+This is a **dataset-reference page**: what the resource is, what it approximates, what it cannot show. Running the identifier-graph method against it would be a separate investigation — and a natural one, already flagged in the live-site TODO. The descriptive content is the output of `notebooks/eda/ieee-fraud-detection.ipynb`; the framing is this page's addition.
 
 ## Why this dataset matters here
 
@@ -27,32 +27,71 @@ Scope note: this is payment fraud, which the project admits only on its **web-fa
 
 Source: Kaggle competition `ieee-fraud-detection` (via `kaggle competitions download`).
 
+- Local path: `data/ieee-fraud-detection`
 - File format: CSV.
-- Files on disk: {{ FILL: file list with sizes — cell 2 }}
-- Date inspected: {{ FILL: date — cell 2 }}
+- Date inspected: 2026-05-23.
+- Files on disk: `sample_submission.csv` — 5.8 MB; `test_identity.csv` — 24.6 MB; `test_transaction.csv` — 584.8 MB; `train_identity.csv` — 25.3 MB; `train_transaction.csv` — 651.7 MB.
 
 ## Structure
 
-- `train_transaction.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one transaction.
-- `train_identity.csv`: {{ FILL: rows × cols — cell 3 }}. Identity / device features attached to a subset of transactions.
-- Join key: `TransactionID` (left join transaction ← identity). Identity available for {{ FILL: overlap count and % — cell 3 }} of transactions.
-- Temporal coverage: `TransactionDT` ranges over {{ FILL: dt_min to dt_max seconds, ~days — cell 3 }} from an unspecified reference time.
+- `train_transaction.csv`: 590,540 rows × 394 cols. One row = one transaction.
+- `train_identity.csv`: 144,233 rows × 41 cols. Identity / device features attached to a subset of transactions.
+- Join key: `TransactionID` (left join transaction ← identity). Identity available for 144,233 / 590,540 transactions (24.4%) — so ~76% of transactions have no identity row.
+- Temporal coverage: `TransactionDT` ranges from 86,400 to 15,811,131 seconds (~182.0 days) from an unspecified reference time.
 
 ## Schema
 
-Most columns are anonymised by Vesta with no public mapping. The interpretable columns are the target (`isFraud`), the amount (`TransactionAmt`), the timing offset (`TransactionDT`), the product code (`ProductCD`), the email domains (`P_emaildomain`, `R_emaildomain`), and — in the identity table — `DeviceType` and `DeviceInfo`. Everything in the `V*` (Vesta-engineered numeric), `C*` (count-type), `D*` (day time-delta), `M*` (match-type T/F), `id_*`, `card*`, `addr*`, and `dist*` families is anonymised.
+Most columns are anonymised by Vesta with no public mapping. The interpretable ones are the target (`isFraud`), amount (`TransactionAmt`), timing offset (`TransactionDT`), product code (`ProductCD`), email domains (`P_/R_emaildomain`), and — in the identity table — `DeviceType`, `DeviceInfo`, plus `id_30` (OS), `id_31` (browser), `id_33` (screen resolution). Everything in the `V*`, `C*`, `D*`, `M*`, `id_*`, `card*`, `addr*`, `dist*` families is anonymised. Full `V`-column range: V1..V339 (339 columns).
 
-- Full `V`-column range: V1..V339 ({{ FILL: count of V columns — cell 4 }} columns).
+### `train_transaction` (non-V columns + V1..V20 of 339 V cols)
 
-::: {.callout-note collapse="true" title="Full schema tables (fill on run)"}
-{{ FILL: schema_block for train_transaction (non-V cols + V1..V20) and train_identity — cell 4. Column descriptions for the interpretable columns are authored above; dtype/example come from the run. }}
-:::
+| column | dtype | example | description |
+|---|---|---|---|
+| `TransactionID` | int64 | `2987000` | Unique transaction id |
+| `isFraud` | int64 | `0` | Target: 1 = fraudulent |
+| `TransactionDT` | int64 | `86400` | Time-delta from reference (s) |
+| `TransactionAmt` | float64 | `68.5` | Transaction amount (USD) |
+| `ProductCD` | object | `W` | Product code (categorical) |
+| `card1` | int64 | `13926` | card attribute (anonymised) |
+| `card2` | float64 | | card attribute (anonymised) |
+| `card3` | float64 | `150.0` | card attribute (anonymised) |
+| `card4` | object | `discover` | card network |
+| `card5` | float64 | `142.0` | card attribute (anonymised) |
+| `card6` | object | `credit` | card type |
+| `addr1` | float64 | `315.0` | address region (anonymised) |
+| `addr2` | float64 | `87.0` | address country (anonymised) |
+| `dist1` | float64 | `19.0` | distance feature (anonymised) |
+| `dist2` | float64 | | distance feature (anonymised) |
+| `P_emaildomain` | object | | Purchaser email domain |
+| `R_emaildomain` | object | | Recipient email domain |
+| `C1`–`C14` | float64 | `1.0` | count-type features (anonymised) |
+| `D1`–`D15` | float64 | `14.0` | day time-delta features (anonymised) |
+| `M1`–`M9` | object | `T` | match-type categoricals (anonymised) |
+| `V1`–`V20` | float64 | `1.0` | Vesta-engineered numeric features (anonymised); continues to V339 |
+
+### `train_identity` (41 columns, selected)
+
+| column | dtype | example | description |
+|---|---|---|---|
+| `TransactionID` | int64 | `2987004` | Join key to train_transaction |
+| `id_01`–`id_11` | float64 | `70787.0` | identity features (anonymised) |
+| `id_12`–`id_29` | object/float | `NotFound` / `New` | identity features (anonymised) |
+| `id_30` | object | `Android 7.0` | OS string |
+| `id_31` | object | `samsung browser 6.2` | browser string |
+| `id_32` | float64 | `32.0` | identity feature (anonymised) |
+| `id_33` | object | `2220x1080` | screen resolution |
+| `id_34`–`id_38` | object | `match_status:2` / `T` | identity features (anonymised) |
+| `DeviceType` | object | `mobile` | Device class (desktop / mobile) |
+| `DeviceInfo` | object | `SAMSUNG SM-G892A Build/NRD90M` | Device info string (browser/UA-derived) |
 
 ## Label
 
 Label column: `isFraud` in `train_transaction.csv` (1 = fraudulent).
 
-- Balance: {{ FILL: isFraud count + rate table — cell 5 }}
+| isFraud | count | rate |
+|---|---|---|
+| 0 | 569,877 | 0.96501 |
+| 1 | 20,663 | 0.03499 |
 
 ::: {.callout-important title="The label is chain-propagated — an entity-resolution lesson, not a per-row truth"}
 Per Kaggle, a fraud label is propagated to *all* transactions in a card / account / email chain after the first reported fraud. So a positive label is partly a **chain-level proxy**, not a per-transaction confirmation: a single confirmed fraud paints every linked transaction positive.
@@ -64,34 +103,57 @@ This is the identifier-graph problem appearing inside the ground truth itself. I
 
 No explicit user ID. Weak actor identifiers come from card hashes, email domains, and (when the identity table joins) device/browser strings — the exact edge types the identifier-graph method uses.
 
-{{ FILL: cardinality + null-rate table for card1-6, addr1-2, P/R_emaildomain, DeviceType, DeviceInfo, id_30/31/33 — cell 6. Roles are authored: card1 = card hash / weak account id; card4 = network; card6 = debit/credit; addr1 = billing region; addr2 = country; P_emaildomain = purchaser domain; DeviceInfo = device fingerprint string; id_30 = OS; id_31 = browser; id_33 = screen resolution. }}
+| column | n_unique | null_rate | role |
+|---|---|---|---|
+| `TransactionID` | 590,540 | 0.0000 | transaction primary key |
+| `card1` | 13,553 | 0.0000 | card hash (weak account identifier) |
+| `card2` | 500 | 0.0151 | card attribute |
+| `card3` | 114 | 0.0027 | card attribute |
+| `card4` | 4 | 0.0027 | card network (visa/mc/etc.) |
+| `card5` | 119 | 0.0072 | card attribute |
+| `card6` | 4 | 0.0027 | card type (debit/credit) |
+| `addr1` | 332 | 0.1113 | billing address region |
+| `addr2` | 74 | 0.1113 | billing country |
+| `P_emaildomain` | 59 | 0.1599 | purchaser email domain (weak actor signal) |
+| `R_emaildomain` | 60 | 0.7675 | recipient email domain |
+| `DeviceType` | 2 | 0.0237 | device class |
+| `DeviceInfo` | 1,786 | 0.1773 | device fingerprint string |
+| `id_30` | 75 | 0.4622 | OS string |
+| `id_31` | 130 | 0.0274 | browser string |
+| `id_33` | 260 | 0.4919 | screen resolution |
+
+The cardinality spread previews the giant-component problem directly: `card1` at 13,553 distinct values is a usefully discriminative edge, while `card4` (4 values) and `card6` (4 values) are near-universal attributes that would fuse everything if treated as linking edges — they are node *attributes*, not edges, exactly as the method's edge-weighting section argues.
 
 ## Temporal structure
 
-- `TransactionDT`: integer seconds from an undisclosed reference time. No wall-clock timestamps, no timezone.
-- Range: {{ FILL: seconds + days — cell 7 }}
+- `TransactionDT`: integer seconds from an undisclosed reference. No wall-clock timestamps, no timezone.
+- Range: 86,400 to 15,811,131 seconds (182.0 days of activity).
 - `D1`..`D15` are documented as day-granularity time-delta features relative to prior events on the same card/account — themselves entity-linked features.
 - Diurnal patterns are inferable modulo the unknown reference; not plotted here.
 
 ## Missing data
 
-High missingness is concentrated in long blocks of `V`/`D`/`id_` columns — typical of features only defined for certain product codes or device classes. Identity rows are entirely absent for the majority of transactions.
+- `train_transaction`: 95,566,686 null cells overall (41.07% of cells); 212 of 394 columns have >20% missingness.
+- `train_identity`: 2,104,107 null cells overall (35.58%); 19 of 41 columns have >20% missingness.
+- Identity rows themselves are missing for ~76% of transactions.
 
-{{ FILL: per-table null summary + top-15 most-null columns for each table — cell 8 }}
+Top most-null columns in `train_transaction`: `dist2` (0.9363), `D7` (0.9341), `D13` (0.8951), `D14` (0.8947), `D12` (0.8904), `D6` (0.8761), `D9` (0.8731), `D8` (0.8731), and a block of V-columns (`V153`, `V149`, `V141`, `V146`, `V154`, `V162`, `V142`) all at 0.8612.
+
+Top most-null columns in `train_identity`: `id_24` (0.9671), `id_25` (0.9644), `id_07` (0.9643), `id_08` (0.9643), `id_21` (0.9642), `id_26`/`id_23`/`id_27`/`id_22` (~0.9642), then `id_18` (0.6872), `id_04`/`id_03` (0.5402), `id_33` (0.4919), `id_10`/`id_09` (0.4805).
 
 ## Quirks and observations
 
-- Two-file structure joined on `TransactionID`; only a minority of transactions carry identity rows.
-- `V*/C*/D*/M*/id_*` columns are anonymised with no public mapping — treat as opaque.
+- Two-file structure joined on `TransactionID`; only 24% of transactions have identity rows.
+- `V*/C*/D*/M*/id_*` columns are anonymised; no public mapping. Treat as opaque.
 - `TransactionDT` is seconds from an unstated reference; cannot anchor to calendar dates.
 - Labels are chain-propagated (see Label callout) — the single most important property for this project.
-- Missingness clusters in feature blocks defined only for certain product codes or device classes, not at random.
+- High missingness clusters in long blocks of V/D/id_ columns — typical of features only defined for certain product codes or device classes, not missing at random.
 
 ## Framing distance
 
 **What real problem it approximates:** identifier-linked payment fraud at realistic scale and cardinality — the real-data setting for the identifier-graph method, with the entity-resolution structure present in both the features and the label.
 
-**What it fails to represent:** it is payment fraud, not bot detection; the label is chain-propagated, not per-transaction truth; most features are anonymised, so the method's edge-weighting can't be reasoned about semantically; and it is a transaction table, not a session/clickstream, so behavioural-synchrony signals are absent.
+**What it fails to represent:** it is payment fraud, not bot detection; the label is chain-propagated, not per-transaction truth; most features are anonymised, so the method's edge-weighting can't be reasoned about semantically beyond the card/email/device columns; and it is a transaction table, not a session/clickstream, so behavioural-synchrony signals are absent.
 
 **What further evidence would be needed:** a bot-labelled (not fraud-labelled) source; per-event rather than chain-propagated labels; de-anonymised identifier semantics; and session-level behavioural data to pair with the transaction-level identifiers.
 
@@ -109,4 +171,4 @@ jupyter nbconvert --to notebook --execute --inplace \
   --ExecutePreprocessor.timeout=600
 ```
 
-Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1 }}. Both train CSVs fit in memory; no chunking needed.
+Loader runtime on the reference machine: 14.0 s. Both train CSVs fit in memory; no chunking needed.

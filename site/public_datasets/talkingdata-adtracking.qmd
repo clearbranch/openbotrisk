@@ -9,10 +9,10 @@ format:
 ---
 
 ::: {.lead}
-A single large flat table of mobile ad clicks, each with anonymised `ip`, `app`, `device`, `os`, `channel`, a `click_time`, and an `is_attributed` target marking whether the click led to an app install. It is a natural real-data setting for the behavioural-synchrony method — rapid repeated clicks per IP/device that never convert — as long as the label is read correctly: it marks *conversion*, not *bot*.
+A single large flat table of mobile ad clicks (~185 million rows), each with anonymised `ip`, `app`, `device`, `os`, `channel`, a `click_time`, and an `is_attributed` target marking whether the click led to an app install. It is a natural real-data setting for the behavioural-synchrony method — rapid repeated clicks per IP/device that never convert — as long as the label is read correctly: it marks *conversion*, not *bot*.
 :::
 
-This is a **dataset-reference page**. Running the synchrony method against the click-timing structure would be a separate investigation, already flagged in the live-site TODO.
+This is a **dataset-reference page**. Running the synchrony method against the click-timing structure would be a separate investigation, already flagged in the live-site TODO. The descriptive content is the output of `notebooks/eda/talkingdata-adtracking.ipynb`; the framing is this page's addition.
 
 ## Why this dataset matters here
 
@@ -24,48 +24,50 @@ The catch is the label, treated below as the load-bearing caution: `is_attribute
 
 Source: Kaggle competition `talkingdata-adtracking-fraud-detection` (via `kaggle competitions download`).
 
+- Local path: `data/talkingdata-adtracking-fraud-detection`
 - File format: CSV.
-- Files on disk: {{ FILL: file list with sizes — cell 3 }}
-- Date inspected: {{ FILL: date — cell 3 }}
+- Date inspected: 2026-05-23.
+- Files on disk: `sample_submission.csv` — 186.5 MB; `test.csv` — 823.3 MB; `test_supplement.csv` — 2.5 GB; `train.csv` — 7.0 GB; `train_sample.csv` — 3.9 MB.
 
 ## Structure
 
-- `train.csv`: {{ FILL: row_count and col count — cell 4 }}. One row = one ad click.
-- `test.csv`: {{ FILL: test row count or N/A — cell 4 }} (no label).
-- Temporal coverage in train: {{ FILL: tmin to tmax — cell 4 }}.
+- `train.csv`: 184,903,890 rows, 8 columns. One row = one ad click.
+- `test.csv`: no label.
+- Temporal coverage in train: 2017-11-06 14:32:21 to 2017-11-09 16:00:00.
 - Single flat table; no join keys between train/test beyond click features.
 
 ## Schema
 
-All feature columns are anonymised integer IDs with no public mapping:
+| column | dtype | example | description |
+|---|---|---|---|
+| `ip` | BIGINT | `83230` | IP address of click (anonymised integer encoding) |
+| `app` | BIGINT | `3` | App ID for marketing (encoded) |
+| `device` | BIGINT | `1` | Device type ID (encoded, e.g. iphone 6 plus, iphone 7) |
+| `os` | BIGINT | `13` | OS version ID (encoded) |
+| `channel` | BIGINT | `379` | Channel ID of mobile ad publisher (encoded) |
+| `click_time` | TIMESTAMP | `2017-11-06 14:32:21` | UTC timestamp of click |
+| `attributed_time` | TIMESTAMP | `NaT` | UTC timestamp of app download if attributed |
+| `is_attributed` | BIGINT | `0` | Target: 1 if app downloaded after click, else 0 |
 
-- `ip` — IP address of the click (anonymised integer encoding).
-- `app` — app ID being advertised (encoded).
-- `device` — device type ID (encoded; a *type*, e.g. a phone model class, not a per-device fingerprint).
-- `os` — OS version ID (encoded).
-- `channel` — mobile ad publisher channel ID (encoded).
-- `click_time` — UTC timestamp of the click.
-- `attributed_time` — UTC timestamp of the app download, populated only when `is_attributed = 1`.
-- `is_attributed` — target: 1 if an install followed the click, else 0.
-
-::: {.callout-note collapse="true" title="Full schema table (fill on run)"}
-{{ FILL: schema table with dtype + example per column — cell 5. Descriptions are authored above. }}
-:::
+All feature columns (`ip`, `app`, `device`, `os`, `channel`) are anonymised integer IDs with no public mapping.
 
 ## Label
 
 Label column: `is_attributed` (1 = click led to an app install, 0 = not).
 
-- Balance: {{ FILL: is_attributed count + rate table — cell 6 }}
+| is_attributed | count | rate |
+|---|---|---|
+| 0 | 184,447,044 | 0.99753 |
+| 1 | 456,846 | 0.00247 |
 
 ::: {.callout-important title="This is a conversion label, not a bot label — read it that way or not at all"}
-`is_attributed = 1` means an install followed the click. The positive class is therefore **legitimate conversion**, and the overwhelming negative class mixes ordinary non-converting clicks with fraudulent ones. There is no direct bot/human flag.
+`is_attributed = 1` means an install followed the click. The positive class is therefore **legitimate conversion**, and the overwhelming negative class (99.75%) mixes ordinary non-converting clicks with fraudulent ones. There is no direct bot/human flag.
 
 Consequences:
 
 1. **Not a supervised bot classifier.** Training to predict `is_attributed` predicts conversion, not automation. Presenting such a model as bot detection would be wrong.
 2. **Fraud is inferred, not labelled.** The signal of interest — many rapid clicks from one `ip`/`device` that never convert — has to be derived from the click structure, which is precisely a behavioural-synchrony / rate-anomaly analysis, not a classification against the given label.
-3. **The label is time-delayed.** `attributed_time` is the install time, after the click, so the target is only known with lag.
+3. **The label is time-delayed.** `attributed_time` is the install time, after the click, so the target is only known with lag (and is null for all negatives by design).
 
 This is why the dataset is filed as a synchrony companion rather than a labelled detector: its value is the click-timing structure, not its target column.
 :::
@@ -74,11 +76,20 @@ This is why the dataset is filed as a synchrony companion rather than a labelled
 
 No per-user ID. `ip` is the closest actor identifier but is coarse and NAT-prone (mobile carrier NAT puts many devices behind one IP). `device` is a device *type*, not a per-device fingerprint. No browser, cookie, or session-token columns exist.
 
-{{ FILL: cardinality + unique-rate table for ip/app/device/os/channel — cell 7. Notes authored: ip = weak actor id, NAT-shared; device = type not fingerprint; channel = publisher; app = advertised app. }}
+| column | n_unique | unique_rate | note |
+|---|---|---|---|
+| `app` | 706 | 0.000004 | app being advertised |
+| `device` | 3,475 | 0.000019 | device type, not a per-device fingerprint |
+| `os` | 800 | 0.000004 | OS version code |
+| `channel` | 202 | 0.000001 | publisher channel |
+| `is_attributed` | 2 | 0.000000 | label |
+| `ip` | 277,396 | 0.001500 | weak actor identifier; shared by NAT/carrier traffic |
+
+The low `ip` unique-rate against 185M rows is the point: many clicks share each IP, which is what makes per-IP click-timing a usable coordination signal — and simultaneously what makes IP a weak *identity* signal, since mobile NAT means one IP is many devices.
 
 ## Temporal structure
 
-- `click_time`: UTC timestamp at second granularity. Range {{ FILL: tmin to tmax — cell 8 }}.
+- `click_time`: UTC timestamp at second granularity. Range 2017-11-06 14:32:21 to 2017-11-09 16:00:00 (~3 days 01:27:39 of wall-clock time).
 - `attributed_time`: UTC second granularity; populated only on positive labels.
 - Click density follows diurnal mobile-ad patterns; not plotted here.
 
@@ -86,17 +97,20 @@ The second-granularity `click_time` per `ip`/`device` is the field the synchrony
 
 ## Missing data
 
-Only `attributed_time` is meaningfully missing, and by design — it is null whenever `is_attributed = 0`. Feature columns are complete.
+Only `attributed_time` is meaningfully missing, and by design — it is null whenever `is_attributed = 0`. Feature columns are fully populated.
 
-{{ FILL: per-column null table — cell 9 }}
+| column | null_count | null_rate |
+|---|---|---|
+| `attributed_time` | 184,447,044 | 0.99753 |
+| all others | 0 | 0.00000 |
 
 ## Quirks and observations
 
-- `train.csv` is large ({{ FILL: ~GB — cell 10 }}); loaded via DuckDB streaming, as pandas would not fit it comfortably in memory.
+- `train.csv` is ~7 GB; loaded via DuckDB streaming. Pandas would not fit it comfortably in memory.
 - All feature columns are anonymised integer IDs — no human-readable meaning, no PII.
-- `attributed_time` null whenever `is_attributed = 0` — by definition, not data loss.
-- `ip` cardinality is large but each IP can map to many devices (mobile NAT), so IP is a weak linkage signal.
-- `test.csv` has {{ FILL: test row count note — cell 10 }}.
+- `attributed_time` null whenever `is_attributed = 0`; by definition, not data loss.
+- IP cardinality is large but each IP can map to many devices (mobile NAT), so IP is a weak linkage signal.
+- `test.csv` lacks `is_attributed` / `attributed_time`.
 
 ## Framing distance
 
@@ -120,4 +134,4 @@ jupyter nbconvert --to notebook --execute --inplace \
   --ExecutePreprocessor.timeout=600
 ```
 
-Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1/11 }}. No file is fully materialised in pandas; the large `train.csv` is scanned via DuckDB.
+Loader runtime on the reference machine: 6.2 s. No file is fully materialised in pandas; DuckDB performs the row count, null counts, cardinality, label counts, and time-range queries in a single pass over `train.csv`.

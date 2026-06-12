@@ -1,5 +1,8 @@
 ---
 title: "Methodology investigations"
+image: ../assets/openbotrisk_banner_panel_04.png
+title-block-banner: ../assets/openbotrisk_banner_panel_04.png
+title-block-banner-color: "#ffffff"
 ---
 
 This section contains concrete experiments and reproducible demonstrations showing what current best-practice methodology can and cannot do. Each investigation is written as a self-contained piece with code or data notes attached where possible.

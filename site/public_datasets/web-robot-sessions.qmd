@@ -12,7 +12,7 @@ format:
 Labelled web sessions with engineered HTTP/behavioural and page-semantic features, derived from a real library OPAC's access logs. This is the most on-remit public dataset the project holds: its unit is the web session, its label is a bot/human flag, and it ships both the engineered features and the raw request log underneath. Its central caveat is the labels — they are the original authors' heuristic, not ground truth, and a model that merely relearns that heuristic has measured nothing.
 :::
 
-This is a **dataset-reference page**: it documents what the resource is, what it approximates, and what it cannot show. It does not run a detection method against the data — that would be a separate investigation (and a strong candidate for one).
+This is a **dataset-reference page**: it documents what the resource is, what it approximates, and what it cannot show. It does not run a detection method against the data — that would be a separate investigation (and a strong candidate for one). The descriptive content below is the output of `notebooks/eda/web-robot-sessions.ipynb`; the framing around it is the addition this page makes.
 
 ## Why this dataset matters here
 
@@ -26,85 +26,158 @@ Source: Figshare dataset 3477932 (web robot detection, session-level features + 
 
 Underlying logs are from the Aristotle University of Thessaloniki library OPAC (`search.lib.auth.gr`), captured in early 2018 (per timestamps in `public_v2.json`). The dataset corresponds to the Rovetta et al. line of web-robot-detection work using semantic + behavioural session features.
 
+- Local path: `data/web-robot-sessions`
 - File formats: CSV (engineered session features) + JSON (raw per-request log).
-- Files on disk: {{ FILL: file list with sizes — from cell 2 `file_lines` }}
-- Date inspected: {{ FILL: date — from cell 2 `today` }}
+- Date inspected: 2026-05-23.
+- Files on disk: `public_v2.json` — 3.0 GB; `semantic_features.csv` — 4.1 MB; `simple_features.csv` — 15.2 MB.
 
 ## Structure
 
-- `simple_features.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one web session. HTTP/behavioural features + binary `ROBOT` label.
-- `semantic_features.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one web session. Page-topic/semantic features + binary `ROBOT` label.
-- `public_v2.json`: {{ FILL: ~GB size — cell 3 }}. Raw per-request log as a single JSON object keyed by request ID (Elasticsearch-style). Each value is a dict with HTTP request fields. Stream-parsed for schema inspection only (first 100 entries); not loaded fully.
-- Join key: `ID` links `simple_features` and `semantic_features` ({{ FILL: overlap count and % — cell 3 }} of session IDs overlap). The session `ID` is the parent key under which raw requests are grouped in the source logs; the raw JSON uses request-level IDs, so a direct session↔raw-request join would require an external mapping not included here.
+- `simple_features.csv`: 67,352 rows × 32 cols. One row = one web session. HTTP/behavioural features + binary `ROBOT` label.
+- `semantic_features.csv`: 67,352 rows × 7 cols. One row = one web session. Page-topic/semantic features + binary `ROBOT` label.
+- `public_v2.json`: ~3.0 GB. Raw per-request log as a single JSON object keyed by request ID (Elasticsearch-style). Each value is a dict with HTTP request fields. Not loaded fully; only the first 100 entries were stream-parsed for schema inspection.
+- Join key: `ID` links the two CSVs (67,352 / 67,352 session IDs overlap = 100%). The session `ID` is the parent key under which raw requests are grouped in the source logs; the raw JSON uses request-level IDs, so a direct session↔raw-request join would require an external mapping not included here.
 
 ## Schema
 
-The two CSVs are two feature blocks for the same session table, inner-joinable on `ID`. The `simple_features` block is HTTP/behavioural; `semantic_features` is page-topic. Selected authored column descriptions:
+### `simple_features` (32 columns)
 
-`simple_features` carries request-volume and timing features (`NUMBER_OF_REQUESTS`, `TOTAL_DURATION`, `AVERAGE_TIME`, `STANDARD_DEVIATION`), response-code mix (`HTTP_RESPONSE_2XX`…`5XX`), HTTP-method mix (`GET_METHOD`, `POST_METHOD`, `HEAD_METHOD`), resource-type ratios (`IMAGES`, `TOTAL_HTML`, `HTML_TO_IMAGE`, `HTML_TO_CSS`, `HTML_TO_JS`), navigation-graph shape (`WIDTH`, `DEPTH`, `STD_DEPTH`, `CONSECUTIVE`), a night-activity fraction (`NIGHT`), a burst measure (`MAX_BARRAGE`), a request-rate proxy (`PPI`), and a heuristic `PENALTY` score, alongside the `ROBOT` target.
+| column | dtype | example | description |
+|---|---|---|---|
+| `ID` | object | `obSnwGoBCue8G08E_WCX` | Session id (join key) |
+| `NUMBER_OF_REQUESTS` | int64 | `79` | Number of HTTP requests in session |
+| `TOTAL_DURATION` | int64 | `592` | Session duration (seconds) |
+| `AVERAGE_TIME` | float64 | `7.5897436` | Mean inter-request interval (s) |
+| `STANDARD_DEVIATION` | float64 | `1.8005404` | Std of inter-request interval (s) |
+| `REPEATED_REQUESTS` | float64 | `0.0` | Fraction of repeated resource requests |
+| `HTTP_RESPONSE_2XX` | float64 | `0.8734177` | Fraction of 2xx responses |
+| `HTTP_RESPONSE_3XX` | float64 | `0.1265823` | Fraction of 3xx responses |
+| `HTTP_RESPONSE_4XX` | float64 | `0.0` | Fraction of 4xx responses |
+| `HTTP_RESPONSE_5XX` | float64 | `0.0` | Fraction of 5xx responses |
+| `GET_METHOD` | float64 | `1.0` | Fraction of GET requests |
+| `POST_METHOD` | float64 | `0.0` | Fraction of POST requests |
+| `HEAD_METHOD` | float64 | `0.0` | Fraction of HEAD requests |
+| `OTHER_METHOD` | float64 | `0.0` | Fraction of other HTTP methods |
+| `NIGHT` | float64 | `0.0` | Fraction of requests during night hours |
+| `UNASSIGNED` | float64 | `1.0` | Fraction of requests with unassigned referrer |
+| `IMAGES` | float64 | `0.1012658` | Fraction of image resources |
+| `TOTAL_HTML` | float64 | `0.8987342` | Fraction of HTML resources |
+| `HTML_TO_IMAGE` | float64 | `0.1126761` | HTML-to-image request ratio |
+| `HTML_TO_CSS` | float64 | `0.0` | HTML-to-CSS request ratio |
+| `HTML_TO_JS` | float64 | `0.0` | HTML-to-JS request ratio |
+| `WIDTH` | float64 | `44.0` | Session navigation graph width |
+| `DEPTH` | float64 | `4.0` | Session navigation graph depth |
+| `STD_DEPTH` | float64 | `0.4940411` | Std of navigation depth |
+| `CONSECUTIVE` | float64 | `0.1012658` | Fraction of consecutive sequential requests |
+| `DATA` | float64 | `1555089.0` | Total bytes transferred |
+| `PPI` | float64 | `27183337.3` | Pages-per-interval (request rate proxy) |
+| `SF_REFERRER` | float64 | `0.0` | Same-frame referrer fraction |
+| `SF_FILETYPE` | float64 | `0.2051282` | Same-frame filetype fraction |
+| `MAX_BARRAGE` | int64 | `1` | Max burst size (consecutive rapid requests) |
+| `PENALTY` | int64 | `0` | Heuristic penalty score |
+| `ROBOT` | int64 | `1` | Target: 1 = bot, 0 = human |
 
-`semantic_features` carries page-topic counts (`TOTAL_TOPICS`, `UNIQUE_TOPICS`) and page-content similarity/variance measures (`PAGE_SIMILARITY`, `PAGE_VARIANCE`, `BOOLEAN_PAGE_VARIANCE`), plus the `ROBOT` target.
+### `semantic_features` (7 columns)
 
-The raw `public_v2.json` per-request fields are `referrer`, `request`, `method`, `resource`, `bytes`, `response`, `ip` (obfuscated), `useragent`, and `timestamp`.
+| column | dtype | example | description |
+|---|---|---|---|
+| `ID` | object | `obSnwGoBCue8G08E_WCX` | Session id (join key) |
+| `TOTAL_TOPICS` | int64 | `242` | Total page topics visited |
+| `UNIQUE_TOPICS` | int64 | `500` | Distinct page topics visited |
+| `PAGE_SIMILARITY` | float64 | `2.0661157` | Mean pairwise page-content similarity |
+| `PAGE_VARIANCE` | float64 | `92.2595556` | Variance of page-content vectors |
+| `BOOLEAN_PAGE_VARIANCE` | float64 | `0.1654137` | Binary indicator of nontrivial page variance |
+| `ROBOT` | int64 | `1` | Target: 1 = bot, 0 = human |
 
-::: {.callout-note collapse="true" title="Full schema tables (fill on run)"}
-{{ FILL: full schema_block tables for simple_features, semantic_features, and the JSON per-entry schema — from cell 4. Each is | column | dtype | example | description |. Descriptions are authored (above); only dtype/example come from the run. }}
-:::
+### `public_v2.json` (per-entry schema, from first 100 entries)
+
+| field | type | example | description |
+|---|---|---|---|
+| `referrer` | str | `http://search.lib.auth.gr/Record/68b03…` | HTTP Referer header (URL or `-`) |
+| `request` | str | `search.lib.auth.gr:80 66.249.34457 - - [01/Mar/2018…` | Full raw access-log request line |
+| `method` | str | `GET` | HTTP method |
+| `resource` | str | `/AJAX/d780f3cf8bf4e286eb6dec2f372f6d78…` | Requested URL path |
+| `bytes` | str | `491` | Response size in bytes (string) |
+| `response` | str | `200` | HTTP status code (string) |
+| `ip` | str | `66.249.34457` | Client IP (final octet digit-jumbled in source) |
+| `useragent` | str | `Mozilla/5.0 (compatible; Googlebot/2.1; …)` | Client User-Agent string |
+| `timestamp` | str | `2018-02-28T22:00:01.000Z` | ISO-8601 UTC timestamp |
 
 ## Label
 
 Label column: `ROBOT` in both CSVs (1 = bot, 0 = human).
 
-- Balance: {{ FILL: ROBOT count + rate table — cell 5 }}
-- Label agreement between the two CSVs on shared `ID`: {{ FILL: agreement fraction — cell 5 }}
+| ROBOT | count | rate |
+|---|---|---|
+| 0 | 53,858 | 0.79965 |
+| 1 | 13,494 | 0.20035 |
+
+Label agreement between the two CSVs on shared `ID`: 1.0000 (labels are derived from the same ground-truth session classification). Class imbalance is roughly 4:1 human:bot — mild, manageable without resampling.
 
 ::: {.callout-important title="The labels are a heuristic, not ground truth — this is the load-bearing caution"}
-The `ROBOT` flag was assigned by the dataset's original authors, almost certainly using a rule built on user-agent strings, `robots.txt` behaviour, known-crawler lists, and request-pattern heuristics. It is **not** an independently verified bot/human determination — there is no such thing available for real traffic at this scale.
+Per the Figshare/paper description, the `ROBOT` flag was assigned in the source dataset by **heuristic plus manual review of session user-agents and behaviour**, and is session-level rather than request-level. It is not an independently verified bot/human determination — no such thing exists for real traffic at this scale.
 
 Two consequences for any modelling:
 
-1. **Circularity risk.** A classifier trained on these features to predict `ROBOT` may simply relearn the user-agent / known-crawler rule that *produced* the label. If so, its apparent accuracy measures agreement with a heuristic, not detection of bots. The honest experiment holds out UA-derived signal, or explicitly benchmarks a UA-baseline against the behavioural model to measure the *marginal* signal over the labelling rule.
-2. **Ceiling, not truth.** Error rates measured against this label are error rates *against the heuristic*. They calibrate "do these behavioural features agree with the standard labelling," which is useful, not "do these features catch real bots," which is unmeasurable here.
+1. **Circularity risk.** A classifier trained on these features to predict `ROBOT` may simply relearn the user-agent / behaviour heuristic that *produced* the label. If so, its apparent accuracy measures agreement with that heuristic, not detection of bots. The honest experiment holds out UA-derived signal, or explicitly benchmarks a UA-baseline against the behavioural model to measure the *marginal* signal over the labelling rule.
+2. **Ceiling, not truth.** Error rates measured against this label are error rates *against the heuristic* — useful calibration of "do these behavioural features agree with the standard labelling," not proof of catching real bots.
 
-This caution is the reason the dataset is valuable rather than a reason to distrust it: it makes the labelling problem — the thing every real deployment faces — explicit and inspectable.
+A specific, sharper version of the risk lives in the data: the `PENALTY` column looks like a heuristic bot-score, and if it fed the `ROBOT` labelling it would **leak the label directly**. Verify and likely drop it before using it as a feature.
 :::
 
 ## Identifier inventory
 
-The CSVs are session-level and expose no raw identifiers beyond the session `ID`. The raw JSON carries an **obfuscated** client `ip` and a `useragent` per request — the latter being exactly the signal most likely to underlie the labels, hence the circularity caution above.
+The CSVs expose only the session `ID`; per-session actor attributes are absent. Actor-level signals (IP, User-Agent) live in the raw `public_v2.json` log at the request level.
 
-{{ FILL: cardinality table for ID (and any json-sample ip/useragent counts) — cell 6 }}
+| column | source | n_unique (in scope) | role |
+|---|---|---|---|
+| `ID` | both CSVs | 67,352 | session primary key (Elasticsearch-style id) |
+| `ip` | JSON (per request) | 9 (in 100-sample) | client IP (obfuscated, weak actor id) |
+| `useragent` | JSON (per request) | 7 (in 100-sample) | UA string (weak actor/bot signal) |
+| `referrer` | JSON (per request) | n/a | referring URL |
+
+The source obfuscates the final octet of each IPv4 address by digit-jumbling (e.g. `66.249.34457`), so IPs cannot be geolocated or joined to external lists. The bot user-agents in the sample are academic crawlers (Googlebot, BUbiNG, ICC-Crawler) — previewing a framing point below: the bot class here is dominated by indexing crawlers, not adversarial automation.
 
 ## Temporal structure
 
 The CSVs hold only aggregated session-level temporal *features* (`TOTAL_DURATION`, `AVERAGE_TIME`, `STANDARD_DEVIATION`, `NIGHT`, `MAX_BARRAGE`); no wall-clock session start/end timestamps are exposed. Wall-clock timestamps live only in `public_v2.json` at the per-request level.
 
-- Raw timestamp format: ISO-8601 UTC.
-- Sampled range: {{ FILL: t_min to t_max from json sample — cell 7 }}
+- Format: ISO-8601 UTC string, e.g. `2018-02-28T22:00:01.000Z` (millisecond precision).
+- Sample range (100 requests from the head of the file): 2018-02-28 22:00:01 to 2018-02-28 22:00:25 UTC.
+- The raw access-log line inside `request` also carries the original local timestamp with a `+0200` (Athens) offset, confirming a European source.
+- The full-file temporal range cannot be reported without scanning the 3 GB JSON, which is out of scope for this bounded EDA.
 
 ## Missing data
 
-{{ FILL: missingness summary + per-column null table — cell 8/9 }}
+- `simple_features`: 43,221 null cells overall (2.0054% of cells); 3 of 32 columns have any nulls.
+- `semantic_features`: 26,328 null cells overall (5.5843%); 3 of 7 columns have any nulls.
+- `public_v2.json`: dense in the 100-row sample; `referrer` is the literal string `-` when absent (Apache convention), not JSON null, so a full-file null check must look for `-` sentinels.
+
+Columns with any nulls in `simple_features`: `STANDARD_DEVIATION` (0.2139), `SF_FILETYPE` (0.2139), `SF_REFERRER` (0.2139).
+Columns with any nulls in `semantic_features`: `BOOLEAN_PAGE_VARIANCE` (0.1303), `PAGE_VARIANCE` (0.1303), `PAGE_SIMILARITY` (0.1303).
 
 ## Quirks and observations
 
-- Three-file layout: two session-feature CSVs (engineered) + one large raw JSON log. The CSVs are pre-computed features; modelling can use them directly without touching the raw log.
-- Both CSVs have identical row counts and 100% `ID` overlap; they are two feature blocks for the same session table, inner-joinable on `ID`.
-- The raw JSON is a single top-level object (one outer `{...}`) rather than NDJSON. Streaming parse is feasible because each entry happens to be written on its own line as `"<id>":{...},`.
-- The client `ip` is obfuscated in the source, so it is a weak actor identifier at best and cannot be resolved to ASN/geography reliably.
-- Labels are heuristic (see Label callout) — the single most important property to carry into any downstream use.
+- Three-file layout: two session-feature CSVs (engineered) + one 3 GB raw JSON log. The CSVs are pre-computed features; modelling can use them directly.
+- Both CSVs have identical row counts and 100% `ID` overlap; two feature blocks for the same session table, inner-joinable on `ID`.
+- The raw JSON is a single top-level object rather than NDJSON. Streaming parse works only because each entry happens to be on its own line; any reformatter would break naive line-parsers.
+- Raw-log IDs are per-*request*, not per-*session*; there is no in-file mapping from a session `ID` to its constituent request IDs.
+- Client IPs are partially obfuscated (final octet digit-shuffled), so they cannot be geolocated.
+- `referrer` uses `"-"` for missing values instead of JSON null.
+- **`PENALTY` looks like a heuristic bot-score; if it was used to derive `ROBOT` it leaks the label. Verify before using as a feature.**
+- The source host is a single library OPAC, so traffic patterns and bot mix are domain-specific — academic search crawlers (Googlebot, ICC-Crawler) dominate the bot class.
 
 ## Framing distance
 
 **What real problem it approximates:** behavioural bot detection on real web sessions — the project's actual unit of analysis — with engineered features close to what a defender would compute from access logs.
 
-**What it fails to represent:** the labels are a heuristic, not verified ground truth; the traffic is a single 2018 library OPAC, not a transactional commercial site under adversarial bot pressure; the bots in it are predominantly commodity crawlers, not sophisticated targeted automation; and the obfuscated IP plus absent TLS/fingerprint signals mean the network and device layers are invisible.
+**What it fails to represent:** the labels are a heuristic, not verified ground truth; the traffic is a single 2018 library OPAC, not a transactional commercial site under adversarial bot pressure; the bots are predominantly **academic indexing crawlers**, not sophisticated targeted automation; and the obfuscated IP plus absent TLS/fingerprint signals mean the network and device layers are invisible.
 
 **What further evidence would be needed:** independently verified labels (unavailable for real traffic); a transactional site with scarce-resource flows; adversarial/targeted bot traffic rather than crawlers; and the raw network/TLS signals the engineered features omit.
 
 ## What it cannot show
 
-A reader should not conclude from this dataset alone that a behavioural model's accuracy here transfers to (a) sophisticated adversaries, (b) commercial transactional sites, or (c) the detection of bots in general rather than agreement with one labelling heuristic. It calibrates behavioural-feature separability against a standard heuristic on commodity-crawler traffic — a real and useful thing, and a bounded one.
+A reader should not conclude that a behavioural model's accuracy here transfers to (a) sophisticated adversaries, (b) commercial transactional sites, or (c) the detection of bots in general rather than agreement with one labelling heuristic on crawler-dominated traffic. It calibrates behavioural-feature separability against a standard heuristic — a real and useful thing, and a bounded one.
 
 ## Reproduction
 
@@ -116,4 +189,4 @@ jupyter nbconvert --to notebook --execute --inplace \
   --ExecutePreprocessor.timeout=300
 ```
 
-Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1 }}. The two CSVs fit in memory; the large JSON is stream-sampled, not fully materialised.
+Loader runtime on the reference machine: 0.2 s. The two CSVs fit in memory; the 3 GB JSON is never fully materialised — only the first 100 entries are read.
