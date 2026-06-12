@@ -15,6 +15,7 @@ Every page follows the same shape — access, structure, schema, label, identifi
 ## The datasets
 
 - **[Web Robot Sessions (Figshare 3477932)](web-robot-sessions.qmd)** — labelled, session-level web traffic; the closest public data to the project's actual unit of analysis. Strongest fit. Its labels are a heuristic, not ground truth, which is the central caution.
+- **[Facebook Recruiting IV: Human or Robot? (Kaggle)](facebook-recruiting-iv.qmd)** — actor-level auction-bid bot labelling; useful mainly as a methods read on weak labels, rare positives, temporal feature engineering, and what published Kaggle solutions converged on. Dated and low-proximity, not a benchmark.
 - **[IEEE-CIS Fraud Detection (Kaggle)](ieee-cis-fraud.qmd)** — labelled payment-fraud transactions with card/email/device identifiers; the real-data companion to the identifier-graph method. Its chain-propagated label is itself an entity-resolution lesson.
 - **[TalkingData AdTracking (Kaggle)](talkingdata-adtracking.qmd)** — large-scale mobile ad clicks; a natural home for the behavioural-synchrony method, provided its `is_attributed` target is read as a conversion flag, not a bot flag.
 - **[CTU-13 botnet netflow](ctu-13.qmd)** — network-layer botnet C2 flows. **Scope-boundary case, unresolved** — sits at the network layer the project excludes; included pending an explicit keep/cut decision, not shipped by default.

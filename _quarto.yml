@@ -85,6 +85,8 @@ website:
             text: IEEE-CIS Fraud Detection
           - href: site/public_datasets/talkingdata-adtracking.qmd
             text: TalkingData AdTracking
+          - href: site/public_datasets/facebook-recruiting-iv.qmd
+            text: Facebook Recruiting IV
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;

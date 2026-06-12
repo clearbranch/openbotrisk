@@ -1,0 +1,143 @@
+---
+title: "Facebook Recruiting IV (Human or Robot?)"
+subtitle: "A methods read: what the 2015 auction-bot competition shows about detecting automation from weak signals"
+description: "Actor-level bot labelling on auction bids, and what the published Kaggle solutions reveal about feature engineering, evaluation under rare positives, and label provenance."
+---
+
+## What this page is
+
+A commentary on someone else's experiment, not a project-own one. The Facebook
+Recruiting IV: Human or Robot? competition (Kaggle, 2015) asked entrants to label
+auction bidders as human or bot from a stream of bids. This page reads the
+*published solutions* — the winner's write-up plus several mid-pack ones — to
+extract what the field collectively learned about discriminating automation on a
+transactional web flow.
+
+It is positioned **low-proximity, weak-label, and dated**. It does not fill the
+methodology gap (there is still no project-own public-data experiment here), and
+nothing below should be cited as a performance benchmark. What it adds over any
+single solution is the *convergence*: where independent competitors, working the
+same raw data separately, landed on the same signals and the same methodological
+traps. Convergence is the evidence; individual leaderboard scores are not.
+
+## The dataset and task
+
+The data is two tables: ~7.6M bids and ~6,600 bidders, of which ~2,000 carry a
+human/bot label (the rest are the prediction target). There are only ~100 bots in
+the labelled set, so the positive class is rare. The evaluation metric is ROC AUC.
+
+Three properties shape everything that follows. First, the task is **actor-level**:
+a label attaches to a bidder, not a request, so every feature is an aggregate over
+that bidder's bid history — this is weak-signal entity resolution, not request
+classification. Second, the labels are **weak**: half were hand-labelled, half
+derived from system statistics, and a subset carried no clear proof. Third, the
+identifying fields (time, IP, URL, device, merchant category) are **obfuscated**,
+which both removed signal and forced reverse-engineering (the time axis had to be
+decoded into roughly three 3-day windows spanning ~31 days before any temporal
+feature worked).
+
+## How competitors approached it
+
+| Solution | Result | Feature approach | Model | Notable move |
+|---|---|---|---|---|
+| Peter Best (*fakeplastictrees*) | 1st of 985 | Per-bidder aggregates from the bid table into a bidder-indexed matrix | scikit-learn gradient-boosted trees | Removed 5 anomalous "single-bid" bots from training; trusted CV over the public board; submitted only 3 entries |
+| L. Schoneveld (*nlml*) | 17th | ~1,400 features: unique counts, proportions, "popularity", mean/var/skew/kurtosis of cross-tabs, PCA on URL dummies | RandomForest (beat xgboost/adaboost here) | Oversampled the positive class; admits overfitting the public board |
+| *aaxwaz* | ~22nd (AUC 0.936) | Per-bidder aggregates incl. median auction time | 2-stage stack: RF+SVM base on OOB, adaboost meta on bagged data, 80 bagging iterations | Explicit bag+stack architecture |
+| *linhr* | mid-pack | "Brute-force": many features, incl. unique-attribute counts per time interval (e.g. unique IPs/hour) | RandomForest as feature selector | Lets the model prune rather than hand-selecting |
+| AnalyticsVidhya write-up | top-10 (reported) | Hypothesis-driven; derived first/last bidder per auction (win proxy) | trees | Found robots show a near-fixed inter-bid lag; humans irregular |
+
+Confidence: high on the winner and 17th-place detail (primary, full code/interview);
+medium on the exact ranks and architecture of the mid-pack solutions (from solution
+repos, not the auth-walled notebooks). Note the obvious selection bias — only
+*published* solutions are visible, mostly the winner and mid-pack, so "what worked"
+is a sample, not the full distribution.
+
+## Convergent discriminative signals
+
+Independent competitors repeatedly surfaced the same families, which is the
+strongest thing the dataset tells us:
+
+| Signal family | Concrete feature | Bot direction | Robustness today |
+|---|---|---|---|
+| Timing regularity | inter-bid time distribution | Bots show a fixed/periodic lag; humans irregular | Conceptually durable; the cleanest single tell |
+| Velocity / activity | bids per unit active time | High, but **not** monotonic (see below) | Durable in principle |
+| Network/infra | unique IPs per actor; IP "popularity" | Bots rotate across many IPs | Pre-dates residential-proxy-at-scale; weaker now |
+| Referral | URL concentration/entropy | Bots arrive from few specific URLs | Still a reasonable entry-pattern tell |
+| Device / geography | device and country distribution | Anomalous spread / over-represented locales | Crude; ages fast |
+| Outcome | share of auctions where last bidder | Sniping concentration | Domain-specific to auctions, not portable |
+
+## Three methods lessons that transfer
+
+**Feature engineering dominated; model choice was secondary.** The winner, the
+17th-place entrant, and the "brute-force" solver independently report that the
+work was in feature construction, and that swapping tree variants (RF, xgboost,
+adaboost, stacks) moved the needle far less than the features did. One competitor
+framed the competition's value precisely because there is no pre-built feature
+matrix — you extract features from a database, which is closer to real detection
+work than a tidy benchmark. This is direct, multi-source support for treating bot
+detection as a representation/signal problem rather than a model-architecture race.
+
+**Evaluation is fragile when positives are rare.** The winner's sharpest insight
+was not a feature: on early cross-validation he found the *statistical error on the
+AUC estimate itself* was large (≈100 positives), so he ran extensive resampling to
+get an estimate precise enough to make decisions on, and concluded the public
+leaderboard would be a poor guide to the private one. He trusted his own CV and
+submitted three entries total. The 17th-place entrant did the opposite — leaned on
+the public board, and his private score regressed to his weaker CV. The transferable
+rule: with rare positives, a single-split or leaderboard AUC comparison is mostly
+noise; you need resampled estimates with uncertainty before believing a ranking.
+This aligns with the project's standing discipline of not publishing unverified
+numbers, and is worth citing as an external, concrete instance of it.
+
+**Label provenance decided the outcome.** The winning margin came from *distrusting*
+labels, not from modelling. Five bidders labelled "bot" had only one bid each — an
+anomaly in the distribution. The winner reasoned they must have been labelled using
+information outside the bid table, so they would not generalise, and removed them.
+The entry that removed those five won. For a project whose recurring lesson is the
+0.68→0.64 correction, this is the most relevant takeaway in the whole competition:
+on weak-label data, auditing label provenance beat algorithmic sophistication.
+
+## Counterintuitive findings worth flagging
+
+The naive prior "bots bid more than humans" was wrong here: the probability of being
+human *rose* with total bid count, because many labelled bots placed few bids. And
+bot activity concentrated in off-peak hours rather than tracking human demand. Both
+are reminders that volume-based intuitions about automation can invert depending on
+the bot's purpose (here, targeted sniping rather than broad scraping).
+
+## What this can and can't support
+
+It can support: that early/unsophisticated automation on a transactional flow is
+separable by aggregate behavioural signals (timing regularity, infra diversity,
+referral concentration); that feature work and label hygiene dominate model choice;
+and that rare-positive evaluation needs resampled uncertainty.
+
+It cannot support: anything about **advanced** bots. This is a 2015, mobile,
+auction-bidding setting that sits at the low end of the sophistication taxonomy —
+before anti-detect browsers, headless-Chrome fingerprint parity, and normalised
+proxy pools. The reported AUCs are against noisy ground truth and a single
+anonymised platform, with no cross-environment validation, so they are illustrative,
+not benchmark figures. The outcome/sniping features do not port outside auctions.
+
+## Relevance to openbotrisk
+
+Slot on the Techniques surface (others' experiment) as a worked example of
+actor-level entity resolution and of the evaluation/label discipline the project
+already argues for. Carry the low-proximity, weak-label, dated flags explicitly.
+The one route by which it could touch the methodology gap is a deliberate project-own
+re-analysis — honest resampled CV, modern imbalance handling, calibration, and a
+label-provenance audit replicating the winner's removal decision — but that is a
+separate decision, not a product of this commentary.
+
+## Sources
+
+- Best, P. (*fakeplastictrees*), 1st-place winner's interview, Kaggle Blog, 2015 —
+  removal of non-generalising labels, AUC-variance / resampling argument, public-vs-private
+  leaderboard. <https://medium.com/kaggle-blog/facebook-iv-winners-interview-1st-place-peter-best-aka-fakeplastictrees-ea6090528db4>
+- Schoneveld, L. (*nlml*), 17th-place write-up, 2015 — full feature catalogue,
+  oversampling, RF vs xgboost, public-board overfit. <https://nlml.github.io/kaggle/fb-recruiting-iv/>
+- *aaxwaz*, solution repo (2-stage bag+stack, AUC 0.936). <https://github.com/aaxwaz/Facebook-Recruiting-IV-Human-or-Robot->
+- *linhr*, solution repo (brute-force RF feature selection). <https://github.com/linhr/human-or-robot>
+- AnalyticsVidhya, top-10 solutions round-up, 2015 — inter-bid-lag regularity,
+  bids-vs-human relationship. <https://www.analyticsvidhya.com/blog/2015/07/top-10-kaggle-fb-recruiting-competition/>
+- Competition page. <https://www.kaggle.com/c/facebook-recruiting-iv-human-or-bot>
