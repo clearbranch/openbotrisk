@@ -9,6 +9,8 @@ project:
     - "!site/background/index-long-draft.qmd"
     - "!site/public_datasets/README.md"
     - "!site/public_datasets/ctu-13.qmd"
+    - "!site/boundaries/index.qmd"
+    - "!site/open-questions/index.qmd"
 
 website:
   title: "openbotrisk"
@@ -81,12 +83,12 @@ website:
             text: Overview
           - href: site/public_datasets/web-robot-sessions.qmd
             text: Web Robot Sessions
+          - href: site/public_datasets/facebook-recruiting-iv.qmd
+            text: Facebook Recruiting IV
           - href: site/public_datasets/ieee-cis-fraud.qmd
             text: IEEE-CIS Fraud Detection
           - href: site/public_datasets/talkingdata-adtracking.qmd
             text: TalkingData AdTracking
-          - href: site/public_datasets/facebook-recruiting-iv.qmd
-            text: Facebook Recruiting IV
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;

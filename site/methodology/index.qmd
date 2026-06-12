@@ -1,16 +1,31 @@
 ---
 title: "Methodology investigations"
+description: "Synthetic experiments and reproducible demonstrations that show what public-data methods can and cannot establish."
+format:
+    html:
+        toc: true
+        toc-depth: 2
+        number-sections: false
+
 image: ../assets/openbotrisk_banner_panel_04.png
 title-block-banner: ../assets/openbotrisk_banner_panel_04.png
 title-block-banner-color: "#ffffff"
 ---
 
+::: {.lead}
+This page introduces the methodology section and links to reproducible demonstrations of identifier graphs, behavioural synchrony, and browser-fingerprint identification.
+:::
+
 This section contains concrete experiments and reproducible demonstrations showing what current best-practice methodology can and cannot do. Each investigation is written as a self-contained piece with code or data notes attached where possible.
 
-## Investigations
+## What this section covers
 
 - **[Identifier graphs and behavioural synchrony](identifier-graph-and-synchrony.qmd)** — a synthetic experiment showing why shared identifiers and coordinated behaviour reveal different kinds of account clusters, and why both methods need false-positive controls.
 - **[How vendors turn fingerprints into stable IDs](fingerprint-identification.qmd)** — a synthetic experiment reconstructing browser-fingerprint identification at four levels of sophistication, showing why the "accuracy" vendors publish is only one of two error modes, and why cloned mobile devices set a hard floor on what fingerprinting can achieve.
+
+::: {.next-page}
+**Next:** [Identifier graphs and behavioural synchrony](identifier-graph-and-synchrony.qmd)
+:::
 
 ## Code
 
