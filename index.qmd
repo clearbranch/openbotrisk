@@ -12,6 +12,7 @@ A public investigation into the bot and abuse prevention category: what techniqu
 - [Background and landscape](site/background/index.qmd) — threat model, actors, economics, vendor landscape
 - [Technical territory](site/techniques/index.qmd) — technique families, how they work, their limits
 - [Methodology investigations](site/methodology/index.qmd) — concrete experiments on public datasets
+- [Public datasets](site/public_datasets/index.qmd) — dataset reference pages, framing distance, and what each source can and cannot show
 - [What can and cannot be replicated](site/boundaries/index.qmd) — the honest boundary of public-data work
 - [Evidence Register](site/reading/evidence-register.qmd) — structured source register for literature, vendor publications, threat intel, and reading decisions
 - [Open questions and gaps](site/open-questions/index.qmd) — genuinely unmapped territory

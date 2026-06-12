@@ -96,6 +96,8 @@ For each piece, the author checks:
 
 **Dual-use containment.** Where a piece draws on bypass, anti-detect, or evasion sources (or operational detail inside legal/victim records), the author confirms it records *that* a technique exists and its operational proximity, not a working procedure. Specifically: no step-by-step bypass or working evasion code is reproduced; the piece does not synthesise details from several sources into a more complete how-to than any single source provides (the **aggregation hazard** — the specific risk for a project that reads widely across attacker-side material); and where a source cannot be used without an operational recipe, the piece summarises the claim and links out. A piece that fails this stays in working notes. This is the publication-side counterpart to the extraction-time no-recipe rule (`source-extraction-prompt`) and the scope rule in `EVIDENCE-REVIEW.md` §3.
 
+**Regulatory-constraint containment.** Where a piece draws on legal or regulatory sources, the author confirms the material is used only as a constraint on technique deployment, not as legal advice, compliance guidance, or regulation-as-subject. The piece states jurisdiction and currency where the constraint matters, carries the "subject to change; not verified current" caveat, and does not let regulatory material become load-bearing for factual claims about bot behaviour, defender efficacy, prevalence, or what any organisation must do. A piece that cannot use regulatory material without legal conclusions stays in working notes.
+
 ### Editorial review note
 
 Every published page has an editorial review note recorded in working notes (PR description or `working/review-notes/`). The template:
@@ -108,6 +110,7 @@ Every published page has an editorial review note recorded in working notes (PR 
 - Main limitation:
 - What this page adds beyond source summary:
 - Dual-use containment (no reproduced recipe; aggregation hazard checked):
+- Regulatory-constraint containment (if applicable: jurisdiction, currency, non-load-bearing, not legal advice):
 ```
 
 The "What this page adds" answer also appears as a single visible line on the page itself — at the top or bottom, depending on flow — so readers can see the project's claim about why the page exists. The other fields stay in working notes.
@@ -225,6 +228,8 @@ Honest assessment of failure modes specific to the agent-assisted approach.
 **Scope drift through accumulation.** Each individual agent output may look in-scope, but the accumulation of small drifts can shift the project. Mitigation: scope is owned by author, codified in PROJECT.md, checked at each editorial review, revisited periodically as a deliberate exercise.
 
 **Source quality drift.** Agents may cite weak sources (low-quality blogs, marketing material, content farms) where stronger sources exist. Mitigation: editorial check on source quality is part of the review; prompts include source-quality guidance.
+
+**Regulatory overreach.** Legal or regulatory material can make a technical explanation more honest, but it can also pull the project into legal advice or compliance commentary. Mitigation: regulatory material is admitted only as a constraint on technique deployment, with jurisdiction and currency recorded, and never as the sole support for a factual claim. Anything actionable is referred out to qualified sources.
 
 **Over-claim from synthesis.** Agent synthesis across multiple sources can produce confident-sounding claims that no single source actually supports. Mitigation: synthesised claims are checked against the underlying sources; "the literature suggests X" gets pushed back unless X is genuinely traceable.
 

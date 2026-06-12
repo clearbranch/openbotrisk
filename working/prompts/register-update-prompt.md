@@ -33,7 +33,7 @@ If the entry file or register path is missing, stop and ask.
 
 1. Read `PROJECT.md`, `EVIDENCE-REVIEW.md`, `GOVERNANCE.md`
 2. Read the register: existing rows and ids, the four category sub-tables, the framing-distance ledger, the signals-and-techniques cross-index, the scarce-resource abuse index, the controlled-vocabulary appendix, and the update log
-3. Read the entry file. Pull: bibliographic, `category`, `evidence basis`, `operational proximity`, `signals / techniques`, `threat types`, scarce-resource abuse fields if present, the three-part `framing distance`, `what it cannot show`, `project impact`, and the **run-metadata block** (extraction agent, model, prompt version, date, source access)
+3. Read the entry file. Pull: bibliographic, `category`, `evidence basis`, `operational proximity`, `signals / techniques`, `threat types`, scarce-resource abuse fields if present, regulatory-constraint fields if present, the three-part `framing distance`, `what it cannot show`, `project impact`, and the **run-metadata block** (extraction agent, model, prompt version, date, source access)
 4. **New source vs re-extraction.** Decide which:
    - *Same source* (same document / URL) as an existing row → **re-extraction.** Use that row's existing `SRC-NNN`. Add the new file to the row's `entry file` cell, update the `reconciliation` tag, do **not** create a new row, do **not** remove the older file or its provenance.
    - *Different source* (including another blog post or doc page from the same vendor) → **new row.** Assign the next `SRC-NNN` in the relevant category sub-table.
@@ -46,12 +46,18 @@ If the entry file or register path is missing, stop and ask.
    - `tags` = `scarce-resource-abuse` plus every specific scarce-resource tag supported by the entry or source framing (`slot-sniping`, `limited-inventory`, `appointment-abuse`, `reservation-abuse`, `ticketing-abuse`, `inventory-hoarding`, `denial-of-inventory`, `scalping`, `queue-abuse`, `booking-flow-abuse`, `availability-polling`, `cancellation-monitoring`, `fast-booking`, `auto-booking`, `slot-resale`, `ticket-resale`, `reservation-resale`, `booking-transfer`, `account-preparation`)
    - `scarce_resource_targeted`, `abuse_phase`, `website_facing_action`, `evidence_of_use`, and `abuse_outcome` copied from the entry using the register appendix vocabulary
    Use `not stated in entry` for a scarce-resource field that is clearly relevant but absent; do not invent values. Keep `evidence_of_use` separate from `operational proximity`: `evidence_of_use` is the scarce-resource-specific use classification, while `operational proximity` remains the broader corpus-level capability-to-use axis.
-9. **Reconciliation tag** in the `entry file` cell:
+9. **Regulatory-constraint projection.** If the entry's regulatory-constraint section is `Not applicable — source is not a regulatory-constraint source`, leave regulatory fields untouched and do not force them onto the inventory row. If the entry is tagged `regulatory-constraint`, verify:
+   - `operational proximity` is `n/a`
+   - `jurisdiction`, `currency`, and `constrains_technique` are present
+   - `currency` includes an as-of date and the caveat `subject to change; not verified current`, or the honest token `as-of unknown — verify before use`
+   - the entry does not state legal advice or compliance instructions
+   Add the source to the relevant signals-and-techniques cross-index row named by `constrains_technique`. If the register later has a dedicated regulatory-constraint index, project the fields there; until then, preserve the fields in the row's project-impact / notes wording and the update-log line.
+10. **Reconciliation tag** in the `entry file` cell:
    - first/only extraction → `[single]`
    - second+ extraction not yet reconciled → `[multiple — unreconciled]`; list all files; `canonical for citation` = latest version
    - a `.combined` file → `[combined]`; `canonical for citation` = the combined file; keep the source extractions listed
-10. **Update log.** Append one dated line: which id was added, or which existing id gained a version; the source; agent / model / prompt version; and any field that changed on a re-extraction, including scarce-resource index changes where applicable
-11. Report back (see Definition of done). Do **not** commit or push — the author reviews the register diff first
+11. **Update log.** Append one dated line: which id was added, or which existing id gained a version; the source; agent / model / prompt version; and any field that changed on a re-extraction, including scarce-resource or regulatory-constraint index changes where applicable
+12. Report back (see Definition of done). Do **not** commit or push — the author reviews the register diff first
 
 ---
 
@@ -90,6 +96,8 @@ When stopping, report what was attempted, the issue, and what decision is needed
 | Copy `operational proximity` from the entry, orthogonal to evidence basis | Derive proximity from evidence basis, or guess it for a pre-v3 entry (use `tbd`) |
 | Carry scarce-resource fields into the scarce-resource abuse index only when relevant | Force scarce-resource fields onto unrelated sources, or treat scarce-resource abuse as a fifth category |
 | Keep `evidence_of_use` distinct from `operational proximity` | Use `evidence_of_use` as a replacement for the broader proximity axis |
+| Carry regulatory-constraint fields only when the entry is tagged `regulatory-constraint` | Treat legal/regulatory material as legal advice, compliance guidance, or a fifth evidence category |
+| Set regulatory-constraint entries to `operational proximity: n/a` | Treat regulatory sources as evidence of abuse, prevalence, or control effectiveness |
 | Append-only; log every change | Silently rewrite an existing judgement |
 | Use honest tokens (`tbd`, `see entry`) for absent fields | Infer or pad a field the entry doesn't support |
 
@@ -101,6 +109,7 @@ When stopping, report what was attempted, the issue, and what decision is needed
 - Inventory row uses controlled-vocabulary values, including `operational proximity` (lifted from the entry, not derived); `provenance` set (or `not recorded`)
 - Framing-distance ledger and signals-and-techniques cross-index updated
 - Scarce-resource abuse index updated when applicable, or left untouched when the entry marks the fields not applicable
+- Regulatory-constraint fields projected when applicable, including jurisdiction, currency, constrained technique, `operational proximity: n/a`, and not-legal-advice caveat
 - `reconciliation` tag set and `canonical for citation` determined
 - One dated line appended to the update log
 - No scope docs, entry files, or older extraction files modified; nothing committed or pushed

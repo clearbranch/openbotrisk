@@ -86,6 +86,20 @@ A distinction the first four categories blur: *capability evidence* ("this tool 
 
 The lane is first-class because the project must not let "a mature bypass and automation tooling market exists" stand in for "these tools are used against real sites at scale." The first is well-supported by public sources; the second is mostly held in vendor and platform telemetry and, for prevalence specifically, is largely unenterable from outside. That boundary is itself a finding to state plainly, not an obstacle to work around.
 
+### 2.6 Regulatory-constraint lane (cross-cutting)
+
+Regulation shapes which techniques defenders can deploy and how — consent rules bearing on fingerprinting, data-protection limits on retention of behavioural signals, anti-circumvention and access rules bearing on what counts as permitted bot activity. The project admits this **only** as a constraint on technique, drawn across the existing categories the same way §2.5 is. It is **not** a fifth category and **not** a lane for compliance, governance, or legal-advice material.
+
+Three properties make regulatory sources unlike the empirical sources the register is built for, and the lane handles each explicitly:
+
+- **Jurisdiction-bound.** A constraint binds in some jurisdictions and not others. Every entry records `jurisdiction`.
+- **Time-varying.** Law is repealed, amended, superseded, and interpreted. Every entry records `currency` with an as-of date and a built-in caveat that the claim is subject to change and not verified current.
+- **Mandatory non-load-bearing.** Like the positioning-background carve-out in §3, a regulatory-constraint source is marked `operational proximity: n/a` and may inform explanatory structure but **never** be the sole support for a factual claim on a page.
+
+**Not legal advice.** The project is not authored by lawyers and states no legal conclusions. Regulatory material is described as landscape — "this rule exists and appears to bear on this technique" — with primary-source citations and the currency caveat. Readers are pointed to qualified sources for anything actionable. The dual-use and aggregation cautions in §3 apply unchanged.
+
+**Output:** woven into the Technique and Background sections where a constraint explains a deployment dynamic, tagged `regulatory-constraint`. Not a standalone compliance page.
+
 ### Standards and protocols as a cross-cutting tag
 
 Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 reference material) are not a separate category but recur across categories. Sources are tagged `standards` in the reading register when they belong to this class. Used for canonical reference rather than treated as evidence to be analysed.
@@ -102,6 +116,7 @@ Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 referen
 - What's known about the limits of public-data research
 - How the threat surface is shifting (browser-native automation, AI agents)
 - Observed-use evidence: vendor production telemetry, independent measurement studies, victim engineering postmortems, and enforcement / legal records — read for technique and operational proximity (the `operational proximity` axis)
+- Regulatory constraints on technique deployment — read only for how jurisdiction-bound, time-varying rules shape what defenders can or do deploy (§2.6)
 
 ### What's out of scope
 
@@ -112,7 +127,7 @@ Standards and protocol references (RFCs, W3C specifications, TLS/JA3/JA4 referen
 - Broader cyber security: malware, network intrusion, vulnerability research, EDR, IR
 - IoT botnets and network-level DDoS
 - Cryptography and protocol design beyond what's needed for foundations
-- Legal and regulatory aspects of bot management (mentioned briefly if at all)
+- Legal and regulatory material *as a subject* — compliance frameworks, legal advice, regulation-as-survey. The narrow exception is regulatory constraints on technique deployment (§2.6), read only for how a rule shapes what defenders can or do deploy, never as advice.
 
 The methods-not-actors framing is sharp. A technique described abstractly is in; a campaign described with named actors is out. A vendor explaining how they detect credential stuffing is in; a threat intel report attributing a campaign to a named group is out.
 
@@ -127,7 +142,7 @@ The methods-not-actors framing is sharp. A technique described abstractly is in;
 - Verizon DBIR and similar incident-focused reports: skip in general (actor-focused), extract the rare technique-focused sections
 - Vendor case studies that name attacks or attackers: skip the attribution, extract the technique
 - Marketing material with no technical substance: skip
-- Material primarily about compliance, governance, or risk management framing: skip
+- Material primarily about compliance, governance, or risk management framing: skip, unless the source is being read under the narrow regulatory-constraint lane (§2.6)
 - Books on general web security or general cyber: skip unless specifically on web abuse/bot topics
 
 ---
@@ -162,6 +177,10 @@ The reading rule: cover the major vendors of scraper tooling and the major detec
 
 Read for proximity first: what did the source actually *observe or measure* against a real target, versus assert? Separate vendor telemetry (`observed`, vendor-measured) from vendor capability claims (`capability` / `claimed`). For legal, enforcement, and victim postmortems, extract the technique and operational proximity and strip attribution per §3. Maintain prevalence humility throughout — even good observed-use evidence rarely supports market-wide prevalence claims, and the honest position is usually "observed in these settings," not "common across the web." Apply the dual-use no-recipe discipline (§3) on what gets reproduced.
 
+### Regulatory-constraint material
+
+Read primary or regulator sources wherever possible. Extract only the constraint on a technique family, not a compliance programme or legal conclusion. Record jurisdiction, currency, the constrained technique, and the not-legal-advice caveat. Treat every regulatory-constraint source as `operational proximity: n/a` and non-load-bearing: it may explain deployment dynamics, but it cannot by itself support a factual claim about what bots do, what defenders detect, or what any organisation must do.
+
 ---
 
 ## 5. Extraction fields per source
@@ -179,6 +198,7 @@ Every source read produces a register entry. The required fields:
 | What signals or techniques it mentions | Specific signals (TLS fingerprint, click cadence, etc.) and methods (XGBoost, autoencoder, etc.) |
 | What threat type it covers | Which OAT categories or similar |
 | Scarce-resource abuse fields | Conditional fields for appointment, ticketing, reservation, product-drop, queueing, cancellation-monitoring, booking-flow, inventory-hoarding, and limited-inventory abuse. Defined in the register appendix. The scarce-resource-specific `evidence_of_use` field does not replace `operational proximity`; it classifies use evidence inside this narrower abuse pattern while `operational proximity` remains the broader corpus-level capability-to-use axis |
+| Regulatory-constraint fields | Conditional fields for §2.6 lane sources only: `jurisdiction` (UK / EU / US / Canada / Australia / other), `currency` (free text, with an as-of date and a "subject to change; not verified current" caveat), and `constrains_technique` (the technique family the rule bears on). Lane sources are always `operational proximity: n/a` and non-load-bearing. Not applied to non-regulatory sources |
 | Framing distance | What real-world bot/abuse problem this source approximates; what it fails to represent; what additional evidence would be needed to go further |
 | What it cannot show | The limits of the source — what readers should not conclude from it alone |
 | Project impact | How this source affects the project's writing or taxonomy |

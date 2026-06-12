@@ -55,6 +55,8 @@ The underlying problem structure across these: automated activity at scale, targ
 
 The project also covers the evolving threat surface introduced by browser-native automation: cloud browser infrastructure, browser extensions, userscripts, and AI browser agents that operate inside otherwise-legitimate browser sessions. These represent a shift in the threat model that older bot detection material doesn't address well.
 
+The project also treats **regulatory constraints as a factor shaping technique deployment**, but only where a legal or regulatory rule materially affects what a defender can or does deploy — for example, consent requirements that bear on whether device fingerprinting can run silently. Regulation enters as one force shaping the dynamics of detection and mitigation, never as a subject in its own right. Legal advice, compliance frameworks as a topic, and regulation-as-survey remain out of scope. This material is jurisdiction-bound, time-varying, and never the sole support for a factual claim.
+
 ### Out of scope
 
 Adjacent areas in cyber security that are *not* this project, even though they intersect with it:

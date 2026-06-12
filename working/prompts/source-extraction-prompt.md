@@ -27,6 +27,8 @@ The repo already exists with `PROJECT.md`, `EVIDENCE-REVIEW.md`, and `GOVERNANCE
 
 **Capability is not use** (the `operational proximity` axis, schema v3). "This tool/technique exists" is weaker evidence than "it is observed against real sites." Record proximity (`capability` / `claimed` / `observed` / `measured` / `n/a`) separately from evidence basis: the corpus skews heavily to capability and claimed, `observed` is mostly vendor telemetry, and real measurement against targets is rare. Do not let a mature tooling market stand in for evidence of real-world use.
 
+**Regulatory constraints are a narrow lane, not legal advice.** Legal or regulatory material is in scope only where it constrains technique deployment — for example, consent rules bearing on browser fingerprinting, retention limits bearing on behavioural signals, or access rules bearing on scraping/automation. It is not a fifth category, not compliance guidance, and not a source of legal conclusions. Regulatory-constraint entries are always `operational proximity: n/a`, jurisdiction-bound, time-varying, and non-load-bearing.
+
 ---
 
 ## INPUTS
@@ -65,6 +67,7 @@ These operationalise GOVERNANCE §7 and EVIDENCE-REVIEW §4 at extraction time, 
 - **Source-quality check.** If the source is low-substance marketing with no technical content, or is out of scope per EVIDENCE-REVIEW §3 (named actors, criminal economics, broader cyber), do not extract it — flag it for skip/rejection with the reason (see Stop-and-ask).
 - **No over-claim from a single source.** Findings preserve the source's scope. A controlled study does not "prove" production behaviour; a vendor claim does not establish a capability works.
 - **Operational proximity, set honestly and orthogonally.** Record how close the source is to *observed abuse against a real target* (`capability` / `claimed` / `observed` / `measured` / `n/a`), independent of rigour. The common error is to read a rigorous controlled experiment as `observed` or `measured`; it is `capability` unless it measures real-target activity. Vendor capability docs are `capability`; vendor "we stop X" / bypass-vendor "works against Y" claims and self-report surveys are `claimed`; vendor telemetry reports are `observed` (vendor-measured); honey-site and in-the-wild studies are `measured`. Do not infer use from the existence of a capability.
+- **Regulatory-constraint discipline.** For primary law, regulator guidance, or legal material admitted under the regulatory-constraint lane, extract only the constraint on technique deployment. Do not state legal conclusions, compliance advice, or what any organisation must do. Record `jurisdiction`, `currency`, and `constrains_technique`; include `regulatory-constraint` in tags; set `Operational proximity` to `n/a`; and include the caveat `subject to change; not verified current`. Prefer primary/regulator sources over commentary.
 - **Dual-use, no-recipe at extraction.** For bypass, anti-detect, and evasion sources (and operational detail inside legal/victim records), extract *that* a technique or bypass class exists and its proximity — not a reproducible procedure. Do not transcribe working evasion code, step-by-step bypass sequences, or target-specific operational steps into the entry (this extends the Named-targets rule above to all attacker-side sources). Capture the signal families and detection surfaces named, the class of bypass claimed, and the framing distance; leave the recipe in the source. Publication-side enforcement of this is GOVERNANCE §4/§7.
 - **Scarce-resource abuse is not generic scraping.** If a source concerns slot sniping, appointment abuse, reservation abuse, ticket scalping, product-drop abuse, inventory hoarding, denial of inventory, queue abuse, booking-flow abuse, cancellation monitoring, limited-inventory abuse, or fast booking automation, record the scarce-resource fields separately. Availability polling may be scraping-like, but the abuse pattern is competition for a scarce transactional resource.
 
@@ -83,7 +86,7 @@ The entry follows this template exactly. Every field is filled. If a field genui
 - **Extraction agent**: Claude Code / Codex / Claude / ChatGPT / Gemini / other
 - **Model name + version, if known**: e.g. Claude Opus 4.x / GPT-x / not stated (do not guess a version)
 - **Source access**: full text / partial / abstract-only / paywalled — stopped
-- **Prompt version**: source-extraction-prompt v3 (2026-06)
+- **Prompt version**: source-extraction-prompt v4 (2026-06; regulatory-constraint fields)
 
 ## Bibliographic
 
@@ -94,6 +97,16 @@ The entry follows this template exactly. Every field is filled. If a field genui
 - **Evidence basis**: One of empirical-academic / empirical-operational / survey / vendor-claim / capability-doc / tooling-readme / methods-taxonomy / taxonomy / threat-intel / legal-record (see register appendix for definitions). This is the field that lets the register distinguish a controlled experiment from a marketing claim.
 - **Operational proximity**: One of capability / claimed / observed / measured / n/a (see register appendix). How close the source sits to *observed abuse against a real target* — **orthogonal** to evidence basis, which records rigour. A controlled lab PoC is `capability` here however rigorous it is; vendor production telemetry is `observed`; a honey-site or in-the-wild measurement is `measured`; a taxonomy or non-bot-use foundation is `n/a`. Give the value and one sentence justifying it. If the source mixes levels, record the highest it *independently* supports and note the mix.
 - **Tags**: Topic tags as relevant. Include `standards` if the source is an RFC, W3C spec, or similar canonical reference. Other useful tags: `taxonomy`, `survey`, `methods`, `behavioural`, `fingerprinting`, `infrastructure`, `cloud-browser`, `ai-agent`, `tls`, `entity-resolution`, etc. For scarce-resource sources, include `scarce-resource-abuse` plus relevant specific tags from the register appendix. Use existing tags if they fit; introduce new ones sparingly.
+
+## Regulatory-constraint fields
+
+If the source is admitted under the regulatory-constraint lane, record the following fields. If not, write `Not applicable — source is not a regulatory-constraint source`.
+
+- **Jurisdiction**: UK / EU / US / Canada / Australia / other.
+- **Currency**: As-of date plus the caveat `subject to change; not verified current`. If unknown, write `as-of unknown — verify before use`.
+- **Constrains technique**: Technique family the rule bears on, ideally matching the register cross-index vocabulary.
+- **Constraint summary**: What the source appears to constrain about technique deployment, phrased as landscape rather than advice.
+- **Not-legal-advice caveat**: Confirm this entry does not state legal conclusions or compliance advice.
 
 ## What it claims
 
@@ -175,7 +188,7 @@ A fictional but representative example showing what a good entry looks like. Use
 - **Extraction agent**: Claude Code
 - **Model name + version, if known**: Claude Opus 4.8
 - **Source access**: full text
-- **Prompt version**: source-extraction-prompt v3 (2026-06)
+- **Prompt version**: source-extraction-prompt v4 (2026-06; regulatory-constraint fields)
 
 ## Bibliographic
 
@@ -232,6 +245,48 @@ Advanced web bots in the sense of OWASP OAT-021 (Denial of Inventory) and OAT-00
 - Cited on the Behavioural detection methods page as one of several sources documenting the mouse-trajectory approach
 - The GAN augmentation result is worth surfacing as evidence that adversarial evaluation matters even when omitted from baseline studies
 ```
+
+---
+
+## APPENDIX: LEGISLATION STARTING POINTS FOR REGULATORY-CONSTRAINT EXTRACTION
+
+This appendix is a pointer list, not extracted evidence and not legal advice. It gives broad links and search queries to find current primary sources when the regulatory-constraint lane is populated. Nothing here is verified current. Re-check primary sources at extraction time and carry an as-of date plus the caveat `subject to change; not verified current`.
+
+Scope reminder: these sources are admitted only as constraints on technique deployment, with `operational proximity: n/a`. They are non-load-bearing and must not be used as compliance guidance.
+
+### UK — primary jurisdiction
+
+**PECR + device fingerprinting.** Constraint: Regulation 6 PECR treats device fingerprinting as a storage/access technology, bearing directly on whether fingerprinting can run silently. Primary starting point: ICO guidance on storage and access technologies, including device fingerprinting and exceptions: <https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guidance-on-the-use-of-storage-and-access-technologies/>. Primary text: search `Privacy and Electronic Communications Regulations 2003 legislation.gov.uk`, and verify the consolidated version reflects the Data (Use and Access) Act 2025 amendments. Pull only: fingerprinting in scope of reg 6, consent/information requirement, exceptions, and in-flux caveats.
+
+**Data (Use and Access) Act 2025.** Constraint: amends PECR and UK GDPR, including new PECR exceptions and recognised legitimate interests. Primary text: search `Data Use and Access Act 2025 legislation.gov.uk`. Pull only: whether fraud/abuse prevention appears in recognised legitimate interests, and whether any new PECR exception bears on security/bot-defence processing.
+
+**UK GDPR lawful basis.** Constraint: IPs, fingerprints, and behavioural signals may be personal-data processing and require a lawful basis. Primary starting point: ICO legitimate interests lawful-basis guidance. Pull only: purpose/necessity/balancing test, fraud-prevention treatment, data-minimisation and retention constraints.
+
+### EU — close-adjacent, diverging from UK post-DUAA
+
+**ePrivacy Directive Art. 5(3).** Constraint: terminal-equipment access rule; fingerprinting may be covered. Primary text: search `ePrivacy Directive 2002/58/EC consolidated eur-lex`. Pull only: terminal-equipment access rule, current status, and UK/EU divergence caveat.
+
+**GDPR Art. 6(1)(f), EDPB Guidelines 1/2024, and relevant CJEU case law.** Constraint: legitimate interest may apply to fraud/abuse prevention but is case-by-case. Primary starting point: EDPB Guidelines 1/2024 on legitimate interest, verifying final/draft status: <https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-12024-processing-personal-data-based-article-61f_en>. Search `CJEU C-621/22 legitimate interest`. Pull only: fraud-prevention worked examples, reasonable expectations, and not-a-blanket-permission caveat.
+
+### US — access/contract law rather than data-protection first
+
+**CFAA + web scraping.** Constraint: public-vs-authenticated access, ToS/contract theories, and access boundaries shape what counts as permitted automated access. Orientation only: EFF hiQ case page <https://www.eff.org/cases/hiq-v-linkedin>. Current primary/legal search: `Bright Data v Meta scraping ruling 2024`, `web scraping legality CFAA 2025`. Pull only the access principle relevant to pre-auth/post-auth framing, stripped of named-actor narrative unless the legal record itself is being extracted for observed-use technique evidence.
+
+**State privacy laws.** Constraint: patchwork treatment of tracking/fingerprinting. Search `CCPA CPRA fingerprinting tracking definition` and `US state privacy law tracking 2025`. Pull only jurisdiction-specific technique constraints, with strong currency caveats.
+
+### Canada
+
+**PIPEDA and provincial law.** Constraint: consent-centric data-protection regime bearing on IP/fingerprint/behavioural processing. Primary starting point: Office of the Privacy Commissioner guidance; search `OPC PIPEDA consent guidance`. Pull only consent/tracking constraints and current reform status.
+
+### Australia
+
+**Privacy Act 1988 and Australian Privacy Principles.** Constraint: collection/use of personal information, with reforms in flight. Primary starting point: OAIC APP guidelines; search `OAIC Australian Privacy Principles APP guidelines`. Pull only collection limitation, definition of personal information as it bears on device/behavioural signals, and reform caveats.
+
+### Cross-jurisdiction notes
+
+- UK/EU divergence should be named where a page might otherwise imply a universal rule.
+- Data-protection regimes constrain collection/processing; US access/contract law constrains permitted access. Do not blur them.
+- Treat 2024-2026 legal/regulatory changes as a reason to verify at extraction time, not as settled background.
 
 ---
 

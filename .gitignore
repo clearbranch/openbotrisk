@@ -64,3 +64,7 @@ experiments/fingerprint-identification/generated/
 
 # Local review artifacts
 working/register-entry-html/
+
+
+# kaggle skills
+skills-lock.json

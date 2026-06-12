@@ -7,6 +7,8 @@ project:
     - site/**/*.md
     - "!site/background/index-old.qmd"
     - "!site/background/index-long-draft.qmd"
+    - "!site/public_datasets/README.md"
+    - "!site/public_datasets/ctu-13.qmd"
 
 website:
   title: "openbotrisk"
@@ -73,6 +75,16 @@ website:
             text: Identifier graphs and synchrony
           - href: site/methodology/fingerprint-identification.qmd
             text: Fingerprints into stable IDs
+      - text: Public datasets
+        menu:
+          - href: site/public_datasets/index.qmd
+            text: Overview
+          - href: site/public_datasets/web-robot-sessions.qmd
+            text: Web Robot Sessions
+          - href: site/public_datasets/ieee-cis-fraud.qmd
+            text: IEEE-CIS Fraud Detection
+          - href: site/public_datasets/talkingdata-adtracking.qmd
+            text: TalkingData AdTracking
   page-footer:
     center: |
       Written content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) &nbsp;|&nbsp;
