@@ -8,6 +8,8 @@ title-block-banner-color: "#ffffff"
 
 A public investigation into the bot and abuse prevention category: what techniques exist, what the evidence says, and what can be independently verified from public data.
 
+[GitHub repository](https://github.com/clearbranch/openbotrisk)
+
 - [Orientation](site/orientation/index.qmd) — what this is, why it exists, scope and non-scope, how to read it
 - [Background and landscape](site/background/index.qmd) — threat model, actors, economics, vendor landscape
 - [Technical territory](site/techniques/index.qmd) — technique families, how they work, their limits

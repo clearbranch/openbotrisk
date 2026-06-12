@@ -1,0 +1,112 @@
+---
+title: "Dataset: IEEE-CIS Fraud Detection (Kaggle)"
+description: "A large labelled payment-fraud dataset whose card/email/device identifiers make it the real-data companion to the identifier-graph method — and whose chain-propagated label is itself an entity-resolution lesson."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: false
+---
+
+::: {.lead}
+A two-table payment-transaction dataset (transaction + identity, joined on `TransactionID`) with a binary `isFraud` label and a rich set of card, address, email-domain, and device/browser identifiers. It is the closest public data to the project's identifier-graph method — and its label, propagated across a card/account chain after the first reported fraud, is the same entity-resolution subtlety that method is about.
+:::
+
+This is a **dataset-reference page**: what the resource is, what it approximates, what it cannot show. Running the identifier-graph method against it would be a separate investigation — and a natural one, already flagged in the live-site TODO.
+
+## Why this dataset matters here
+
+The synthetic identifier-graph experiment built rings by hand and so detected them by construction. This dataset is the real-data counterpart: actual card hashes, email domains, and device strings, with an actual fraud label, at a scale where the giant-component and edge-weighting problems are real rather than staged. Two of its properties map directly onto the method's core concerns:
+
+- The identifiers are exactly the method's edge types — card attributes, address, email domains, device/browser strings — at realistic cardinality.
+- The label is **chain-propagated**: once a card/account is flagged, related transactions inherit the positive label. That is entity resolution showing up *in the label itself*, which is the method's whole subject. It is a feature for understanding the problem and a trap for naive per-row modelling.
+
+Scope note: this is payment fraud, which the project admits only on its **web-facing / bot-driven slice** (carding, payment-flow abuse at checkout). The dataset is not bot-labelled; it is fraud-labelled. Used here for the identifier structure, not as a bot classifier.
+
+## Access
+
+Source: Kaggle competition `ieee-fraud-detection` (via `kaggle competitions download`).
+
+- File format: CSV.
+- Files on disk: {{ FILL: file list with sizes — cell 2 }}
+- Date inspected: {{ FILL: date — cell 2 }}
+
+## Structure
+
+- `train_transaction.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one transaction.
+- `train_identity.csv`: {{ FILL: rows × cols — cell 3 }}. Identity / device features attached to a subset of transactions.
+- Join key: `TransactionID` (left join transaction ← identity). Identity available for {{ FILL: overlap count and % — cell 3 }} of transactions.
+- Temporal coverage: `TransactionDT` ranges over {{ FILL: dt_min to dt_max seconds, ~days — cell 3 }} from an unspecified reference time.
+
+## Schema
+
+Most columns are anonymised by Vesta with no public mapping. The interpretable columns are the target (`isFraud`), the amount (`TransactionAmt`), the timing offset (`TransactionDT`), the product code (`ProductCD`), the email domains (`P_emaildomain`, `R_emaildomain`), and — in the identity table — `DeviceType` and `DeviceInfo`. Everything in the `V*` (Vesta-engineered numeric), `C*` (count-type), `D*` (day time-delta), `M*` (match-type T/F), `id_*`, `card*`, `addr*`, and `dist*` families is anonymised.
+
+- Full `V`-column range: V1..V339 ({{ FILL: count of V columns — cell 4 }} columns).
+
+::: {.callout-note collapse="true" title="Full schema tables (fill on run)"}
+{{ FILL: schema_block for train_transaction (non-V cols + V1..V20) and train_identity — cell 4. Column descriptions for the interpretable columns are authored above; dtype/example come from the run. }}
+:::
+
+## Label
+
+Label column: `isFraud` in `train_transaction.csv` (1 = fraudulent).
+
+- Balance: {{ FILL: isFraud count + rate table — cell 5 }}
+
+::: {.callout-important title="The label is chain-propagated — an entity-resolution lesson, not a per-row truth"}
+Per Kaggle, a fraud label is propagated to *all* transactions in a card / account / email chain after the first reported fraud. So a positive label is partly a **chain-level proxy**, not a per-transaction confirmation: a single confirmed fraud paints every linked transaction positive.
+
+This is the identifier-graph problem appearing inside the ground truth itself. It inflates the positive count, complicates per-row interpretation, and means that "predicting `isFraud`" is partly "predicting membership of a flagged entity chain" — which is exactly what the identifier-graph method does explicitly. Treated naively it's a leakage hazard; treated knowingly it's the most realistic feature of the dataset for this project's purposes.
+:::
+
+## Identifier inventory
+
+No explicit user ID. Weak actor identifiers come from card hashes, email domains, and (when the identity table joins) device/browser strings — the exact edge types the identifier-graph method uses.
+
+{{ FILL: cardinality + null-rate table for card1-6, addr1-2, P/R_emaildomain, DeviceType, DeviceInfo, id_30/31/33 — cell 6. Roles are authored: card1 = card hash / weak account id; card4 = network; card6 = debit/credit; addr1 = billing region; addr2 = country; P_emaildomain = purchaser domain; DeviceInfo = device fingerprint string; id_30 = OS; id_31 = browser; id_33 = screen resolution. }}
+
+## Temporal structure
+
+- `TransactionDT`: integer seconds from an undisclosed reference time. No wall-clock timestamps, no timezone.
+- Range: {{ FILL: seconds + days — cell 7 }}
+- `D1`..`D15` are documented as day-granularity time-delta features relative to prior events on the same card/account — themselves entity-linked features.
+- Diurnal patterns are inferable modulo the unknown reference; not plotted here.
+
+## Missing data
+
+High missingness is concentrated in long blocks of `V`/`D`/`id_` columns — typical of features only defined for certain product codes or device classes. Identity rows are entirely absent for the majority of transactions.
+
+{{ FILL: per-table null summary + top-15 most-null columns for each table — cell 8 }}
+
+## Quirks and observations
+
+- Two-file structure joined on `TransactionID`; only a minority of transactions carry identity rows.
+- `V*/C*/D*/M*/id_*` columns are anonymised with no public mapping — treat as opaque.
+- `TransactionDT` is seconds from an unstated reference; cannot anchor to calendar dates.
+- Labels are chain-propagated (see Label callout) — the single most important property for this project.
+- Missingness clusters in feature blocks defined only for certain product codes or device classes, not at random.
+
+## Framing distance
+
+**What real problem it approximates:** identifier-linked payment fraud at realistic scale and cardinality — the real-data setting for the identifier-graph method, with the entity-resolution structure present in both the features and the label.
+
+**What it fails to represent:** it is payment fraud, not bot detection; the label is chain-propagated, not per-transaction truth; most features are anonymised, so the method's edge-weighting can't be reasoned about semantically; and it is a transaction table, not a session/clickstream, so behavioural-synchrony signals are absent.
+
+**What further evidence would be needed:** a bot-labelled (not fraud-labelled) source; per-event rather than chain-propagated labels; de-anonymised identifier semantics; and session-level behavioural data to pair with the transaction-level identifiers.
+
+## What it cannot show
+
+A reader should not read `isFraud` performance as bot-detection performance, nor a per-row metric as if the labels were per-row truth. The dataset shows how identifier structure and chain-propagated labels behave on real fraud data — it does not show prevalence, bot-specific behaviour, or the meaning of its anonymised features.
+
+## Reproduction
+
+Generated by `notebooks/eda/ieee-fraud-detection.ipynb`, which calls `openbotrisk.eda.loaders.load_ieee_meta` (pandas full-read).
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace \
+  notebooks/eda/ieee-fraud-detection.ipynb \
+  --ExecutePreprocessor.timeout=600
+```
+
+Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1 }}. Both train CSVs fit in memory; no chunking needed.

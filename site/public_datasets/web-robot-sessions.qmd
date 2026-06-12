@@ -1,0 +1,119 @@
+---
+title: "Dataset: Web Robot Sessions (Figshare 3477932)"
+description: "A labelled, session-level web-traffic dataset for bot detection — the closest public data to the project's actual unit of analysis, and the one whose labels demand the most care."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: false
+---
+
+::: {.lead}
+Labelled web sessions with engineered HTTP/behavioural and page-semantic features, derived from a real library OPAC's access logs. This is the most on-remit public dataset the project holds: its unit is the web session, its label is a bot/human flag, and it ships both the engineered features and the raw request log underneath. Its central caveat is the labels — they are the original authors' heuristic, not ground truth, and a model that merely relearns that heuristic has measured nothing.
+:::
+
+This is a **dataset-reference page**: it documents what the resource is, what it approximates, and what it cannot show. It does not run a detection method against the data — that would be a separate investigation (and a strong candidate for one).
+
+## Why this dataset matters here
+
+The project's recurring problem is that public data sits at a distance from the real bot/abuse problem, and most datasets sit *far* — synthetic toys, vendor blogs, fraud tables labelled by chain-propagation. This one sits closer than most: the unit of analysis is a **web session**, which is the project's actual subject, and it carries a **direct `ROBOT` label** rather than a proxy. That makes it the natural calibration anchor for any behavioural-detection work — including the local red-team experiment, which has perfect ground truth but only against its own attacker model. Where the red-team shows what signals *look like* on traffic you generated, this dataset shows whether those signals separate bots from humans at a *measurable error rate* on real sessions.
+
+The cost of that proximity is the labelling problem, treated below as the load-bearing caution.
+
+## Access
+
+Source: Figshare dataset 3477932 (web robot detection, session-level features + raw HTTP logs).
+
+Underlying logs are from the Aristotle University of Thessaloniki library OPAC (`search.lib.auth.gr`), captured in early 2018 (per timestamps in `public_v2.json`). The dataset corresponds to the Rovetta et al. line of web-robot-detection work using semantic + behavioural session features.
+
+- File formats: CSV (engineered session features) + JSON (raw per-request log).
+- Files on disk: {{ FILL: file list with sizes — from cell 2 `file_lines` }}
+- Date inspected: {{ FILL: date — from cell 2 `today` }}
+
+## Structure
+
+- `simple_features.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one web session. HTTP/behavioural features + binary `ROBOT` label.
+- `semantic_features.csv`: {{ FILL: rows × cols — cell 3 }}. One row = one web session. Page-topic/semantic features + binary `ROBOT` label.
+- `public_v2.json`: {{ FILL: ~GB size — cell 3 }}. Raw per-request log as a single JSON object keyed by request ID (Elasticsearch-style). Each value is a dict with HTTP request fields. Stream-parsed for schema inspection only (first 100 entries); not loaded fully.
+- Join key: `ID` links `simple_features` and `semantic_features` ({{ FILL: overlap count and % — cell 3 }} of session IDs overlap). The session `ID` is the parent key under which raw requests are grouped in the source logs; the raw JSON uses request-level IDs, so a direct session↔raw-request join would require an external mapping not included here.
+
+## Schema
+
+The two CSVs are two feature blocks for the same session table, inner-joinable on `ID`. The `simple_features` block is HTTP/behavioural; `semantic_features` is page-topic. Selected authored column descriptions:
+
+`simple_features` carries request-volume and timing features (`NUMBER_OF_REQUESTS`, `TOTAL_DURATION`, `AVERAGE_TIME`, `STANDARD_DEVIATION`), response-code mix (`HTTP_RESPONSE_2XX`…`5XX`), HTTP-method mix (`GET_METHOD`, `POST_METHOD`, `HEAD_METHOD`), resource-type ratios (`IMAGES`, `TOTAL_HTML`, `HTML_TO_IMAGE`, `HTML_TO_CSS`, `HTML_TO_JS`), navigation-graph shape (`WIDTH`, `DEPTH`, `STD_DEPTH`, `CONSECUTIVE`), a night-activity fraction (`NIGHT`), a burst measure (`MAX_BARRAGE`), a request-rate proxy (`PPI`), and a heuristic `PENALTY` score, alongside the `ROBOT` target.
+
+`semantic_features` carries page-topic counts (`TOTAL_TOPICS`, `UNIQUE_TOPICS`) and page-content similarity/variance measures (`PAGE_SIMILARITY`, `PAGE_VARIANCE`, `BOOLEAN_PAGE_VARIANCE`), plus the `ROBOT` target.
+
+The raw `public_v2.json` per-request fields are `referrer`, `request`, `method`, `resource`, `bytes`, `response`, `ip` (obfuscated), `useragent`, and `timestamp`.
+
+::: {.callout-note collapse="true" title="Full schema tables (fill on run)"}
+{{ FILL: full schema_block tables for simple_features, semantic_features, and the JSON per-entry schema — from cell 4. Each is | column | dtype | example | description |. Descriptions are authored (above); only dtype/example come from the run. }}
+:::
+
+## Label
+
+Label column: `ROBOT` in both CSVs (1 = bot, 0 = human).
+
+- Balance: {{ FILL: ROBOT count + rate table — cell 5 }}
+- Label agreement between the two CSVs on shared `ID`: {{ FILL: agreement fraction — cell 5 }}
+
+::: {.callout-important title="The labels are a heuristic, not ground truth — this is the load-bearing caution"}
+The `ROBOT` flag was assigned by the dataset's original authors, almost certainly using a rule built on user-agent strings, `robots.txt` behaviour, known-crawler lists, and request-pattern heuristics. It is **not** an independently verified bot/human determination — there is no such thing available for real traffic at this scale.
+
+Two consequences for any modelling:
+
+1. **Circularity risk.** A classifier trained on these features to predict `ROBOT` may simply relearn the user-agent / known-crawler rule that *produced* the label. If so, its apparent accuracy measures agreement with a heuristic, not detection of bots. The honest experiment holds out UA-derived signal, or explicitly benchmarks a UA-baseline against the behavioural model to measure the *marginal* signal over the labelling rule.
+2. **Ceiling, not truth.** Error rates measured against this label are error rates *against the heuristic*. They calibrate "do these behavioural features agree with the standard labelling," which is useful, not "do these features catch real bots," which is unmeasurable here.
+
+This caution is the reason the dataset is valuable rather than a reason to distrust it: it makes the labelling problem — the thing every real deployment faces — explicit and inspectable.
+:::
+
+## Identifier inventory
+
+The CSVs are session-level and expose no raw identifiers beyond the session `ID`. The raw JSON carries an **obfuscated** client `ip` and a `useragent` per request — the latter being exactly the signal most likely to underlie the labels, hence the circularity caution above.
+
+{{ FILL: cardinality table for ID (and any json-sample ip/useragent counts) — cell 6 }}
+
+## Temporal structure
+
+The CSVs hold only aggregated session-level temporal *features* (`TOTAL_DURATION`, `AVERAGE_TIME`, `STANDARD_DEVIATION`, `NIGHT`, `MAX_BARRAGE`); no wall-clock session start/end timestamps are exposed. Wall-clock timestamps live only in `public_v2.json` at the per-request level.
+
+- Raw timestamp format: ISO-8601 UTC.
+- Sampled range: {{ FILL: t_min to t_max from json sample — cell 7 }}
+
+## Missing data
+
+{{ FILL: missingness summary + per-column null table — cell 8/9 }}
+
+## Quirks and observations
+
+- Three-file layout: two session-feature CSVs (engineered) + one large raw JSON log. The CSVs are pre-computed features; modelling can use them directly without touching the raw log.
+- Both CSVs have identical row counts and 100% `ID` overlap; they are two feature blocks for the same session table, inner-joinable on `ID`.
+- The raw JSON is a single top-level object (one outer `{...}`) rather than NDJSON. Streaming parse is feasible because each entry happens to be written on its own line as `"<id>":{...},`.
+- The client `ip` is obfuscated in the source, so it is a weak actor identifier at best and cannot be resolved to ASN/geography reliably.
+- Labels are heuristic (see Label callout) — the single most important property to carry into any downstream use.
+
+## Framing distance
+
+**What real problem it approximates:** behavioural bot detection on real web sessions — the project's actual unit of analysis — with engineered features close to what a defender would compute from access logs.
+
+**What it fails to represent:** the labels are a heuristic, not verified ground truth; the traffic is a single 2018 library OPAC, not a transactional commercial site under adversarial bot pressure; the bots in it are predominantly commodity crawlers, not sophisticated targeted automation; and the obfuscated IP plus absent TLS/fingerprint signals mean the network and device layers are invisible.
+
+**What further evidence would be needed:** independently verified labels (unavailable for real traffic); a transactional site with scarce-resource flows; adversarial/targeted bot traffic rather than crawlers; and the raw network/TLS signals the engineered features omit.
+
+## What it cannot show
+
+A reader should not conclude from this dataset alone that a behavioural model's accuracy here transfers to (a) sophisticated adversaries, (b) commercial transactional sites, or (c) the detection of bots in general rather than agreement with one labelling heuristic. It calibrates behavioural-feature separability against a standard heuristic on commodity-crawler traffic — a real and useful thing, and a bounded one.
+
+## Reproduction
+
+Generated by `notebooks/eda/web-robot-sessions.ipynb`, which calls `openbotrisk.eda.loaders.load_web_robot_meta` (pandas full-read for the two CSVs; manual line-streaming for the first 100 entries of `public_v2.json`).
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace \
+  notebooks/eda/web-robot-sessions.ipynb \
+  --ExecutePreprocessor.timeout=300
+```
+
+Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1 }}. The two CSVs fit in memory; the large JSON is stream-sampled, not fully materialised.

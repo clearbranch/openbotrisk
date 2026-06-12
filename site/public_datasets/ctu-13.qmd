@@ -1,0 +1,114 @@
+---
+title: "Dataset: CTU-13 botnet netflow (Stratosphere Lab)"
+description: "A labelled botnet network-flow dataset — included as a scaffold pending an explicit scope keep/cut decision, because it sits at the network layer the project deliberately excludes."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: false
+---
+
+::: {.callout-warning title="SCOPE DECISION UNRESOLVED — do not publish without resolving"}
+This page is scaffolded for completeness, but the dataset's place in the project is **not settled**. CTU-13 is network-layer botnet command-and-control netflow, which falls under the project's explicit out-of-scope exclusions (network intrusion, malware, network-level botnets). It is included in the EDA batch so the keep/cut decision can be made against a concrete page, **not** so it ships by default. Resolve the scope question (live-site TODO §9) before this leaves draft. The lean in that note is *cut*.
+:::
+
+::: {.lead}
+Thirteen separate Argus bidirectional netflow captures, each a different botnet family, with a free-text `Label` annotation coarsenable into Botnet / Legitimate / Background classes. Real IP/port network metadata from a controlled university lab capture. Genuinely labelled and technically a "botnet" dataset — but at the network flow layer, not the web-facing application layer the project is about.
+:::
+
+## Why this is a scope question, not a straightforward fit
+
+The project's subject is automated abuse against **web-facing flows** — sessions, requests, application-layer behaviour. CTU-13 is **network-layer** data: bidirectional flow records (source/destination IP, ports, protocol, byte/packet counts, Argus connection state). That is the territory of intrusion detection and SOC tooling, which the project's scope documents exclude by name. Three further properties weaken the fit even on its own terms:
+
+- The `Background` class is unlabelled real traffic from the same network — **not** verified-legitimate, so it isn't a clean negative class.
+- The 13 scenarios are different botnet families captured at different times — not one time series, and concatenating them mixes captures.
+- The actor unit is a **host (IP)**, not a user or session; there is no application-layer or user-level identifier.
+
+It has "botnet" in its lineage, which is exactly the temptation: the label says botnet, but the layer is wrong. The honest call is whether network-flow botnet C2 belongs in a web-facing-abuse project at all. The scaffold below exists to make that call concrete.
+
+## Access
+
+Source: CTU-13 dataset, Czech Technical University (Stratosphere Lab).
+
+- File format: per-scenario `.binetflow` CSV (Argus bidirectional NetFlow export).
+- Files on disk (13 scenarios): {{ FILL: per-scenario file list with sizes — cell 2 }}
+- Date inspected: {{ FILL: date — cell 2 }}
+
+## Structure
+
+- 13 scenarios; each a separate Argus bidirectional netflow capture. Record granularity: one bidirectional flow per row.
+- Total rows (all scenarios concatenated): {{ FILL: row count — cell 3 }}; columns: {{ FILL: col count — cell 3 }} (14 native + a `scenario` tag added by the loader).
+- Time range across scenarios (`StartTime` as string): {{ FILL: tmin to tmax — cell 3 }}.
+- No join keys between scenarios; each capture is independent. Within a scenario, flows link by `SrcAddr`/`DstAddr`/port tuples.
+- Per-scenario row counts: {{ FILL: per-scenario rows/size table — cell 3 }}
+
+## Schema
+
+All columns are real (non-anonymised) network metadata; IPs are real but from a controlled lab capture. Authored column descriptions:
+
+`StartTime` (flow start, microsecond string), `Dur` (duration, seconds), `Proto` (L4 protocol), `SrcAddr`/`DstAddr` (source/destination IP), `Sport`/`Dport` (ports, stored as strings — some non-numeric like `0x*`), `Dir` (direction marker), `State` (Argus connection-state code), `sTos`/`dTos` (ToS bytes, often null), `TotPkts`/`TotBytes`/`SrcBytes` (volume counters), `Label` (free-text Argus annotation: `flow=Background-...`, `flow=From-Botnet-...`, `flow=LEGITIMATE`, etc.), and `scenario` (folder id 1..13, added by loader).
+
+::: {.callout-note collapse="true" title="Full schema table (fill on run)"}
+{{ FILL: schema_block with dtype + example per column — cell 4. Descriptions authored above. }}
+:::
+
+## Label
+
+Label column: `Label` (free-text Argus annotation), coarsened by string match into Botnet / Legitimate / Background / Other.
+
+- Balance: {{ FILL: label_class count + rate table — cell 5 }}
+- Distinct raw label strings across all scenarios: {{ FILL: n_distinct — cell 5 }}
+
+Botnet traffic is heavily outnumbered by background. **Background flows are unlabelled real traffic and must not be treated as confirmed-legitimate** — the absence of a clean negative class is a real limitation for any supervised use.
+
+## Identifier inventory
+
+Identifiers are real IP addresses and ports — no user IDs, no device fingerprints. Within a scenario, infected hosts have known IPs (documented in each scenario `README`). The actor unit is the host (IP) inside the captured network; there is no user-level identifier.
+
+{{ FILL: n_unique + null_rate table for SrcAddr/DstAddr/Sport/Dport/Proto — cell 6 }}
+
+## Temporal structure
+
+- `StartTime`: microsecond-precision string (`YYYY/MM/DD HH:MM:SS.ffffff`).
+- `Dur`: float seconds; flow durations span sub-second to hours.
+- Each scenario is a contiguous capture window of hours; scenarios are not contemporaneous.
+- Per-scenario time spans: {{ FILL: per-scenario t_min/t_max/rows table — cell 7 }}
+
+## Missing data
+
+`sTos`/`dTos` are commonly null (routers don't always set ToS); port nulls occur for connectionless / ICMP / ARP flows.
+
+{{ FILL: overall null summary + per-column null table — cell 8 }}
+
+## Quirks and observations
+
+- 13 separate captures, each a different botnet family (per scenario `README`) — not a single time series.
+- `Label` is a free-text Argus annotation, not a clean class column; coarsening requires substring matching.
+- `Background` flows are unlabelled real traffic — NOT verified-legitimate.
+- `Sport`/`Dport` are stored as strings (some non-numeric `0x*` values), not integers.
+- IPs are real, from a single university network capture; the actor unit is a host, not a user.
+- Concatenating all scenarios is fine for descriptive stats but mixes captures from different dates and botnet families.
+
+## Framing distance
+
+**What real problem it approximates:** network-layer botnet C2 detection from flow records — a different problem from web-facing bot abuse, sharing only the word "bot."
+
+**What it fails to represent:** the web/application layer entirely; user- or session-level units; a clean legitimate class; and any single coherent timeline. It represents host-level malware C2 traffic, not automated abuse of web flows.
+
+**What further evidence would be needed:** to be in scope at all, application-layer/session data rather than netflow — at which point it would be a different dataset. This is the core of the keep/cut question.
+
+## What it cannot show
+
+Nothing about web-facing bot abuse — the project's actual subject. It documents network-flow botnet traffic, which sits outside the project's scope boundary. Its presence here is a decision aid, not an endorsement of inclusion.
+
+## Reproduction
+
+Generated by `notebooks/eda/ctu-13.ipynb`, which calls `openbotrisk.eda.loaders.load_ctu13_meta` (polars read of each `*.binetflow`, then vertical concat).
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace \
+  notebooks/eda/ctu-13.ipynb \
+  --ExecutePreprocessor.timeout=600
+```
+
+Loader runtime on the reference machine: {{ FILL: elapsed seconds — cell 1 }} for all 13 scenarios concatenated in-memory with polars.
