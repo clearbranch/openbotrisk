@@ -80,8 +80,8 @@ Concrete commitments. Versions pinned in dependency files as work begins; this s
 | Linting / formatting | ruff | ORR convention; fast, single tool |
 | Pre-commit | pre-commit framework | ruff, detect-secrets, large-file checks |
 | Site framework | Quarto | ORR convention; matches the writing-led project shape |
-| Site hosting | GitHub Pages from `gh-pages` branch | Free; standard Quarto deployment |
-| Public URL | `https://clearbranch.github.io/openbotrisk/` on GitHub Pages | Stable URL, simple setup |
+| Site hosting | GitHub Pages via GitHub Actions (`actions/deploy-pages`) to `https://clearbranch.github.io/openbotrisk/` | Free; builds `_site` with Quarto and deploys the artifact (no `gh-pages` branch) |
+| Public URL | `https://clearbranch.github.io/openbotrisk/` on GitHub Pages; `openbotrisk.org` not configured (ownership unconfirmed) | Stable URL, simple setup |
 | CI | GitHub Actions | Run ruff, pytest, and Quarto build on PRs |
 | Branch protection | Required on `main` | PR-based workflow; no direct commits |
 | Issue tracking | GitHub Issues | Sufficient for solo-with-possible-contributors |
