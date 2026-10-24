@@ -75,6 +75,8 @@ Use this note before discussing:
 - rate limiting by IP
 - why “same IP” does not always mean “same person”
 
+For the practical source hierarchy and lookup design, continue to [Public IP enrichment: what the flags actually mean](../techniques/public-ip-enrichment.qmd).
+
 ## Sources used on this page
 
 ::: {.sources-used}

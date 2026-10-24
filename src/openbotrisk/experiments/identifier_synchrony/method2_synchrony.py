@@ -43,10 +43,9 @@ import pandas as pd
 from matplotlib.axes import Axes
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
-IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
+from openbotrisk.config import EXPERIMENTS_DIR, IMAGE_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "identifier-synchrony" / "generated"
 
 BUCKET = pd.Timedelta(hours=1)
 JACCARD_MIN = 0.25
@@ -201,26 +200,41 @@ def _cluster_components(graph: nx.Graph, min_size: int = 3) -> dict[str, int]:
 def run_synchrony_clustering(
     users: pd.DataFrame,
     events: pd.DataFrame,
+    *,
+    bucket: pd.Timedelta = BUCKET,
+    jaccard_min: float = JACCARD_MIN,
+    min_shared: int = MIN_SHARED,
+    token_user_cap: int = TOKEN_USER_CAP,
 ) -> tuple[pd.DataFrame, nx.Graph, pd.DataFrame]:
     """Run Method 2 and attach ``cluster_m2`` to the user table.
 
     Args:
         users: User table, usually the ``users_m1.csv`` output from Method 1.
         events: Event table from ``generate_data.py``.
+        bucket: Width of each overlapping time bucket.
+        jaccard_min: Minimum Jaccard similarity for an edge.
+        min_shared: Minimum shared-token count before considering Jaccard.
+        token_user_cap: Drop tokens touched by more users than this cap.
 
     Returns:
         ``(users_with_clusters, graph, coverage)``. ``coverage`` gives the
         Method 1 and Method 2 detection share by ground-truth group.
     """
 
-    user_tokens = _build_user_tokens(events)
-    pair_shared, token_count, dropped = _count_shared_tokens(user_tokens)
+    user_tokens = _build_user_tokens(events, bucket)
+    pair_shared, token_count, dropped = _count_shared_tokens(user_tokens, token_user_cap)
     print(
         f"{token_count} tokens, {dropped} dropped as too popular, "
         f"{len(pair_shared)} candidate pairs"
     )
 
-    graph = _build_similarity_graph(users.user_id, user_tokens, pair_shared)
+    graph = _build_similarity_graph(
+        users.user_id,
+        user_tokens,
+        pair_shared,
+        min_shared=min_shared,
+        jaccard_min=jaccard_min,
+    )
     clusters = _cluster_components(graph)
 
     users = users.copy()
@@ -324,12 +338,26 @@ def plot_synchrony_results(
     plt.close(fig)
 
 
-def main() -> None:
+def main(
+    *,
+    bucket: pd.Timedelta = BUCKET,
+    jaccard_min: float = JACCARD_MIN,
+    min_shared: int = MIN_SHARED,
+    token_user_cap: int = TOKEN_USER_CAP,
+) -> None:
     """Run the Method 2 experiment and write its outputs."""
 
-    events = pd.read_csv(DATA_DIR / "events.csv", parse_dates=["ts"])
-    users = pd.read_csv(DATA_DIR / "users_m1.csv", parse_dates=["reg_ts"])
-    users, _graph, coverage = run_synchrony_clustering(users, events)
+    events = pd.read_csv(GENERATED_DIR / "events.csv", parse_dates=["ts"])
+    users = pd.read_csv(GENERATED_DIR / "users_m1.csv", parse_dates=["reg_ts"])
+    users, _graph, coverage = run_synchrony_clustering(
+        users,
+        events,
+        bucket=bucket,
+        jaccard_min=jaccard_min,
+        min_shared=min_shared,
+        token_user_cap=token_user_cap,
+    )
+    coverage.to_csv(GENERATED_DIR / "method_coverage.csv")
     plot_synchrony_results(
         users,
         events,
@@ -337,7 +365,7 @@ def main() -> None:
         IMAGE_DIR / "method2_synchrony.png",
     )
     print("\nSaved method2_synchrony.png")
-    users.to_csv(DATA_DIR / "users_final.csv", index=False)
+    users.to_csv(GENERATED_DIR / "users_final.csv", index=False)
 
 
 if __name__ == "__main__":

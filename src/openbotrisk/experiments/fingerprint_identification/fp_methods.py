@@ -43,10 +43,9 @@ from matplotlib.axes import Axes
 from sklearn.linear_model import LogisticRegression
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "fingerprint-identification" / "generated"
-IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
+from openbotrisk.config import EXPERIMENTS_DIR, IMAGE_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "fingerprint-identification" / "generated"
 
 ATTRS = [
     "os",
@@ -578,7 +577,7 @@ def plot_method_tradeoff(
 def main() -> None:
     """Run the fingerprint-identification comparison and write the figure."""
 
-    visits = pd.read_csv(DATA_DIR / "fp_visits.csv", parse_dates=["ts"])
+    visits = pd.read_csv(GENERATED_DIR / "fp_visits.csv", parse_dates=["ts"])
     results, _sweep = run_identification_methods(visits)
     plot_method_tradeoff(results, IMAGE_DIR / "fp_methods_tradeoff.png")
     print("\nSaved fp_methods_tradeoff.png")

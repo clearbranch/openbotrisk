@@ -16,15 +16,14 @@ Example:
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "fingerprint-identification" / "generated"
+from openbotrisk.config import EXPERIMENTS_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "fingerprint-identification" / "generated"
 
 SEED = 7
 T0 = pd.Timestamp("2026-01-01")
@@ -332,9 +331,9 @@ def _print_summary(visits: pd.DataFrame) -> None:
 def main() -> None:
     """Generate the visit CSV used by the fingerprint-method comparison."""
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
     visits = generate_fingerprint_visits()
-    visits.to_csv(DATA_DIR / "fp_visits.csv", index=False)
+    visits.to_csv(GENERATED_DIR / "fp_visits.csv", index=False)
     _print_summary(visits)
 
 

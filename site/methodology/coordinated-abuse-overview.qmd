@@ -1,0 +1,144 @@
+---
+title: "Identifier graphs and behavioural synchrony: overview"
+description: "Why two different methods are needed to find coordinated account groups, and the synthetic cast built to break each one."
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: false
+---
+
+::: {.lead}
+Abuse online is rarely one account acting alone. Review farms, ticket-scalping
+rings, fraud crews, and bot networks are *groups* of accounts working together.
+The practical problem is telling a coordinated group apart from the ordinary
+users who happen to look similar — and an attacker who knows you are looking
+will try to look ordinary.
+:::
+
+This experiment compares two ways of finding such groups, because each one
+catches rings the other misses.
+
+The **first idea** is that coordinated accounts tend to reuse the same things —
+a payment card, a device, an IP address — because getting fresh ones for every
+account costs money and effort. Link accounts by what they share, and the lazy
+rings light up.
+
+The **second idea** is aimed at the attackers who *do* pay that cost. If every
+account has its own card, device, and IP, there is nothing to link them by —
+except their behaviour. A ring still has to act on the same targets at roughly
+the same time to get its job done. Linking accounts by coordinated behaviour —
+same action, same target, same time window — catches groups that share no
+infrastructure at all. This page calls that signal **behavioural synchrony**.
+
+Neither idea is enough on its own, and the instructive cases are the ones that
+break each method: a benign group that *looks* like a reuse ring, and an
+ordinary crowd that *looks* coordinated because everyone wanted the same thing
+at once. Most of this experiment is about those failure modes.
+
+::: {.callout-important title="What this is, and what it is not"}
+The data here is synthetic, and the abusive groups are detectable by
+construction. That makes the mechanics of each method easy to see, but it is
+**not** evidence that either method would reach these detection rates on real
+telemetry. Read it as a demonstration of *how* the methods work and *where*
+they fail, not as a benchmark.
+
+The ground-truth group labels only exist because the data is synthetic. In a
+real system they would come from review outcomes, chargebacks, takedowns, and
+other imperfect, delayed feedback — never the clean labels used here.
+:::
+
+## Meet the five groups
+
+The synthetic population is built along two axes: how much accounts **reuse
+identifiers**, and how much they **coordinate behaviour**. Every group is placed
+to break at least one method.
+
+| Group | Identifier reuse | Behavioural coordination | Why it is here |
+|---|---|---|---|
+| `legit` | incidental (household IPs/cards; one shared university network) | none | the ordinary-user background neither method should flag |
+| `travel_agent` | heavy but benign (one office IP + one card across 25 staff) | none | false-positive trap — looks exactly like a reuse ring |
+| `ring_lazy` | heavy (5 cards, 8 devices, 4 IPs, 3 phones across 60 accounts) | tight (~5-min jitter) | the easy case — reuses identifiers *and* coordinates, so most methods should catch it |
+| `ring_careful` | none (every identifier unique) | loose (~30-min jitter) | unique identifiers but coordinated timing — built to be invisible to the identifier method |
+| `ring_mid` | partial, one type only (12 devices across 40 accounts) | loosest (~1-hr jitter, 70% turnout) | partial reuse and loose timing — built to sit near the limits of both methods |
+
+The numbers in that grid are construction facts, set in `generate_data.py`: the
+group sizes, the identifier counts, the campaign jitter (300 / 1800 / 3600
+seconds for lazy / careful / mid), and the mid ring's 70% per-wave
+participation. They are not results — they are the design, and they are what
+makes each cell of the headline result come out the way it does. (*Jitter* is
+the small random timing offset a ring adds between its accounts so they do not
+all act at the exact same instant — wider jitter looks less coordinated, but is
+harder to keep tight.)
+
+The deliberate overlap is the point. Households share IPs and sometimes cards;
+120 legit accounts sit behind a single university egress IP; the travel agent's
+25 staff share one office IP and one card. That benign reuse is exactly what an
+identifier graph has to avoid mistaking for a ring — and exactly why a
+clustering step alone is not a detector.
+
+## Headline result
+
+With the cast and the two ideas in hand, the result reads as a payoff rather
+than a cold open: which groups each method recovers.
+
+| Group | Identifier graph | Behavioural synchrony |
+|---|---:|---:|
+| `legit` | 0.00 | 0.00 |
+| `travel_agent` | clustered, scored benign | 0.00 |
+| `ring_lazy` | 1.00 | 0.97 |
+| `ring_careful` | 0.00 | 0.28 |
+| `ring_mid` | 0.00 | 0.00 |
+
+Detected share is the fraction of a group's accounts placed in a flagged
+cluster, at each method's default settings.
+
+How to read it: for the abusive rings, a *higher* number is better detection.
+For the two benign groups — `legit` and `travel_agent` — the target is *zero*;
+any detection there would be a false positive. So the ideal column is high on the
+rings and zero on the rest.
+
+The two methods are near-complementary by design. The lazy ring is caught by
+*both* — it reuses identifiers *and* coordinates. The careful ring, with unique
+identifiers, is invisible to the graph and only partly caught by synchrony at
+the default one-hour bucket. The mixed ring slips both at default settings. And
+the travel agent is the instructive case: the identifier graph *does* cluster it
+— correctly; it is a tight cluster — but the scoring step clears it.
+
+::: {.callout-note}
+The `travel_agent` cell needs care. "Clustered, scored benign" is two separate
+steps: the graph groups the 25 accounts (they really do share infrastructure),
+and a later scoring step finds their CAPTCHA rate and registration timing look
+ordinary, so they are not flagged. The coverage figure on the Method 1 page
+shows only the *clustering* step, so the travel agent appears there as a full
+Method 1 bar. That bar means "grouped," not "flagged" — the distinction is the
+whole point of separating clustering from scoring.
+:::
+
+The result worth dwelling on is `ring_mid` — though the sweeps narrow what can
+honestly be said about it. At each method's *default* settings it is the
+adversary both catch least (zero on each), and it is also the most realistic:
+partial reuse of one identifier type, loose timing. That much is real. But
+loosening Method 1's edge-weight floor from 0.8 to 0.4 recovers about 40% of it,
+and dropping Method 2's Jaccard floor to 0.10 recovers nearly all of it — both
+with no measured cost to the benign groups. The catch is that *this* population
+cannot show a cost: its one large benign reuse group is removed by pruning, its
+households are below the cluster-size floor, and its ordinary accounts generate
+almost no coincidental synchrony, so the false-positive side of every tradeoff is
+structurally absent. The honest claim is therefore narrow — `ring_mid` slips both
+at conservative defaults, is partly recoverable by loosening thresholds, and this
+dataset cannot say what that loosening would cost on real traffic. Building
+benign groups that actually exercise that cost is the clearest next limitation to
+close.
+
+The detection shares above are reproduced from the experiment run and
+corroborated by the rendered coverage and sweep figures.
+
+## Where to go next
+
+- [Concepts](graphs-and-synchrony-concepts.qmd) — the graph and similarity
+  ideas in plain language, before any code.
+- *Method 1: identifier graph* — build, prune, project, score *(page to follow)*.
+- *Method 2: behavioural synchrony, and tuning* — tokens, Jaccard, and the
+  bucket-width tradeoff *(page to follow)*.
+- *Validation* — does a cluster survive a threshold tweak? *(page to follow)*.

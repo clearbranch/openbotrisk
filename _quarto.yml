@@ -68,8 +68,12 @@ website:
             text: AI-agent shift
           - href: site/background/background-status.md
             text: Background status
-      - href: site/techniques/index.qmd
-        text: Techniques
+      - text: Techniques
+        menu:
+          - href: site/techniques/index.qmd
+            text: Overview
+          - href: site/techniques/public-ip-enrichment.qmd
+            text: Public IP enrichment
       - text: Methodology
         menu:
           - href: site/methodology/index.qmd

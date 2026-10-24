@@ -52,10 +52,9 @@ except ImportError:  # pragma: no cover - supports direct script execution
     )
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
-IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
+from openbotrisk.config import EXPERIMENTS_DIR, IMAGE_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "identifier-synchrony" / "generated"
 
 BUCKET_GRID = [0.5, 1, 2, 4, 8, 16]
 
@@ -115,6 +114,10 @@ def run_bucket_sweep(
     events: pd.DataFrame,
     users: pd.DataFrame,
     bucket_grid: list[float] = BUCKET_GRID,
+    *,
+    jaccard_min: float = JACCARD_MIN,
+    min_shared: int = MIN_SHARED,
+    token_user_cap: int = TOKEN_USER_CAP,
 ) -> pd.DataFrame:
     """Run Method 2 over a grid of bucket widths.
 
@@ -122,6 +125,9 @@ def run_bucket_sweep(
         events: Event table from ``generate_data.py``.
         users: User table from ``generate_data.py``.
         bucket_grid: Bucket widths, in hours.
+        jaccard_min: Minimum Jaccard similarity for an edge.
+        min_shared: Minimum shared-token count for an edge.
+        token_user_cap: Drop tokens touched by more users than this cap.
 
     Returns:
         DataFrame indexed by bucket width, with one detection column per
@@ -129,7 +135,17 @@ def run_bucket_sweep(
     """
 
     results = pd.DataFrame(
-        {bucket: run_bucket(events, users, bucket) for bucket in bucket_grid}
+        {
+            bucket: run_bucket(
+                events,
+                users,
+                bucket,
+                jaccard_min=jaccard_min,
+                min_shared=min_shared,
+                token_user_cap=token_user_cap,
+            )
+            for bucket in bucket_grid
+        }
     ).T
     results.index.name = "bucket_h"
     return results
@@ -169,12 +185,26 @@ def plot_bucket_sweep(results: pd.DataFrame, output_path: Path) -> None:
     plt.close(fig)
 
 
-def main() -> None:
+def main(
+    *,
+    bucket_grid: list[float] = BUCKET_GRID,
+    jaccard_min: float = JACCARD_MIN,
+    min_shared: int = MIN_SHARED,
+    token_user_cap: int = TOKEN_USER_CAP,
+) -> None:
     """Run the bucket-width sweep and write its figure."""
 
-    events = pd.read_csv(DATA_DIR / "events.csv", parse_dates=["ts"])
-    users = pd.read_csv(DATA_DIR / "users.csv", parse_dates=["reg_ts"])
-    results = run_bucket_sweep(events, users)
+    events = pd.read_csv(GENERATED_DIR / "events.csv", parse_dates=["ts"])
+    users = pd.read_csv(GENERATED_DIR / "users.csv", parse_dates=["reg_ts"])
+    results = run_bucket_sweep(
+        events,
+        users,
+        bucket_grid,
+        jaccard_min=jaccard_min,
+        min_shared=min_shared,
+        token_user_cap=token_user_cap,
+    )
+    results.to_csv(GENERATED_DIR / "bucket_sweep.csv")
     print(results.to_string(float_format=lambda x: f"{x:.2f}"))
     plot_bucket_sweep(results, IMAGE_DIR / "method2_bucket_sweep.png")
     print("Saved method2_bucket_sweep.png")

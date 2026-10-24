@@ -20,20 +20,45 @@ Example:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
+from openbotrisk.config import EXPERIMENTS_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "identifier-synchrony" / "generated"
 
 SEED = 42
 T0 = pd.Timestamp("2026-01-01")
 HORIZON_DAYS = 120
 ACTIONS = ["view", "add_to_basket", "checkout"]
+HYBRID_N = 3
+FUZZY_BUCKETS = 5
+FUZZY_LEGIT_BYSTANDERS = 3
+ASN_CONTAMINATION_N = 5
+HARD_MODE_AUGMENT_SEED = 11
+
+EXPECTED_DEFAULT_GROUP_COUNTS = {
+    "legit": 934,
+    "ring_careful": 50,
+    "ring_lazy": 60,
+    "ring_mid": 40,
+    "travel_agent": 25,
+}
+EXPECTED_DEFAULT_EVENT_COUNT = 25118
+EXPECTED_DEFAULT_USER_COLUMNS = [
+    "user_id",
+    "group",
+    "reg_ts",
+    "card",
+    "email",
+    "phone",
+    "ip",
+    "asn",
+    "device_id",
+    "captcha_hit",
+]
 
 
 @dataclass
@@ -106,6 +131,9 @@ def _legit_events(
     uid: str,
     n: int,
     targets: list[str],
+    *,
+    start: pd.Timestamp = T0,
+    horizon_days: int = HORIZON_DAYS,
 ) -> None:
     """Append ordinary browsing events for one synthetic user.
 
@@ -115,12 +143,14 @@ def _legit_events(
         uid: Synthetic user ID.
         n: Number of events to append.
         targets: Candidate item/listing targets.
+        start: Start of the synthetic observation window.
+        horizon_days: Number of days in the observation window.
 
     Returns:
         ``None``. The ``events`` list is modified in place.
     """
 
-    for ts in _rand_ts_organic(rng, n):
+    for ts in _rand_ts_organic(rng, n, start=start, horizon_days=horizon_days):
         events.append(
             {
                 "user_id": uid,
@@ -178,12 +208,96 @@ def _campaign(
                 )
 
 
-def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFrame]:
+def _add_hard_mode_contamination(
+    users: list[dict[str, Any]],
+    careful_uids: list[str],
+    *,
+    hybrid_n: int = HYBRID_N,
+    fuzzy_buckets: int = FUZZY_BUCKETS,
+    legit_bystanders: int = FUZZY_LEGIT_BYSTANDERS,
+    asn_contamination_n: int = ASN_CONTAMINATION_N,
+) -> list[str]:
+    """Add hybrid accounts and loose fuzzy identifiers for hard-mode data.
+
+    The construction mirrors ``hybrid_demo.py``: pick a few legitimate accounts
+    to become dual-use hybrids, then distribute the careful ring across shared
+    fuzzy-session buckets with hybrid and benign bystander contamination.
+    """
+
+    hard_rng = np.random.default_rng(HARD_MODE_AUGMENT_SEED)
+    for user in users:
+        user["fuzzy_id"] = "fz_" + user["user_id"]
+
+    legit_idx = [i for i, user in enumerate(users) if user["group"] == "legit"]
+    hybrid_count = min(hybrid_n, len(legit_idx))
+    hybrid_idx = list(hard_rng.choice(legit_idx, hybrid_count, replace=False))
+    for idx in hybrid_idx:
+        users[idx]["group"] = "hybrid"
+
+    careful_uid_set = set(careful_uids)
+    careful_idx = [i for i, user in enumerate(users) if user["user_id"] in careful_uid_set]
+    legit_left = [i for i in legit_idx if i not in hybrid_idx]
+    bucket_size = max(1, len(careful_idx) // fuzzy_buckets)
+    bystander_count = min(legit_bystanders, len(legit_left))
+    for bucket in range(fuzzy_buckets):
+        members = careful_idx[bucket * bucket_size : (bucket + 1) * bucket_size]
+        hybrid_extra = [hybrid_idx[bucket]] if bucket < len(hybrid_idx) else []
+        bystanders = list(hard_rng.choice(legit_left, bystander_count, replace=False))
+        for idx in members + hybrid_extra + bystanders:
+            users[idx]["fuzzy_id"] = f"fz_shared_{bucket}"
+
+    asn_count = min(asn_contamination_n, len(legit_left))
+    for idx in hard_rng.choice(legit_left, asn_count, replace=False):
+        users[idx]["asn"] = "AS_CheapVPS"
+
+    return [users[idx]["user_id"] for idx in hybrid_idx]
+
+
+def check_default_population(
+    users: pd.DataFrame,
+    events: pd.DataFrame,
+) -> tuple[bool, str]:
+    """Check that the default easy dataset has not drifted."""
+
+    counts = users.group.value_counts().to_dict()
+    columns = list(users.columns)
+    ok = (
+        counts == EXPECTED_DEFAULT_GROUP_COUNTS
+        and len(events) == EXPECTED_DEFAULT_EVENT_COUNT
+        and columns == EXPECTED_DEFAULT_USER_COLUMNS
+    )
+    detail = (
+        f"groups={counts}, users={len(users)}, events={len(events)}, "
+        f"columns={columns}"
+    )
+    return ok, detail
+
+
+def _assert_default_population(users: pd.DataFrame, events: pd.DataFrame) -> None:
+    """Stop if a default generation run no longer matches the pinned baseline."""
+
+    ok, detail = check_default_population(users, events)
+    if not ok:
+        msg = "Default determinism check failed: " + detail
+        raise RuntimeError(msg)
+
+
+def generate_synthetic_data(
+    seed: int = SEED,
+    *,
+    start: pd.Timestamp = T0,
+    horizon_days: int = HORIZON_DAYS,
+    hard: bool = False,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Generate the synthetic user and event tables.
 
     Args:
         seed: Random seed. The default reproduces the figures on the
             Methodology page.
+        start: Start of the synthetic observation window.
+        horizon_days: Number of days in the observation window.
+        hard: When ``True``, add hybrid accounts, fuzzy-session contamination,
+            and light ASN contamination to stress clustering-quality metrics.
 
     Returns:
         A tuple ``(users_df, events_df)``. ``users_df`` contains synthetic
@@ -224,7 +338,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
                 {
                     "user_id": uid,
                     "group": "legit",
-                    "reg_ts": _rand_ts_organic(rng, 1)[0],
+                    "reg_ts": _rand_ts_organic(rng, 1, start=start, horizon_days=horizon_days)[0],
                     "card": hh_card if share_card else _ident("card_", counters.card),
                     "email": _ident("em_", counters.email),
                     "phone": _ident("ph_", counters.phone),
@@ -260,7 +374,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
             {
                 "user_id": uid,
                 "group": "travel_agent",
-                "reg_ts": _rand_ts_organic(rng, 1)[0],
+                "reg_ts": _rand_ts_organic(rng, 1, start=start, horizon_days=horizon_days)[0],
                 "card": agent_card,
                 "email": _ident("em_", counters.email),
                 "phone": _ident("ph_", counters.phone),
@@ -281,7 +395,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
     lazy_phones = [_ident("ph_", counters.phone + 1 + i) for i in range(3)]
     counters.phone += 3
     lazy_uids: list[str] = []
-    burst_starts = [T0 + pd.Timedelta(days=20), T0 + pd.Timedelta(days=21)]
+    burst_starts = [start + pd.Timedelta(days=20), start + pd.Timedelta(days=21)]
     for k in range(60):
         uid = _new_uid(counters)
         lazy_uids.append(uid)
@@ -316,7 +430,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
             {
                 "user_id": uid,
                 "group": "ring_careful",
-                "reg_ts": T0
+                "reg_ts": start
                 + pd.Timedelta(days=40)
                 + pd.Timedelta(hours=float(k * 3 + rng.uniform(0, 2))),
                 "card": _ident("card_", counters.card),
@@ -344,7 +458,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
             {
                 "user_id": uid,
                 "group": "ring_mid",
-                "reg_ts": T0
+                "reg_ts": start
                 + pd.Timedelta(days=60)
                 + pd.Timedelta(hours=float(rng.uniform(0, 96))),
                 "card": _ident("card_", counters.card),
@@ -357,16 +471,26 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
             }
         )
 
+    hybrid_uids = _add_hard_mode_contamination(users, careful_uids) if hard else []
+
     targets = [f"item_{i:04d}" for i in range(500)]
     for uid in legit_uids + agent_uids:
-        _legit_events(rng, events, uid, int(rng.integers(5, 40)), targets)
+        _legit_events(
+            rng,
+            events,
+            uid,
+            int(rng.integers(5, 40)),
+            targets,
+            start=start,
+            horizon_days=horizon_days,
+        )
 
     hot = rng.choice(targets, 30, replace=False)
     _campaign(
         rng,
         events,
         lazy_uids,
-        T0 + pd.Timedelta(days=22),
+        start + pd.Timedelta(days=22),
         n_waves=10,
         wave_gap_h=12,
         targets_pool=hot,
@@ -375,8 +499,8 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
     _campaign(
         rng,
         events,
-        careful_uids,
-        T0 + pd.Timedelta(days=48),
+        careful_uids + hybrid_uids,
+        start + pd.Timedelta(days=48),
         n_waves=12,
         wave_gap_h=8,
         targets_pool=hot,
@@ -386,7 +510,7 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
         rng,
         events,
         mid_uids,
-        T0 + pd.Timedelta(days=65),
+        start + pd.Timedelta(days=65),
         n_waves=6,
         wave_gap_h=24,
         targets_pool=hot,
@@ -395,27 +519,52 @@ def generate_synthetic_data(seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFram
     )
 
     for uid in lazy_uids + careful_uids + mid_uids:
-        _legit_events(rng, events, uid, int(rng.integers(2, 8)), targets)
+        _legit_events(
+            rng,
+            events,
+            uid,
+            int(rng.integers(2, 8)),
+            targets,
+            start=start,
+            horizon_days=horizon_days,
+        )
 
     users_df = pd.DataFrame(users)
     events_df = pd.DataFrame(events).sort_values("ts").reset_index(drop=True)
+    if not hard and seed == SEED and pd.Timestamp(start) == T0 and horizon_days == HORIZON_DAYS:
+        _assert_default_population(users_df, events_df)
     return users_df, events_df
 
 
-def main() -> None:
+def main(
+    *,
+    seed: int = SEED,
+    start: pd.Timestamp = T0,
+    horizon_days: int = HORIZON_DAYS,
+    hard: bool = False,
+) -> None:
     """Write synthetic users/events CSVs for the Methodology page.
 
     Args:
-        None.
+        seed: Random seed for the synthetic data.
+        start: Start of the synthetic observation window.
+        horizon_days: Number of days in the observation window.
+        hard: When ``True``, write the hard-mode variant.
 
     Returns:
-        ``None``. Writes ``users.csv`` and ``events.csv`` under ``DATA_DIR``.
+        ``None``. Writes ``users.csv`` and ``events.csv`` under ``GENERATED_DIR``.
     """
 
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    users_df, events_df = generate_synthetic_data()
-    users_df.to_csv(DATA_DIR / "users.csv", index=False)
-    events_df.to_csv(DATA_DIR / "events.csv", index=False)
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    users_df, events_df = generate_synthetic_data(
+        seed=seed, start=start, horizon_days=horizon_days, hard=hard
+    )
+    if not hard and seed == SEED and pd.Timestamp(start) == T0 and horizon_days == HORIZON_DAYS:
+        _assert_default_population(users_df, events_df)
+        ok, detail = check_default_population(users_df, events_df)
+        print(f"Default determinism check: {'OK' if ok else 'FAILED'} - {detail}")
+    users_df.to_csv(GENERATED_DIR / "users.csv", index=False)
+    events_df.to_csv(GENERATED_DIR / "events.csv", index=False)
     print(users_df.group.value_counts())
     print(f"{len(events_df)} events")
 

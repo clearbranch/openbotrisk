@@ -35,10 +35,9 @@ import pandas as pd
 from matplotlib.axes import Axes
 
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_ROOT = SCRIPT_DIR.parents[3]
-DATA_DIR = REPO_ROOT / "experiments" / "identifier-synchrony" / "generated"
-IMAGE_DIR = REPO_ROOT / "site" / "methodology" / "images"
+from openbotrisk.config import EXPERIMENTS_DIR, IMAGE_DIR
+
+GENERATED_DIR = EXPERIMENTS_DIR / "identifier-synchrony" / "generated"
 
 ID_TYPES: dict[str, float] = {
     "card": 3.0,
@@ -224,7 +223,9 @@ def score_clusters(users: pd.DataFrame, k_shrink: int = K_SHRINK) -> pd.DataFram
         k_shrink: Pseudo-observations toward the global CAPTCHA base rate.
 
     Returns:
-        Cluster score table sorted by ``captcha_shrunk`` descending.
+        Cluster score table sorted by ``captcha_shrunk`` descending. Empty (but
+        with the full column set) when no clusters survive, e.g. under an
+        aggressive ``min_edge_w`` in a parameter sweep.
     """
 
     base_rate = users.captcha_hit.mean()
@@ -243,51 +244,81 @@ def score_clusters(users: pd.DataFrame, k_shrink: int = K_SHRINK) -> pd.DataFram
                 "majority_truth": group.group.mode()[0],
             }
         )
-    return pd.DataFrame(rows).sort_values("captcha_shrunk", ascending=False)
+    scored = pd.DataFrame(
+        rows,
+        columns=[
+            "cluster",
+            "size",
+            "captcha_raw",
+            "captcha_shrunk",
+            "med_reg_gap_h",
+            "top_asn",
+            "majority_truth",
+        ],
+    )
+    if scored.empty:
+        return scored
+    return scored.sort_values("captcha_shrunk", ascending=False)
 
 
 def run_identifier_graph(
     users: pd.DataFrame,
+    *,
+    id_types: Mapping[str, float] = ID_TYPES,
+    degree_cap: int = DEGREE_CAP,
+    min_edge_w: float = MIN_EDGE_W,
+    big_component: int = BIG_COMPONENT,
+    k_shrink: int = K_SHRINK,
+    verbose: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame, nx.Graph, pd.Series, int]:
     """Run Method 1 and attach ``cluster_m1`` to the user table.
 
     Args:
         users: Synthetic user table from ``generate_data.py``.
+        id_types: Identifier columns to include and their base edge weights.
+        degree_cap: Maximum users per identifier before pruning.
+        min_edge_w: Minimum projected user-user edge weight to keep.
+        big_component: Components larger than this are split with Louvain.
+        k_shrink: Pseudo-observations toward the global CAPTCHA base rate.
+        verbose: When ``False``, suppress the progress prints (used by sweeps).
 
     Returns:
         ``(users_with_clusters, scores, user_graph, original_degrees,
         weak_edge_count)``.
     """
 
-    bipartite = _build_bipartite_graph(users)
+    bipartite = _build_bipartite_graph(users, id_types)
     original_degrees = _identifier_degrees(bipartite)
-    pruned = _prune_promiscuous_identifiers(bipartite)
-    print("Pruned promiscuous identifiers:")
-    print(pruned.to_string() if len(pruned) else "  (none)")
+    pruned = _prune_promiscuous_identifiers(bipartite, degree_cap)
+    if verbose:
+        print("Pruned promiscuous identifiers:")
+        print(pruned.to_string() if len(pruned) else "  (none)")
 
-    user_graph, weak_count = _project_to_user_graph(bipartite, users)
-    print(
-        f"\nProjected graph: {user_graph.number_of_nodes()} users, "
-        f"{user_graph.number_of_edges()} edges ({weak_count} weak edges pruned)"
-    )
+    user_graph, weak_count = _project_to_user_graph(bipartite, users, id_types, min_edge_w)
+    if verbose:
+        print(
+            f"\nProjected graph: {user_graph.number_of_nodes()} users, "
+            f"{user_graph.number_of_edges()} edges ({weak_count} weak edges pruned)"
+        )
 
-    clusters = _cluster_user_graph(user_graph)
+    clusters = _cluster_user_graph(user_graph, big_component)
     users = users.copy()
     users["cluster_m1"] = users.user_id.map(clusters).astype("Int64")
-    print(
-        f"{users.cluster_m1.notna().sum()} users in {len(set(clusters.values()))} "
-        f"clusters; {users.cluster_m1.isna().sum()} singletons"
-    )
+    if verbose:
+        print(
+            f"{users.cluster_m1.notna().sum()} users in {len(set(clusters.values()))} "
+            f"clusters; {users.cluster_m1.isna().sum()} singletons"
+        )
 
-    scores = score_clusters(users)
+    scores = score_clusters(users, k_shrink)
     return users, scores, user_graph, original_degrees, weak_count
 
 
-def _plot_degree_distribution(ax: Axes, degrees: pd.Series) -> None:
+def _plot_degree_distribution(ax: Axes, degrees: pd.Series, degree_cap: int = DEGREE_CAP) -> None:
     """Plot identifier degree distribution."""
 
     ax.hist(degrees.values, bins=np.logspace(0, 2.5, 30), color="#4878a8")
-    ax.axvline(DEGREE_CAP, color="crimson", ls="--", label=f"degree cap = {DEGREE_CAP}")
+    ax.axvline(degree_cap, color="crimson", ls="--", label=f"degree cap = {degree_cap}")
     ax.set(
         xscale="log",
         yscale="log",
@@ -347,6 +378,7 @@ def plot_identifier_graph_results(
     graph: nx.Graph,
     degrees: pd.Series,
     output_path: Path,
+    degree_cap: int = DEGREE_CAP,
 ) -> None:
     """Write the Method 1 figure.
 
@@ -356,6 +388,7 @@ def plot_identifier_graph_results(
         graph: Weighted user-user graph.
         degrees: Identifier degree distribution before pruning.
         output_path: PNG file path to write.
+        degree_cap: Degree cap to annotate on the distribution plot.
 
     Returns:
         ``None``. Writes a PNG figure.
@@ -363,7 +396,7 @@ def plot_identifier_graph_results(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 3, figsize=(16, 5))
-    _plot_degree_distribution(axes[0], degrees)
+    _plot_degree_distribution(axes[0], degrees, degree_cap)
     _plot_user_projection(axes[1], users, graph)
     _plot_cluster_scores(axes[2], users, scores)
     fig.tight_layout()
@@ -371,11 +404,29 @@ def plot_identifier_graph_results(
     plt.close(fig)
 
 
-def main() -> None:
+def main(
+    *,
+    id_types: Mapping[str, float] = ID_TYPES,
+    degree_cap: int = DEGREE_CAP,
+    min_edge_w: float = MIN_EDGE_W,
+    big_component: int = BIG_COMPONENT,
+    k_shrink: int = K_SHRINK,
+) -> None:
     """Run Method 1, write ``users_m1.csv``, and update the Methodology figure."""
 
-    users = pd.read_csv(DATA_DIR / "users.csv", parse_dates=["reg_ts"])
-    users, scores, graph, degrees, _weak_count = run_identifier_graph(users)
+    users = pd.read_csv(GENERATED_DIR / "users.csv", parse_dates=["reg_ts"])
+    users, scores, graph, degrees, _weak_count = run_identifier_graph(
+        users,
+        id_types=id_types,
+        degree_cap=degree_cap,
+        min_edge_w=min_edge_w,
+        big_component=big_component,
+        k_shrink=k_shrink,
+    )
+    scores.to_csv(GENERATED_DIR / "method1_cluster_scores.csv", index=False)
+    pd.Series({"captcha_base_rate": users.captcha_hit.mean()}).to_csv(
+        GENERATED_DIR / "method1_base_rate.csv"
+    )
 
     print("\nTop clusters by shrunk captcha rate (size >= 5):")
     print(
@@ -399,9 +450,26 @@ def main() -> None:
         graph,
         degrees,
         IMAGE_DIR / "method1_identifier_graph.png",
+        degree_cap=degree_cap,
     )
     print("\nSaved method1_identifier_graph.png")
-    users.to_csv(DATA_DIR / "users_m1.csv", index=False)
+    users.to_csv(GENERATED_DIR / "users_m1.csv", index=False)
+
+    pd.DataFrame(
+        [
+            {
+                "bipartite_users": len(users),
+                "bipartite_identifiers": len(degrees),
+                "bipartite_edges": int(degrees.sum()),
+                "pruned_identifiers": int((degrees > degree_cap).sum()),
+                "projected_users": graph.number_of_nodes(),
+                "projected_edges": graph.number_of_edges(),
+                "weak_edges_pruned": _weak_count,
+                "clusters": int(users.cluster_m1.nunique()),
+                "singletons": int(users.cluster_m1.isna().sum()),
+            }
+        ]
+    ).to_csv(GENERATED_DIR / "method1_stage_summary.csv", index=False)
 
 
 if __name__ == "__main__":

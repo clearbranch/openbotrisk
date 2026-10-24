@@ -1,0 +1,223 @@
+---
+title: "Public IP enrichment: what the flags actually mean"
+description: "A reproducible hierarchy for adding network, ASN, cloud, VPN and Tor context to an IP address without turning infrastructure metadata into a verdict."
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: false
+image: ../assets/openbotrisk_banner_panel_05.png
+title-block-banner: ../assets/openbotrisk_banner_panel_07.png
+title-block-banner-color: "#ffffff"
+---
+
+## The question
+
+An application log often starts with little more than a source IP address. Public data can add useful context: the routed prefix, autonomous system number (ASN), network name, broad geography, cloud-provider range, known VPN or datacentre range, and whether the address appeared in a Tor exit list.
+
+None of those fields answers the question **“is this request abusive?”** They describe infrastructure. The defensible output is a set of dated observations with provenance, not one all-purpose `bad_ip` label.
+
+::: {.callout-tip}
+## The compact rule
+
+Preserve each source as its own feature, record when it was observed, and let later analysis decide how much weight it deserves.
+:::
+
+## Five different kinds of information
+
+The exploratory work for this page tested routing tables, ASN metadata, a multi-provider range aggregator, Tor exits, VPN/datacentre lists, and a hand-maintained ASN blocklist. It did not download AWS and Google Cloud's first-party feeds directly. These sources are easy to join technically and easy to conflate conceptually.
+
+| Layer | Example output | What a match supports | What it does not support |
+|---|---|---|---|
+| Route origin | `asn`, routed prefix | The ASN originating the best matching prefix in that snapshot | The end user, business type, or intent |
+| Organisation metadata | network name, website, self-described type | Context about the network operator | An independently verified residential/hosting classification |
+| Provider-published ranges | provider, service, region | The address fell inside a range the provider published for that purpose | Complete coverage of the provider or proof that a customer generated the request |
+| Observed service list | `tor_exit_listed` | The address appeared in the relevant Tor list at the observation time | Abuse, identity, or historical Tor use outside that snapshot |
+| Curated heuristic | `vpn_listed`, `datacentre_listed`, `hosting_asn_listed` | A particular maintainer classified the range or ASN that way | Ground truth, completeness, or a safe automatic block decision |
+
+The distinction matters because the rows have different units. A Tor list is largely an IP-level observation. A provider feed is a set of prefixes. PeeringDB describes a network associated with an ASN. A hand-built “hosting ASN” list applies one label to every routed address associated with that ASN. Collapsing them into one boolean discards both provenance and uncertainty.
+
+## A source hierarchy
+
+### 1. Start with routing, not reputation
+
+An IP-to-ASN table answers the narrowest useful question: which ASN originated the longest matching routed prefix in a particular routing snapshot? It supplies a join key for network-level metadata. It does not establish that the ASN owns every address, operates the end host, or belongs to a particular business category.
+
+Routing data is time-varying. Prefixes are announced, withdrawn, transferred, and sometimes originated by different ASNs. Historical event analysis therefore needs a routing snapshot close to the event, not only the current table. One suitable source is CAIDA's [RouteViews Prefix-to-AS mappings](https://www.caida.org/catalog/datasets/routeviews-prefix2as/), produced daily for IPv4 and IPv6 with archives extending back to 2005 and 2007 respectively. Its Public AUA requires citation and asks users to report publications—including web pages—that use the data.
+
+### 2. Add network metadata without promoting it to truth
+
+[PeeringDB](https://docs.peeringdb.com/) exposes network names, websites, reach, traffic characteristics, and `info_types` through its API. These records are valuable explanatory metadata, but many of the fields are self-described and coverage is not universal. An absent PeeringDB row means “no matched row,” not “unknown or suspicious network.”
+
+Likewise, an ASN category from an inferred classification model should retain the model name and version. The former [CAIDA AS Classification dataset](https://www.caida.org/catalog/datasets/as-classification/), for example, trained on PeeringDB-derived ground truth supplemented by 500 manually classified enterprise networks. Its features included AS relationships, customer-cone size, advertised IPv4 space, popular domains mapped to the AS, and observed address activity. CAIDA reports a positive predictive value of 70% and now marks the dataset as unsupported. That is useful research context, not a timeless label.
+
+### 3. Prefer first-party cloud ranges
+
+Provider feeds are strong evidence for the specific claim their publisher makes:
+
+- [AWS publishes `ip-ranges.json`](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ip-ranges.html), with service and region fields. AWS explicitly says the file omits some services and customer-owned BYOIP space.
+- [Google Cloud publishes `cloud.json`](https://cloud.google.com/compute/docs/faq#find_ip_range), covering global and regional external ranges available to customer resources.
+
+These should be stored as separate provider/service/region matches. The notebook instead tested rezmoss's third-party aggregation: its normalized table carries `provider`, `service`, and `region` fields assembled from multiple upstream sources. Those fields were not independently reproduced from the AWS and Google feeds in this exploration. An aggregate inherits every upstream definition, refresh schedule, overlap, and omission, so keep the aggregator, original publisher, and source URL distinct wherever possible.
+
+Overlaps are not an error to erase blindly. A broad parent prefix may be labelled for one provider while a more specific prefix has another service label. A lookup policy must specify longest-prefix behaviour and whether it returns one match or every matching range.
+
+### 4. Treat Tor as a dated observation
+
+The notebook downloaded the exact endpoint [`https://check.torproject.org/torbulkexitlist`](https://check.torproject.org/torbulkexitlist). The [Tor Project bulk exit tool](https://check.torproject.org/api/bulk) describes a nearly real-time list of exits that can contact one destination server on port 80. It identifies the current data as TorDNSEL output and points historical users to CollecTor. A present-day match therefore supports a `tor_exit_listed_at` observation tied to that exact artifact; it cannot establish that an address was a Tor exit when an older login occurred.
+
+Do not silently substitute another Tor artifact. Different list-building methods have produced different counts, and this exploration did not compare them. Record the endpoint, destination assumptions, retrieval time, and hash with the result.
+
+The 24 October 2026 rerun of that exact endpoint contained 1,210 distinct addresses. This is a reproducibility detail, not a stable size estimate: the live list can change after the snapshot.
+
+Most importantly, a Tor match identifies shared privacy infrastructure. It does not identify a person and it is not evidence of abuse.
+
+### 5. Keep community lists visibly heuristic
+
+Community VPN, datacentre, and hosting-ASN lists can add coverage that first-party feeds do not provide. They can also contain stale ownership, broad labels, false positives, and undocumented judgement calls.
+
+The explored `bad-asn-list` is a useful example. It is an open defensive artifact accompanied by one operator's account of using hosting-ASN blocking against signup abuse. It is not a measured reference classification: the reported effect is single-site and anecdotal, the selection method is not documented as a reproducible study, and one ASN-level decision can affect mixed residential, enterprise, and hosted traffic. In this project it is retained as a **heuristic feature and historical operator account** (`SRC-052`), not adopted as ground truth.
+
+The same rule applies to merged range repositories: useful for comparison and recall experiments, but label the aggregator and snapshot rather than implying that every entry is an official provider assertion.
+
+## A defensible output schema
+
+Avoid a single `is_proxy` or `is_bad` column. A narrow event-enrichment table might instead use:
+
+| Field | Meaning |
+|---|---|
+| `ip_normalized` | Canonical IPv4 or IPv6 text after strict parsing |
+| `route_prefix`, `route_asn` | Longest-prefix routing match in the named snapshot |
+| `asn_name`, `asn_country` | Descriptive metadata, with its source retained |
+| `peeringdb_info_types` | Self-described network types, possibly missing |
+| `cloud_matches` | Zero or more publisher/provider/service/region matches |
+| `tor_exit_listed` | Match against the named and hashed Tor artifact |
+| `vpn_listed`, `datacentre_listed` | Separate matches against named community lists |
+| `hosting_asn_listed` | Separate curated-ASN heuristic |
+| `source_snapshot_at` | Timestamp or publication time per source |
+| `source_sha256` | Hash of the downloaded artifact used for reproduction |
+
+Use nullable values deliberately. `False` should mean the address was checkable against the source and no match was found. `NA` should mean the lookup was not applicable or could not be performed—for example, applying an IPv4-only list to IPv6. Unknown ASN metadata should remain unknown; it is not adverse evidence.
+
+## Lookup mechanics that change the result
+
+### Longest-prefix match
+
+IP ranges are nested, so a lexical join is insufficient. Route-origin and provider lookups should choose the most specific matching prefix unless the source defines another rule. Returning only the first interval found can silently mislabel overlaps.
+
+### IPv4 and IPv6 are separate paths
+
+Converting IPv4 to a 32-bit integer gives a fast interval lookup, but that implementation does not generalise unchanged to IPv6. IPv4-mapped IPv6 addresses can be normalised deliberately; other IPv6 addresses need a 128-bit-capable prefix structure or library. An IPv6 address checked only against IPv4 lists should produce `NA`, not `False`.
+
+### Snapshot before transform
+
+For every mutable download:
+
+1. save the original bytes under a dated path;
+2. record the URL, retrieval time, publisher time if present, and SHA-256;
+3. parse into a derived table without modifying the raw artifact;
+4. version the lookup policy as well as the data;
+5. retain the snapshot needed to reproduce an event-time result.
+
+This is especially important for Tor exits, BGP-derived route origins, and cloud feeds, all of which change over time.
+
+### Test meaning, not just code
+
+A lookup implementation needs boundary cases: first and last address in a prefix, addresses immediately outside it, overlapping prefixes, malformed input, private and reserved space, IPv4-mapped IPv6, ordinary IPv6, and duplicate source rows. It also needs semantic checks: a missing source record must not become a risk flag, and a match must not become an abuse label.
+
+## Dated coverage measurements
+
+The following figures were rerun on **24 October 2026** from newly downloaded bytes. “Addresses” counts the union represented by each internally non-overlapping IPv4 CIDR file; it is not a count of observed users or active hosts.
+
+| List | IPv4 networks | IPv4 addresses | Share of all IPv4 |
+|---|---:|---:|---:|
+| X4BNet VPN | 10,931 | 3,170,072 | 0.07% |
+| X4BNet datacentre | 44,584 | 395,597,872 | 9.21% |
+| rezmoss all-providers merged IPv4 | 12,840 | 255,279,192 | 5.94% |
+
+Expanding the X4BNet datacentre ranges to one dotted IPv4 address per line would produce about **5.55 GB** of text (5.17 GiB), calculated from the ranges without materialising that file. Range lookup avoids that expansion.
+
+The lists are not independent. X4BNet defines its datacentre output as VPNs **and** datacentres, while its VPN output is intended to be the narrower list. In this snapshot:
+
+- 3,145,854 of 3,170,072 VPN addresses (99.24%) were also covered by the X4BNet datacentre list;
+- 8,249 of 10,931 VPN network starts fell inside a datacentre network, and 8,242 whole VPN networks were contained there;
+- 234,192,021 of the 255,279,192 rezmoss merged IPv4 addresses (91.74%) were covered by X4BNet datacentre.
+
+The address-intersection figures are exact for these three normalized snapshots. The 8,249 start-point figure is retained only as a rough network-level diagnostic; it is not evidence that one file is a strict CIDR-level superset of the other. Agreement analysis must account for this construction instead of treating the lists as independent votes.
+
+Two other profiles help explain the source limitations:
+
+| Artifact | Snapshot result | Interpretation |
+|---|---:|---|
+| rezmoss `all_providers.json` | 466,408 rows; 299,344 IPv6 (64.18%) | Row count is not address-space coverage; IPv4 and IPv6 need separate lookup paths |
+| `bad-asn-list.csv` | 742 rows; 723 unique ASNs | Duplicate ASNs must be removed before matching |
+| `bad-asn-list.csv`, 16-bit ASN | 641 rows; 623 unique ASNs | The older-ASN skew is consistent with dated coverage, but does not by itself measure freshness or recall |
+
+::: {.callout-note collapse="true"}
+## Snapshot hashes
+
+| Artifact | Bytes | SHA-256 |
+|---|---:|---|
+| X4BNet VPN IPv4 | 179,405 | `d5555f06a151141d08d79bbbcb96150f979860b48d8bfd66515ffa4d3fcc4ef7` |
+| X4BNet datacentre IPv4 | 697,495 | `380eccc1e05d05b3535dff6c380a0fb9d8bd6978018c972599cbb50c13389202` |
+| rezmoss merged IPv4 | 204,948 | `115a926058b183792e538e92cb369b7403333ab0952f1898d44507ef7ebba2f2` |
+| rezmoss `all_providers.json` | 91,041,786 | `38515c1f594536a47e44823d8926f371deb8cf094e17cde17710ce16648f93ea` |
+| `bad-asn-list.csv` | 24,159 | `0af8e58dc07ba070a10c9083a1a9f5c9fc76be35fab32bb6d144e72caa20a252` |
+| Tor `torbulkexitlist` | 17,135 | `e5e35bc551f1e52ae89b9182eab5a73c878750a39d3bd497a065ee97cfced506` |
+
+The rerunnable audit is recorded in `notebooks/temp_ips.ipynb` and implemented by `notebooks/ip_enrichment_snapshot.py`. The raw downloads remain local rather than being committed as site assets.
+:::
+
+## What the exploration established
+
+The notebook proved that the source families can be downloaded, parsed, and joined locally. It also exposed the design decisions that need to precede a reusable pipeline:
+
+- a current Tor list is simple to match but inappropriate for historical claims;
+- the rezmoss aggregate carries provider, service, and region fields from its upstream inputs, but this exploration did not validate them against the first-party feeds;
+- multi-provider aggregates contain IPv4, IPv6, and overlapping entries, so row counts are not address-space coverage;
+- PeeringDB adds readable organisational context but uses self-reported types and incomplete coverage;
+- broad VPN/datacentre lists cover hundreds of millions of addresses and should be stored as ranges, not expanded into individual IP addresses;
+- a curated hosting-ASN list is a heuristic whose incremental coverage and false-positive exposure should be measured before use.
+
+This produces design guidance and coverage measurements, not a predictive finding. Building a universal “bad infrastructure” detector from these sources would overstate what the data can support.
+
+## What to measure next
+
+The next useful experiment is comparative, not additive. Given a dated set of login IPs:
+
+1. enrich it with route origin and first-party provider/Tor snapshots;
+2. apply each community range or ASN heuristic separately;
+3. measure agreement, unique additions, missingness, and stability across snapshots;
+4. inspect disagreements by network type and prefix size;
+5. only then test whether any feature adds predictive value against an independently obtained outcome label.
+
+Without the last step, the output remains infrastructure description. That is still useful—as long as it is named honestly.
+
+## Sources used on this page
+
+::: {.sources-used}
+
+| Source | Use here | Licence or access note checked for this draft |
+|---|---|---|
+| [X4BNet `lists_vpn`](https://github.com/X4BNet/lists_vpn) | VPN and combined VPN/datacentre IPv4 lists | Repository says the scripts, source files, and generated output are MIT licensed |
+| [rezmoss `cloud-provider-ip-addresses`](https://github.com/rezmoss/cloud-provider-ip-addresses) | Unified provider table and merged IPv4 comparison list | Repository is dedicated under CC0 1.0; that does not remove any separate conditions attached to upstream feeds |
+| [IPtoASN](https://iptoasn.com/) | Exploratory IP-to-ASN and country table | Site labels the downloadable database PDDL 1.0 |
+| [Stanford ASdb](https://asdb.stanford.edu/about) | ASN owner and industry categories | Public research download; the page describes known error/staleness risks but states no explicit dataset licence, so redistribution is not assumed here |
+| [IPinfo Lite](https://ipinfo.io/developers/ipinfo-lite-database) | Exploratory country and basic ASN comparison | CC BY-SA 4.0 with attribution; the separate privacy sample is not used in the measurements above |
+| [PeeringDB](https://docs.peeringdb.com/) | Network metadata and self-described `info_types` | API data used as descriptive context; no snapshot is redistributed here |
+| [CAIDA RouteViews Prefix-to-AS](https://www.caida.org/catalog/datasets/routeviews-prefix2as/) | Historical routing source | Public AUA requires citation and publication reporting |
+| [CAIDA AS Classification](https://www.caida.org/catalog/datasets/as-classification/) | Legacy classifier example | Unsupported legacy dataset; no download access |
+| [Tor Project bulk exit tool](https://check.torproject.org/api/bulk) | TorDNSEL-derived current-exit context and CollecTor pointer | Exact notebook endpoint named in the text |
+| [Hamachek `bad-asn-list`](https://github.com/brianhama/bad-asn-list) | Curated hosting-ASN heuristic (`SRC-052`) | MIT; treated as an anecdotal defensive artifact, not ground truth |
+| [AWS IP ranges](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ip-ranges.html) | First-party alternative not tested in this run | Documentation says `ip-ranges.json` omits some services and BYOIP ranges |
+| [Google Cloud IP ranges](https://cloud.google.com/compute/docs/faq#find_ip_range) | First-party alternative not tested in this run | Documentation describes `cloud.json` as customer-usable global and regional external ranges |
+
+:::
+
+---
+
+**Related reading**
+
+- [IP addresses and network origin](../foundations/01-ip-addresses-and-network-origin.md)
+- [Proxies, VPNs, NAT, and shared addresses](../foundations/05-proxies-vpns-nat-and-shared-addresses.md)
+- [Techniques and signal families](index.qmd)
