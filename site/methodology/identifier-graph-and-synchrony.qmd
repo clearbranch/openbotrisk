@@ -24,8 +24,8 @@ The whole experiment reduces to one table: which groups each method recovers. Th
 |---|---:|---:|
 | `legit` | 0.00 | 0.00 |
 | `travel_agent` | clustered, scored benign | 0.00 |
-| `ring_lazy` | 1.00 | 0.97 |
-| `ring_careful` | 0.00 | 0.28 |
+| `ring_lazy` | 1.00 | 0.95 |
+| `ring_careful` | 0.00 | 0.48 |
 | `ring_mid` | 0.00 | 0.00 |
 
 (Detected share = fraction of a group's accounts placed in a flagged cluster.) The lazy ring is caught by *both* — it reuses identifiers *and* coordinates. The careful ring, with unique identifiers, is invisible to the graph and only partly caught by synchrony at the default one-hour bucket. The mixed ring slips both at default settings. And the travel agent is the instructive case: the identifier graph *does* cluster it — correctly, it is a tight cluster — but the scoring step clears it. The rest of the page is the mechanism behind each cell.
@@ -48,6 +48,8 @@ The generated tables are deliberately simple:
 - `events.csv` contains timestamped actions against targets.
 
 The ground-truth labels are only available because this is synthetic. In a real setting, those labels would come from review outcomes, confirmed abuse cases, chargebacks, takedowns, or other imperfect feedback loops.
+
+The generator enforces `registration_time <= event_time < observation_end` for every group. Organic activity is sampled directly inside each user's eligible window with a daytime-weighted hour distribution. Campaign schedules that do not fit a custom horizon, or that begin before a participant registers, raise an error rather than being clamped onto a boundary.
 
 ## Synthetic data design
 
@@ -73,7 +75,12 @@ For `ring_careful`, every account receives unique identifiers. That makes this r
 
 ```python
 def campaign(uids, start, n_waves, wave_gap_h, targets_pool,
+             registrations, observation_end,
              participation=0.9, jitter_s=900):
+    if any(registrations[uid] > start for uid in uids):
+        raise ValueError("campaign starts before users register")
+    if campaign_end(start, n_waves, wave_gap_h, jitter_s) > observation_end:
+        raise ValueError("campaign extends beyond observation_end")
     for w in range(n_waves):
         wave_t = start + pd.Timedelta(hours=w * wave_gap_h)
         wave_targets = rng.choice(targets_pool, 3, replace=False)
@@ -171,10 +178,10 @@ The numbers from this run show why the scoring step, not the clustering step, is
 
 | Cluster | Size | Shrunk CAPTCHA rate | Median registration gap |
 |---|---:|---:|---:|
-| `travel_agent` | 25 | 0.019 | 77.2 hours |
-| `ring_lazy` | 60 | 0.424 | 0.04 hours (~2.5 min) |
+| `travel_agent` | 25 | 0.045 | 80.4 hours |
+| `ring_lazy` | 60 | 0.423 | 0.045 hours (~2.7 min) |
 
-Against a population CAPTCHA base rate of 0.066, the travel agent sits *below* baseline while the ring sits far above it, and the registration-timing gap is three orders of magnitude apart: the agent's clients accumulate organically over days, the ring's accounts are minted in bursts minutes apart. The clean separation here is partly a property of synthetic data — real benign clusters are messier — but the design principle holds: clustering is neutral entity resolution, and the judgement of *problematic versus benign* belongs entirely in a separate, behaviour-based scoring step.
+Against a population CAPTCHA base rate of 0.058, the travel agent sits *below* baseline while the ring sits far above it, and the registration-timing gap is three orders of magnitude apart: the agent's clients accumulate organically over days, the ring's accounts are minted in bursts minutes apart. The clean separation here is partly a property of synthetic data — real benign clusters are messier — but the design principle holds: clustering is neutral entity resolution, and the judgement of *problematic versus benign* belongs entirely in a separate, behaviour-based scoring step.
 
 ::: {.callout-note collapse="true" title="Similarity terms used here"}
 The second method uses similarity language rather than identifier-linking language.
@@ -276,7 +283,7 @@ grid = [0.5, 1, 2, 4, 8, 16]
 res = pd.DataFrame({b: run(b) for b in grid}).T
 ```
 
-In this synthetic run, a one-hour window catches most of the lazy ring but only part of the careful ring. Widening the window recovers them — the careful ring climbs from 0.28 detected at one hour to 0.96 at eight hours, the mixed ring from zero to roughly half — while `legit` and `travel_agent` stay at zero across *every* bucket width tested. In this synthetic data the benign groups never co-occur enough to be swept up; in real data, the same widening would increase benign co-occurrence too, especially around popular targets, sales, outages, announcements, or high-demand inventory releases, so that clean zero is optimistic.
+In this synthetic run, a one-hour window catches most of the lazy ring but only part of the careful ring. Widening the window recovers them — the careful ring climbs from 0.48 detected at one hour to 0.92 at eight hours, and the mixed ring from zero to 0.65 — while `legit` and `travel_agent` stay at zero across *every* bucket width tested. In this synthetic data the benign groups never co-occur enough to be swept up; in real data, the same widening would increase benign co-occurrence too, especially around popular targets, sales, outages, announcements, or high-demand inventory releases, so that clean zero is optimistic.
 
 The sharper reading of the sweep is adversarial rather than statistical. The bucket width has to be at least as wide as the ring's internal jitter for the ring to register. That means an attacker can evade a fixed bucket simply by *spreading their actions out* — adding jitter until their coordination falls below the window's resolution. But that evasion is not free: spreading actions out is the same thing as slowing the campaign down. A ticket-scalping or inventory-hoarding bot that jitters its requests across eight hours to dodge a one-hour detector has, by construction, an eight-hour campaign instead of a one-hour one. The detector does not have to *catch* coordination so much as *tax* it: every increment of evasion is paid for in tempo, which is the link to the [economics of automation](../background/economics-of-automation.qmd) — the defence works by making the attack slower, not by making it impossible.
 

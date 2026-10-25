@@ -86,8 +86,8 @@ than a cold open: which groups each method recovers.
 |---|---:|---:|
 | `legit` | 0.00 | 0.00 |
 | `travel_agent` | clustered, scored benign | 0.00 |
-| `ring_lazy` | 1.00 | 0.97 |
-| `ring_careful` | 0.00 | 0.28 |
+| `ring_lazy` | 1.00 | 0.95 |
+| `ring_careful` | 0.00 | 0.48 |
 | `ring_mid` | 0.00 | 0.00 |
 
 Detected share is the fraction of a group's accounts placed in a flagged

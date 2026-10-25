@@ -46,7 +46,7 @@ EXPECTED_DEFAULT_GROUP_COUNTS = {
     "ring_mid": 40,
     "travel_agent": 25,
 }
-EXPECTED_DEFAULT_EVENT_COUNT = 25118
+EXPECTED_DEFAULT_EVENT_COUNT = 25312
 EXPECTED_DEFAULT_USER_COLUMNS = [
     "user_id",
     "group",
@@ -107,22 +107,52 @@ def _rand_ts_organic(
     *,
     start: pd.Timestamp = T0,
     horizon_days: int = HORIZON_DAYS,
+    eligible_start: pd.Timestamp | None = None,
+    observation_end: pd.Timestamp | None = None,
 ) -> pd.DatetimeIndex:
-    """Generate organic-looking timestamps over the experiment horizon.
+    """Generate daytime-weighted timestamps inside an eligible time window.
 
     Args:
         rng: NumPy random generator.
         n: Number of timestamps to generate.
         start: Start of the synthetic observation window.
         horizon_days: Number of days in the observation window.
+        eligible_start: Earliest timestamp that may be returned.
+        observation_end: Exclusive upper bound for returned timestamps.
 
     Returns:
         A ``DatetimeIndex`` with daytime-weighted timestamps.
     """
 
-    days = rng.uniform(0, horizon_days, n)
-    hour = rng.normal(15, 5, n) % 24
-    return start + pd.to_timedelta(days, "D") + pd.to_timedelta(hour, "h")
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    if n == 0:
+        return pd.DatetimeIndex([])
+
+    start = pd.Timestamp(start)
+    window_start = pd.Timestamp(eligible_start) if eligible_start is not None else start
+    window_end = (
+        pd.Timestamp(observation_end)
+        if observation_end is not None
+        else start + pd.Timedelta(days=horizon_days)
+    )
+    if window_start >= window_end:
+        raise ValueError("eligible_start must be earlier than observation_end")
+
+    first_day = window_start.normalize()
+    last_day = (window_end - pd.Timedelta(nanoseconds=1)).normalize()
+    day_count = (last_day - first_day).days + 1
+    samples: list[pd.Timestamp] = []
+    while len(samples) < n:
+        batch_size = max(64, 2 * (n - len(samples)))
+        day_offsets = rng.integers(0, day_count, batch_size)
+        hours = rng.normal(15, 5, batch_size) % 24
+        candidates = (
+            first_day + pd.to_timedelta(day_offsets, unit="D") + pd.to_timedelta(hours, unit="h")
+        )
+        valid = candidates[(candidates >= window_start) & (candidates < window_end)]
+        samples.extend(valid[: n - len(samples)].tolist())
+    return pd.DatetimeIndex(samples)
 
 
 def _legit_events(
@@ -132,8 +162,8 @@ def _legit_events(
     n: int,
     targets: list[str],
     *,
-    start: pd.Timestamp = T0,
-    horizon_days: int = HORIZON_DAYS,
+    registered_at: pd.Timestamp,
+    observation_end: pd.Timestamp,
 ) -> None:
     """Append ordinary browsing events for one synthetic user.
 
@@ -143,14 +173,19 @@ def _legit_events(
         uid: Synthetic user ID.
         n: Number of events to append.
         targets: Candidate item/listing targets.
-        start: Start of the synthetic observation window.
-        horizon_days: Number of days in the observation window.
+        registered_at: Earliest time at which this user's events may occur.
+        observation_end: Exclusive end of the observation window.
 
     Returns:
         ``None``. The ``events`` list is modified in place.
     """
 
-    for ts in _rand_ts_organic(rng, n, start=start, horizon_days=horizon_days):
+    for ts in _rand_ts_organic(
+        rng,
+        n,
+        eligible_start=registered_at,
+        observation_end=observation_end,
+    ):
         events.append(
             {
                 "user_id": uid,
@@ -170,6 +205,8 @@ def _campaign(
     wave_gap_h: int,
     targets_pool: np.ndarray,
     *,
+    registrations: dict[str, pd.Timestamp],
+    observation_end: pd.Timestamp,
     participation: float = 0.9,
     jitter_s: int = 900,
 ) -> None:
@@ -183,12 +220,31 @@ def _campaign(
         n_waves: Number of campaign waves.
         wave_gap_h: Hours between waves.
         targets_pool: Candidate hot targets.
+        registrations: Registration timestamp for each participating user.
+        observation_end: Exclusive end of the observation window.
         participation: Per-user probability of joining each wave.
         jitter_s: Maximum within-wave timestamp jitter in seconds.
 
     Returns:
         ``None``. The ``events`` list is modified in place.
     """
+
+    if n_waves < 1 or wave_gap_h < 0 or jitter_s < 0:
+        raise ValueError("campaign waves, gaps, and jitter must be non-negative")
+    missing = sorted(set(uids) - registrations.keys())
+    if missing:
+        raise ValueError(f"campaign users have no registration timestamp: {missing[:3]}")
+    late = sorted(uid for uid in uids if registrations[uid] > start)
+    if late:
+        raise ValueError(f"campaign starts before users register: {late[:3]}")
+    campaign_end_exclusive = (
+        start + pd.Timedelta(hours=(n_waves - 1) * wave_gap_h) + pd.Timedelta(seconds=jitter_s)
+    )
+    if campaign_end_exclusive > observation_end:
+        raise ValueError(
+            "campaign schedule extends beyond observation_end; "
+            "increase the horizon or provide an earlier schedule"
+        )
 
     for w in range(n_waves):
         wave_t = start + pd.Timedelta(hours=w * wave_gap_h)
@@ -200,8 +256,7 @@ def _campaign(
                 events.append(
                     {
                         "user_id": uid,
-                        "ts": wave_t
-                        + pd.Timedelta(seconds=float(rng.uniform(0, jitter_s))),
+                        "ts": wave_t + pd.Timedelta(seconds=float(rng.uniform(0, jitter_s))),
                         "action": rng.choice(ACTIONS, p=[0.5, 0.3, 0.2]),
                         "target": target,
                     }
@@ -212,6 +267,7 @@ def _add_hard_mode_contamination(
     users: list[dict[str, Any]],
     careful_uids: list[str],
     *,
+    campaign_start: pd.Timestamp,
     hybrid_n: int = HYBRID_N,
     fuzzy_buckets: int = FUZZY_BUCKETS,
     legit_bystanders: int = FUZZY_LEGIT_BYSTANDERS,
@@ -229,8 +285,13 @@ def _add_hard_mode_contamination(
         user["fuzzy_id"] = "fz_" + user["user_id"]
 
     legit_idx = [i for i, user in enumerate(users) if user["group"] == "legit"]
+    campaign_eligible_idx = [
+        i for i in legit_idx if pd.Timestamp(users[i]["reg_ts"]) <= campaign_start
+    ]
     hybrid_count = min(hybrid_n, len(legit_idx))
-    hybrid_idx = list(hard_rng.choice(legit_idx, hybrid_count, replace=False))
+    if hybrid_count > len(campaign_eligible_idx):
+        raise ValueError("not enough registered legitimate users for hard-mode campaigns")
+    hybrid_idx = list(hard_rng.choice(campaign_eligible_idx, hybrid_count, replace=False))
     for idx in hybrid_idx:
         users[idx]["group"] = "hybrid"
 
@@ -253,6 +314,37 @@ def _add_hard_mode_contamination(
     return [users[idx]["user_id"] for idx in hybrid_idx]
 
 
+def authored_network_fixture() -> pd.DataFrame:
+    """Return authored network context for a few synthetic identifier values.
+
+    The fixture is scenario data, not output from public IP lists. It is keyed
+    only by the synthetic ``ip`` identifier and does not inspect or encode the
+    ground-truth user group.
+    """
+    records = [
+        ("ip_cgnat_000601", "university shared egress", False, False),
+        ("ip_office_000602", "business office egress", False, False),
+        ("ip_dc_000603", "scenario hosting range", True, False),
+        ("ip_dc_000604", "scenario hosting range", True, True),
+        ("ip_res_000607", "scenario residential access", False, False),
+        ("ip_res_000657", "scenario mobile access", False, False),
+    ]
+    fixture = pd.DataFrame(
+        records,
+        columns=[
+            "ip",
+            "network_context",
+            "datacentre_listed",
+            "tor_exit_listed",
+        ],
+    )
+    fixture["fixture_source"] = "authored synthetic scenario"
+    fixture[["datacentre_listed", "tor_exit_listed"]] = fixture[
+        ["datacentre_listed", "tor_exit_listed"]
+    ].astype("boolean")
+    return fixture
+
+
 def check_default_population(
     users: pd.DataFrame,
     events: pd.DataFrame,
@@ -266,10 +358,7 @@ def check_default_population(
         and len(events) == EXPECTED_DEFAULT_EVENT_COUNT
         and columns == EXPECTED_DEFAULT_USER_COLUMNS
     )
-    detail = (
-        f"groups={counts}, users={len(users)}, events={len(events)}, "
-        f"columns={columns}"
-    )
+    detail = f"groups={counts}, users={len(users)}, events={len(events)}, columns={columns}"
     return ok, detail
 
 
@@ -310,6 +399,18 @@ def generate_synthetic_data(
         ```
     """
 
+    start = pd.Timestamp(start)
+    if horizon_days <= 0:
+        raise ValueError("horizon_days must be positive")
+    observation_end = start + pd.Timedelta(days=horizon_days)
+    latest_campaign_end = start + pd.Timedelta(days=65) + pd.Timedelta(hours=5 * 24, seconds=3600)
+    if latest_campaign_end > observation_end:
+        raise ValueError(
+            "horizon_days is incompatible with the fixed campaign schedule; "
+            f"observation_end must be at least {latest_campaign_end}"
+        )
+    registration_end = observation_end - pd.Timedelta(days=1)
+
     rng = np.random.default_rng(seed)
     counters = _Counters()
     users: list[dict[str, Any]] = []
@@ -338,7 +439,12 @@ def generate_synthetic_data(
                 {
                     "user_id": uid,
                     "group": "legit",
-                    "reg_ts": _rand_ts_organic(rng, 1, start=start, horizon_days=horizon_days)[0],
+                    "reg_ts": _rand_ts_organic(
+                        rng,
+                        1,
+                        eligible_start=start,
+                        observation_end=registration_end,
+                    )[0],
                     "card": hh_card if share_card else _ident("card_", counters.card),
                     "email": _ident("em_", counters.email),
                     "phone": _ident("ph_", counters.phone),
@@ -374,7 +480,12 @@ def generate_synthetic_data(
             {
                 "user_id": uid,
                 "group": "travel_agent",
-                "reg_ts": _rand_ts_organic(rng, 1, start=start, horizon_days=horizon_days)[0],
+                "reg_ts": _rand_ts_organic(
+                    rng,
+                    1,
+                    eligible_start=start,
+                    observation_end=registration_end,
+                )[0],
                 "card": agent_card,
                 "email": _ident("em_", counters.email),
                 "phone": _ident("ph_", counters.phone),
@@ -471,7 +582,18 @@ def generate_synthetic_data(
             }
         )
 
-    hybrid_uids = _add_hard_mode_contamination(users, careful_uids) if hard else []
+    careful_campaign_start = start + pd.Timedelta(days=48)
+    hybrid_uids = (
+        _add_hard_mode_contamination(
+            users,
+            careful_uids,
+            campaign_start=careful_campaign_start,
+        )
+        if hard
+        else []
+    )
+
+    registrations = {user["user_id"]: pd.Timestamp(user["reg_ts"]) for user in users}
 
     targets = [f"item_{i:04d}" for i in range(500)]
     for uid in legit_uids + agent_uids:
@@ -481,8 +603,8 @@ def generate_synthetic_data(
             uid,
             int(rng.integers(5, 40)),
             targets,
-            start=start,
-            horizon_days=horizon_days,
+            registered_at=registrations[uid],
+            observation_end=observation_end,
         )
 
     hot = rng.choice(targets, 30, replace=False)
@@ -494,16 +616,20 @@ def generate_synthetic_data(
         n_waves=10,
         wave_gap_h=12,
         targets_pool=hot,
+        registrations=registrations,
+        observation_end=observation_end,
         jitter_s=300,
     )
     _campaign(
         rng,
         events,
         careful_uids + hybrid_uids,
-        start + pd.Timedelta(days=48),
+        careful_campaign_start,
         n_waves=12,
         wave_gap_h=8,
         targets_pool=hot,
+        registrations=registrations,
+        observation_end=observation_end,
         jitter_s=1800,
     )
     _campaign(
@@ -514,6 +640,8 @@ def generate_synthetic_data(
         n_waves=6,
         wave_gap_h=24,
         targets_pool=hot,
+        registrations=registrations,
+        observation_end=observation_end,
         jitter_s=3600,
         participation=0.7,
     )
@@ -525,12 +653,19 @@ def generate_synthetic_data(
             uid,
             int(rng.integers(2, 8)),
             targets,
-            start=start,
-            horizon_days=horizon_days,
+            registered_at=registrations[uid],
+            observation_end=observation_end,
         )
 
     users_df = pd.DataFrame(users)
     events_df = pd.DataFrame(events).sort_values("ts").reset_index(drop=True)
+    event_windows = events_df.merge(
+        users_df[["user_id", "reg_ts"]], on="user_id", how="left", validate="many_to_one"
+    )
+    if not (
+        (event_windows["ts"] >= event_windows["reg_ts"]) & (event_windows["ts"] < observation_end)
+    ).all():
+        raise RuntimeError("generated events escaped their eligible observation windows")
     if not hard and seed == SEED and pd.Timestamp(start) == T0 and horizon_days == HORIZON_DAYS:
         _assert_default_population(users_df, events_df)
     return users_df, events_df
@@ -565,6 +700,7 @@ def main(
         print(f"Default determinism check: {'OK' if ok else 'FAILED'} - {detail}")
     users_df.to_csv(GENERATED_DIR / "users.csv", index=False)
     events_df.to_csv(GENERATED_DIR / "events.csv", index=False)
+    authored_network_fixture().to_csv(GENERATED_DIR / "synthetic_network_fixture.csv", index=False)
     print(users_df.group.value_counts())
     print(f"{len(events_df)} events")
 

@@ -6,6 +6,8 @@ format:
     toc: true
     toc-depth: 3
     number-sections: false
+execute:
+  freeze: auto
 image: ../assets/openbotrisk_banner_panel_05.png
 title-block-banner: ../assets/openbotrisk_banner_panel_07.png
 title-block-banner-color: "#ffffff"
@@ -60,15 +62,17 @@ Provider feeds are strong evidence for the specific claim their publisher makes:
 
 These should be stored as separate provider/service/region matches. The notebook instead tested rezmoss's third-party aggregation: its normalized table carries `provider`, `service`, and `region` fields assembled from multiple upstream sources. Those fields were not independently reproduced from the AWS and Google feeds in this exploration. An aggregate inherits every upstream definition, refresh schedule, overlap, and omission, so keep the aggregator, original publisher, and source URL distinct wherever possible.
 
-Overlaps are not an error to erase blindly. A broad parent prefix may be labelled for one provider while a more specific prefix has another service label. A lookup policy must specify longest-prefix behaviour and whether it returns one match or every matching range.
+Overlaps are not an error to erase blindly. A broad parent prefix may carry one provider label while a more specific prefix carries another. The provider enrichment used here returns **every applicable provider label**; it does not discard a broader match merely because a more specific range also matched. This is distinct from route-origin semantics.
 
 ### 4. Treat Tor as a dated observation
 
-The notebook downloaded the exact endpoint [`https://check.torproject.org/torbulkexitlist`](https://check.torproject.org/torbulkexitlist). The [Tor Project bulk exit tool](https://check.torproject.org/api/bulk) describes a nearly real-time list of exits that can contact one destination server on port 80. It identifies the current data as TorDNSEL output and points historical users to CollecTor. A present-day match therefore supports a `tor_exit_listed_at` observation tied to that exact artifact; it cannot establish that an address was a Tor exit when an older login occurred.
+The notebook downloaded the exact endpoint [`https://check.torproject.org/torbulkexitlist`](https://check.torproject.org/torbulkexitlist). The Tor Project describes this default bulk artifact as addresses it has observed being used by exit relays through active measurements. Since its 2020 service change, bulk-list queries are no longer filtered by exit policy: an observed exit address is returned regardless of query parameters. It should therefore be described as a list of observed Tor exit addresses, not as proof that every listed address can reach a particular destination. Raw measurements are archived by CollecTor. See the Tor Project's [explanation of the exit-list service change](https://blog.torproject.org/changes-tor-exit-list-service/).
+
+A present-day match supports a `tor_exit_listed_at` observation tied to that exact artifact; it cannot establish that an address was a Tor exit when an older login occurred. If retrieval fails, the notebook leaves `tor_exit_listed` as `NA`; it does not turn an unavailable source into an empty list or a checked non-match.
 
 Do not silently substitute another Tor artifact. Different list-building methods have produced different counts, and this exploration did not compare them. Record the endpoint, destination assumptions, retrieval time, and hash with the result.
 
-The 24 October 2026 rerun of that exact endpoint contained 1,210 distinct addresses. This is a reproducibility detail, not a stable size estimate: the live list can change after the snapshot.
+The 25 October 2026 rerun of that exact endpoint contained 1,213 distinct addresses. This is a reproducibility detail, not a stable size estimate: the live list can change after the snapshot.
 
 Most importantly, a Tor match identifies shared privacy infrastructure. It does not identify a person and it is not evidence of abuse.
 
@@ -82,28 +86,49 @@ The same rule applies to merged range repositories: useful for comparison and re
 
 ## A defensible output schema
 
-Avoid a single `is_proxy` or `is_bad` column. A narrow event-enrichment table might instead use:
+Avoid a single `is_proxy` or `is_bad` column. The companion implementation's `enrich()` call returns this stable event-level schema:
 
 | Field | Meaning |
 |---|---|
+| `ip_input` | Original value, retained for audit and error handling |
 | `ip_normalized` | Canonical IPv4 or IPv6 text after strict parsing |
-| `route_prefix`, `route_asn` | Longest-prefix routing match in the named snapshot |
+| `ip_version` | Parsed address family, or missing for invalid input |
+| `route_asn` | Route-origin match in the named IPtoASN snapshot |
 | `asn_name`, `asn_country` | Descriptive metadata, with its source retained |
-| `peeringdb_info_types` | Self-described network types, possibly missing |
-| `cloud_matches` | Zero or more publisher/provider/service/region matches |
+| `cloud_matches` | Zero or more provider matches from the rezmoss aggregate; overlaps are retained |
 | `tor_exit_listed` | Match against the named and hashed Tor artifact |
 | `vpn_listed`, `datacentre_listed` | Separate matches against named community lists |
 | `hosting_asn_listed` | Separate curated-ASN heuristic |
-| `source_snapshot_at` | Timestamp or publication time per source |
-| `source_sha256` | Hash of the downloaded artifact used for reproduction |
+
+Source URL, retrieval time, and SHA-256 live in a companion source-level manifest rather than being repeated on every event row. PeeringDB fields and first-party cloud service/region fields can be joined as later, separately sourced extensions; the current module does not manufacture them from the provider-level lookup.
 
 Use nullable values deliberately. `False` should mean the address was checkable against the source and no match was found. `NA` should mean the lookup was not applicable or could not be performed—for example, applying an IPv4-only list to IPv6. Unknown ASN metadata should remain unknown; it is not adverse evidence.
 
+## Worked implementation
+
+The reusable functions are in [`src/openbotrisk/ip_enrichment.py`](https://github.com/clearbranch/openbotrisk/blob/main/src/openbotrisk/ip_enrichment.py), with boundary and semantics checks in [`tests/test_ip_enrichment.py`](https://github.com/clearbranch/openbotrisk/blob/main/tests/test_ip_enrichment.py). The [executed demo notebook](https://github.com/clearbranch/openbotrisk/blob/main/notebooks/public_ip_enrichment_demo.ipynb) downloads and snapshots each mutable source, loads the five source types, measures list overlap, and calls `enrich()` on deliberately awkward inputs.
+
+The site build embeds the notebook's committed output; it does not download live data. Run the notebook explicitly when creating a new dated snapshot, inspect the output, and commit the notebook with its outputs. The main enrichment call is:
+
+{{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#enrich-demo >}}
+
+An empty `cloud_matches` tuple means the IPv4 address was checked and did not match. Missing values mean that the source was absent or inapplicable. Report that missingness alongside any flag rate:
+
+{{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#na-semantics >}}
+
+::: {.callout-caution}
+## Current implementation limits
+
+Interval, route, and provider lookups are IPv4-only. Ordinary IPv6 therefore produces `NA`, even though 64% of rows in the measured provider aggregate were IPv6. `cloud_matches` currently operates at provider level, not service or region level. It constructs a provider match matrix over unique IPv4 inputs; chunk the input before calling it when the number of unique addresses makes that matrix too large for available memory.
+:::
+
+The identifiers in the synchrony experiment, such as `ip_res_000607`, are deliberately synthetic and are not submitted to these public lookup services. A separate authored fixture in [`notebooks/methodology_synchrony.ipynb`](https://github.com/clearbranch/openbotrisk/blob/main/notebooks/methodology_synchrony.ipynb) demonstrates how network context can be joined to those scenario identifiers. It is labelled as scenario data and does not measure public-list accuracy or real-world detection performance.
+
 ## Lookup mechanics that change the result
 
-### Longest-prefix match
+### Provider overlap and route-origin semantics
 
-IP ranges are nested, so a lexical join is insufficient. Route-origin and provider lookups should choose the most specific matching prefix unless the source defines another rule. Returning only the first interval found can silently mislabel overlaps.
+IP ranges are nested, so a lexical join is insufficient, but the correct policy depends on the source. Provider enrichment returns all matching provider labels so overlaps remain visible. Raw routing prefixes generally require source-defined best-match semantics; the IPtoASN input used by the companion implementation is already a resolved, non-overlapping address-range table, so the code looks up its containing interval rather than inventing another longest-prefix rule.
 
 ### IPv4 and IPv6 are separate paths
 
@@ -114,10 +139,12 @@ Converting IPv4 to a 32-bit integer gives a fast interval lookup, but that imple
 For every mutable download:
 
 1. save the original bytes under a dated path;
-2. record the URL, retrieval time, publisher time if present, and SHA-256;
+2. record the URL, actual retrieval time, publisher update time if supplied, and SHA-256;
 3. parse into a derived table without modifying the raw artifact;
 4. version the lookup policy as well as the data;
 5. retain the snapshot needed to reproduce an event-time result.
+
+Filesystem modification time is recorded separately when useful. It is not a substitute for retrieval time: a copied local file with no retrieval record keeps `retrieved_at` missing.
 
 This is especially important for Tor exits, BGP-derived route origins, and cloud feeds, all of which change over time.
 
@@ -127,13 +154,13 @@ A lookup implementation needs boundary cases: first and last address in a prefix
 
 ## Dated coverage measurements
 
-The following figures were rerun on **24 October 2026** from newly downloaded bytes. “Addresses” counts the union represented by each internally non-overlapping IPv4 CIDR file; it is not a count of observed users or active hosts.
+The following figures were rerun on **25 October 2026** from newly downloaded bytes. “Addresses” counts the union represented by each internally non-overlapping IPv4 CIDR file; it is not a count of observed users or active hosts.
 
 | List | IPv4 networks | IPv4 addresses | Share of all IPv4 |
 |---|---:|---:|---:|
 | X4BNet VPN | 10,931 | 3,170,072 | 0.07% |
 | X4BNet datacentre | 44,584 | 395,597,872 | 9.21% |
-| rezmoss all-providers merged IPv4 | 12,840 | 255,279,192 | 5.94% |
+| rezmoss all-providers merged IPv4 | 12,842 | 255,279,702 | 5.94% |
 
 Expanding the X4BNet datacentre ranges to one dotted IPv4 address per line would produce about **5.55 GB** of text (5.17 GiB), calculated from the ranges without materialising that file. Range lookup avoids that expansion.
 
@@ -141,7 +168,7 @@ The lists are not independent. X4BNet defines its datacentre output as VPNs **an
 
 - 3,145,854 of 3,170,072 VPN addresses (99.24%) were also covered by the X4BNet datacentre list;
 - 8,249 of 10,931 VPN network starts fell inside a datacentre network, and 8,242 whole VPN networks were contained there;
-- 234,192,021 of the 255,279,192 rezmoss merged IPv4 addresses (91.74%) were covered by X4BNet datacentre.
+- 234,191,767 of the 255,279,702 rezmoss merged IPv4 addresses (91.74%) were covered by X4BNet datacentre.
 
 The address-intersection figures are exact for these three normalized snapshots. The 8,249 start-point figure is retained only as a rough network-level diagnostic; it is not evidence that one file is a strict CIDR-level superset of the other. Agreement analysis must account for this construction instead of treating the lists as independent votes.
 
@@ -149,7 +176,7 @@ Two other profiles help explain the source limitations:
 
 | Artifact | Snapshot result | Interpretation |
 |---|---:|---|
-| rezmoss `all_providers.json` | 466,408 rows; 299,344 IPv6 (64.18%) | Row count is not address-space coverage; IPv4 and IPv6 need separate lookup paths |
+| rezmoss `all_providers.json` | 466,400 rows; 299,342 IPv6 (64.18%) | Row count is not address-space coverage; IPv4 and IPv6 need separate lookup paths |
 | `bad-asn-list.csv` | 742 rows; 723 unique ASNs | Duplicate ASNs must be removed before matching |
 | `bad-asn-list.csv`, 16-bit ASN | 641 rows; 623 unique ASNs | The older-ASN skew is consistent with dated coverage, but does not by itself measure freshness or recall |
 
@@ -160,12 +187,12 @@ Two other profiles help explain the source limitations:
 |---|---:|---|
 | X4BNet VPN IPv4 | 179,405 | `d5555f06a151141d08d79bbbcb96150f979860b48d8bfd66515ffa4d3fcc4ef7` |
 | X4BNet datacentre IPv4 | 697,495 | `380eccc1e05d05b3535dff6c380a0fb9d8bd6978018c972599cbb50c13389202` |
-| rezmoss merged IPv4 | 204,948 | `115a926058b183792e538e92cb369b7403333ab0952f1898d44507ef7ebba2f2` |
-| rezmoss `all_providers.json` | 91,041,786 | `38515c1f594536a47e44823d8926f371deb8cf094e17cde17710ce16648f93ea` |
+| rezmoss `all_providers.json` | 91,040,336 | `fa5c03243d283b27af15bf7cad73f42cf768e21f9c06545b43c46a4ecbf8e3c4` |
 | `bad-asn-list.csv` | 24,159 | `0af8e58dc07ba070a10c9083a1a9f5c9fc76be35fab32bb6d144e72caa20a252` |
-| Tor `torbulkexitlist` | 17,135 | `e5e35bc551f1e52ae89b9182eab5a73c878750a39d3bd497a065ee97cfced506` |
+| Tor `torbulkexitlist` | 17,169 | `6756af70704aa18c358c48563b54ec27c962b86f0dc2b5028a87d4ba067db618` |
+| IPtoASN combined TSV | 9,030,529 | `7336abc7611351b0261023c6268293bc9d4a02fb32a3ea9c286655351435eea2` |
 
-The rerunnable audit is recorded in `notebooks/temp_ips.ipynb` and implemented by `notebooks/ip_enrichment_snapshot.py`. The raw downloads remain local rather than being committed as site assets.
+The publication example and source manifest are recorded in `notebooks/public_ip_enrichment_demo.ipynb`; the earlier exploratory audit remains in `notebooks/temp_ips.ipynb` and `notebooks/ip_enrichment_snapshot.py`. Raw downloads remain local rather than being committed as site assets.
 :::
 
 ## What the exploration established
@@ -207,7 +234,7 @@ Without the last step, the output remains infrastructure description. That is st
 | [PeeringDB](https://docs.peeringdb.com/) | Network metadata and self-described `info_types` | API data used as descriptive context; no snapshot is redistributed here |
 | [CAIDA RouteViews Prefix-to-AS](https://www.caida.org/catalog/datasets/routeviews-prefix2as/) | Historical routing source | Public AUA requires citation and publication reporting |
 | [CAIDA AS Classification](https://www.caida.org/catalog/datasets/as-classification/) | Legacy classifier example | Unsupported legacy dataset; no download access |
-| [Tor Project bulk exit tool](https://check.torproject.org/api/bulk) | TorDNSEL-derived current-exit context and CollecTor pointer | Exact notebook endpoint named in the text |
+| [Tor Project exit-list service](https://blog.torproject.org/changes-tor-exit-list-service/) | Interpretation of the default bulk list and CollecTor pointer | Exact notebook endpoint named in the text; unavailable retrieval remains `NA` |
 | [Hamachek `bad-asn-list`](https://github.com/brianhama/bad-asn-list) | Curated hosting-ASN heuristic (`SRC-052`) | MIT; treated as an anecdotal defensive artifact, not ground truth |
 | [AWS IP ranges](https://docs.aws.amazon.com/vpc/latest/userguide/aws-ip-ranges.html) | First-party alternative not tested in this run | Documentation says `ip-ranges.json` omits some services and BYOIP ranges |
 | [Google Cloud IP ranges](https://cloud.google.com/compute/docs/faq#find_ip_range) | First-party alternative not tested in this run | Documentation describes `cloud.json` as customer-usable global and regional external ranges |

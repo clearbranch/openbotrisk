@@ -9,7 +9,10 @@ description = "Analysis and utilities supporting the openbotrisk methodology inv
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-dependencies = []
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+]
 
 [project.optional-dependencies]
 dev = [

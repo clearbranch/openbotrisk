@@ -48,8 +48,8 @@ JACCARD_GRID = [0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5]
 # guard against accidental behaviour drift.
 DEFAULT_DETECTION = {
     "legit": 0.0,
-    "ring_careful": 0.28,
-    "ring_lazy": 0.97,
+    "ring_careful": 0.48,
+    "ring_lazy": 0.95,
     "ring_mid": 0.0,
     "travel_agent": 0.0,
 }
