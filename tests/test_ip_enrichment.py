@@ -6,17 +6,24 @@ import pandas as pd
 import pytest
 
 from openbotrisk.ip_enrichment import (
+    ASdbTable,
     IntervalSet,
+    IPinfoTable,
     ListedIPs,
+    PeeringDBTable,
+    ProviderTable,
     RouteTable,
     artifact_provenance,
+    asn_agreement,
     enrich,
     flag_asn_list,
     flag_intervals,
     flag_listed,
     flag_providers,
     ip_frame,
+    matching_manifest_record,
     normalise,
+    normalise_asn,
     provider_sets,
 )
 
@@ -38,6 +45,19 @@ def test_local_artifact_does_not_invent_a_retrieval_time(tmp_path):
     assert provenance.sha256 == expected_sha256
 
 
+def test_manifest_evidence_requires_name_and_hash_and_uses_newest_match():
+    records = [
+        {"name": "source.csv", "sha256": "right", "retrieved_at": "first"},
+        {"name": "source.csv", "sha256": "wrong", "retrieved_at": "wrong bytes"},
+        {"name": "other.csv", "sha256": "right", "retrieved_at": "wrong name"},
+        {"name": "source.csv", "sha256": "right", "retrieved_at": "newest"},
+    ]
+    match = matching_manifest_record(records, "source.csv", "right")
+    assert match is not None
+    assert match["retrieved_at"] == "newest"
+    assert matching_manifest_record(records, "source.csv", "missing") is None
+
+
 @pytest.mark.parametrize(
     "raw",
     ["not an ip", "1.2.3.4:443", "1.2.3.0/24", "", "  ", "01.2.3.4", None, np.nan, pd.NA],
@@ -53,6 +73,19 @@ def test_ipv4_mapped_is_normalised_to_ipv4():
 
 def test_ipv6_has_no_v4_integer():
     assert normalise("2001:db8::1") == ("2001:db8::1", 6, None)
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [("AS13335", 13335), ("as 13335", 13335), (13335, 13335), (13335.0, 13335)],
+)
+def test_asn_normalisation(raw, expected):
+    assert normalise_asn(raw) == expected
+
+
+@pytest.mark.parametrize("raw", [None, pd.NA, np.nan, 0, "AS0", "AS12.5", "not-an-asn"])
+def test_invalid_or_unavailable_asn_is_none(raw):
+    assert normalise_asn(raw) is None
 
 
 def test_whitespace_is_stripped():
@@ -152,6 +185,147 @@ def test_repeated_addresses_get_identical_results():
     assert list(result) == [("a",), (), ("a",)]
 
 
+def test_provider_details_retain_overlaps_relationships_and_remove_exact_duplicates():
+    records = pd.DataFrame(
+        {
+            "cidr": ["10.0.0.0/8", "10.1.0.0/16", "10.1.0.0/16", "2001:db8::/32"],
+            "provider": ["broad", "specific", "specific", "v6-provider"],
+            "service": ["compute", "relay", "relay", "edge"],
+            "region": ["global", "eu-west", "eu-west", "global"],
+            "last_updated": ["2026-01-01", "2026-01-02", "2026-01-02", "2026-01-03"],
+        }
+    )
+    providers = ProviderTable(records)
+    details = providers.lookup(frame("10.1.0.0", "10.1.255.255", "10.2.0.1", "2001:db8::1"))
+
+    assert len(details.iloc[0]) == 2
+    assert details.iloc[0][0] == {
+        "cidr": "10.1.0.0/16",
+        "provider": "specific",
+        "service": "relay",
+        "region": "eu-west",
+        "source_updated_at": "2026-01-02",
+    }
+    assert details.iloc[0] == details.iloc[1]
+    assert [match["provider"] for match in details.iloc[2]] == ["broad"]
+    assert [match["provider"] for match in details.iloc[3]] == ["v6-provider"]
+    assert providers.provider_names(details).iloc[0] == ("broad", "specific")
+
+
+def test_provider_details_are_na_for_unsupported_or_invalid_inputs():
+    providers = ProviderTable(
+        pd.DataFrame(
+            {
+                "cidr": ["10.0.0.0/8"],
+                "provider": ["v4"],
+                "service": [""],
+                "region": [""],
+                "last_updated": ["2026-01-01"],
+            }
+        )
+    )
+    result = providers.lookup(frame("11.0.0.1", "2001:db8::1", "junk"))
+    assert result.iloc[0] == ()
+    assert result.iloc[1:].isna().all()
+
+
+def test_peeringdb_missing_types_and_multi_category_semantics():
+    table = PeeringDBTable(
+        [
+            {
+                "asn": "AS64500",
+                "name": "Campus and enterprise network",
+                "info_types": ["Educational/Research", "Enterprise"],
+                "website": "https://example.test",
+                "info_scope": "Regional",
+                "updated": "2026-01-01T00:00:00Z",
+                "status": "ok",
+            },
+            {"asn": 64501, "name": "Unclassified", "info_types": [], "status": "ok"},
+            {"asn": 64502, "name": "Types unavailable", "info_types": None, "status": "ok"},
+            {"asn": 64503, "name": "Deleted", "info_types": ["Enterprise"], "status": "deleted"},
+        ]
+    )
+    result = table.lookup(pd.Series(pd.array([64500, 64501, 64502, 64503], dtype="Int64")))
+
+    assert result.loc[0, "peeringdb_info_types"] == ("Educational/Research", "Enterprise")
+    assert result.loc[0, "education_network_reported"] == True  # noqa: E712
+    assert result.loc[0, "enterprise_network_reported"] == True  # noqa: E712
+    assert result.loc[0, "cable_dsl_isp_network_reported"] == False  # noqa: E712
+    assert result.loc[1, "peeringdb_info_types"] == ()
+    assert result.loc[1, list(PeeringDBTable.TYPE_FLAGS)].eq(False).all()
+    assert result.loc[2, list(PeeringDBTable.TYPE_FLAGS)].isna().all()
+    assert result.loc[3].isna().all()
+    assert table.record_presence(pd.Series([64500, 64501, 64503, pd.NA])).tolist() == [
+        True,
+        True,
+        False,
+        pd.NA,
+    ]
+
+
+def make_ipinfo():
+    return IPinfoTable(
+        pd.DataFrame(
+            {
+                "network": ["1.0.0.0/24", "1.0.3.0/24", "2001:db8::/126"],
+                "country": ["Australia", "United Kingdom", "Documentation"],
+                "continent": ["Oceania", "Europe", "Documentation"],
+                "asn": ["AS13335", 64501, "AS64502"],
+                "as_name": ["Cloudflare", "Example", "Example v6"],
+                "as_domain": ["cloudflare.com", "example.test", "v6.example.test"],
+            }
+        )
+    )
+
+
+def test_ipinfo_cidr_boundaries_gaps_and_ipv6():
+    result = make_ipinfo().lookup(
+        frame("1.0.0.0", "1.0.0.255", "1.0.1.0", "2001:db8::", "2001:db8::3", "2001:db8::4")
+    )
+    assert result["ipinfo_asn"].tolist()[:2] == [13335, 13335]
+    assert pd.isna(result.loc[2, "ipinfo_asn"])
+    assert result.loc[3, "ipinfo_asn"] == 64502
+    assert result.loc[4, "ipinfo_asn"] == 64502
+    assert pd.isna(result.loc[5, "ipinfo_asn"])
+
+
+def test_asn_agreement_only_exists_when_both_sources_have_an_asn():
+    left = pd.Series(pd.array(["AS13335", 64500, pd.NA, 64502], dtype="object"))
+    right = pd.Series(pd.array([13335, "AS64501", 64500, pd.NA], dtype="object"))
+    result = asn_agreement(left, right)
+    assert result.tolist()[:2] == [True, False]
+    assert result.iloc[2:].isna().all()
+
+
+def test_asdb_preserves_multiple_category_pairs_and_normalises_asn():
+    table = ASdbTable(
+        pd.DataFrame(
+            {
+                "ASN": ["AS64500"],
+                "Category 1 - Layer 1": ["Education"],
+                "Category 1 - Layer 2": ["University"],
+                "Category 2 - Layer 1": ["Technology"],
+                "Category 2 - Layer 2": ["ISP"],
+                "Category 3 - Layer 1": ["Education"],
+                "Category 3 - Layer 2": ["University"],
+            }
+        )
+    )
+    result = table.lookup(pd.Series(pd.array([64500, 64501], dtype="Int64")))
+    assert result.loc[0, "asdb_category_pairs"] == (
+        {"layer1": "Education", "layer2": "University"},
+        {"layer1": "Technology", "layer2": "ISP"},
+    )
+    assert result.loc[0, "asdb_layer1_categories"] == ("Education", "Technology")
+    assert pd.isna(result.loc[1, "asdb_category_pairs"])
+    assert table.record_presence(pd.Series([64500, 64501, pd.NA])).tolist() == [
+        True,
+        False,
+        pd.NA,
+    ]
+
+
 def make_route():
     return RouteTable(
         start=[int(ip_address("1.0.0.0")), int(ip_address("1.0.1.0")), int(ip_address("1.0.3.0"))],
@@ -209,3 +383,23 @@ def test_enrich_distinguishes_checked_negative_from_unavailable():
     assert result["vpn_listed"].iloc[0] == False  # noqa: E712
     assert result["vpn_listed"].iloc[1:].isna().all()
     assert result["tor_exit_listed"].isna().all()
+
+
+def test_enrich_reports_route_ipinfo_agreement_and_disagreement():
+    result = enrich(["1.0.0.7", "1.0.3.7", "1.0.2.7"], route=make_route(), ipinfo=make_ipinfo())
+
+    assert result["route_ipinfo_asn_agree"].iloc[0] == True  # noqa: E712
+    assert result["route_ipinfo_asn_agree"].iloc[1] == False  # noqa: E712
+    assert pd.isna(result["route_ipinfo_asn_agree"].iloc[2])
+    assert result.loc[1, "route_asn"] == 64500
+    assert result.loc[1, "ipinfo_asn"] == 64501
+
+
+def test_enrich_accepts_legacy_provider_sets_for_backward_compatibility():
+    records = pd.DataFrame(
+        {"cidr": ["10.0.0.0/8"], "ip_version": ["IPv4"], "provider": ["legacy"]}
+    )
+    result = enrich(["10.1.2.3", "11.0.0.1"], cloud=provider_sets(records))
+
+    assert result["cloud_matches"].tolist() == [("legacy",), ()]
+    assert result["cloud_match_details"].isna().all()
