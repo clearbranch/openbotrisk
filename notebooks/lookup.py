@@ -21,7 +21,10 @@ def load_provider_data(data_dir):
     entries = []
     if not os.path.isdir(data_dir):
         print(f"Error: Data directory '{data_dir}' not found.", file=sys.stderr)
-        print("Run 'python app.py' first to generate data, or specify --data-dir.", file=sys.stderr)
+        print(
+            "Run 'python app.py' first to generate data, or specify --data-dir.",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
     for provider_name in os.listdir(data_dir):
@@ -32,15 +35,22 @@ def load_provider_data(data_dir):
         if not os.path.exists(json_file):
             continue
         try:
-            with open(json_file, 'r') as f:
+            with open(json_file) as f:
                 ip_list = json.load(f)
             for entry in ip_list:
                 try:
                     net = ipaddress.ip_network(entry['ip_address'], strict=False)
-                    entries.append((net, provider_name, entry.get('service', ''), entry.get('region', '')))
+                    entries.append(
+                        (
+                            net,
+                            provider_name,
+                            entry.get('service', ''),
+                            entry.get('region', ''),
+                        )
+                    )
                 except ValueError:
                     continue
-        except (json.JSONDecodeError, IOError):
+        except (OSError, json.JSONDecodeError):
             continue
 
     # Sort by prefix length descending for most-specific match
@@ -100,7 +110,12 @@ def main():
     )
     parser.add_argument('ips', nargs='*', help='IP addresses to look up')
     parser.add_argument('--file', '-f', help='File with one IP per line')
-    parser.add_argument('--data-dir', '-d', default='data', help='Path to data directory (default: data)')
+    parser.add_argument(
+        '--data-dir',
+        '-d',
+        default='data',
+        help='Path to data directory (default: data)',
+    )
     parser.add_argument('--json', '-j', action='store_true', help='Output as JSON')
     args = parser.parse_args()
 
@@ -115,12 +130,12 @@ def main():
     ips_to_check = list(args.ips) if args.ips else []
     if args.file:
         try:
-            with open(args.file, 'r') as f:
+            with open(args.file) as f:
                 for line in f:
                     line = line.strip()
                     if line and not line.startswith('#'):
                         ips_to_check.append(line)
-        except IOError as e:
+        except OSError as e:
             print(f"Error reading file: {e}", file=sys.stderr)
             sys.exit(1)
 

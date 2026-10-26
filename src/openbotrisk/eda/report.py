@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict
-
+from typing import Any
 
 SECTIONS = [
     "Access",
@@ -19,7 +18,7 @@ SECTIONS = [
 
 
 def write_report(
-    stats: Dict[str, Any],
+    stats: dict[str, Any],
     dataset_name: str,
     output_path: str | Path,
 ) -> Path:

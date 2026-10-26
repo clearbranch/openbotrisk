@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any
 
 import duckdb
 import pandas as pd
@@ -19,11 +19,10 @@ import polars as pl
 # ---------------------------------------------------------------------------
 # TalkingData
 # ---------------------------------------------------------------------------
-def load_talkingdata_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
+def load_talkingdata_meta(data_dir: str | os.PathLike) -> dict[str, Any]:
     """Summarise the TalkingData train.csv using DuckDB in a single scan."""
     data_dir = Path(data_dir)
     train = data_dir / "train.csv"
-    test = data_dir / "test.csv"
 
     con = duckdb.connect()
     # Default schema inference (first 20480 rows) — fast.
@@ -90,7 +89,7 @@ def load_talkingdata_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # IEEE-CIS
 # ---------------------------------------------------------------------------
-def load_ieee_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
+def load_ieee_meta(data_dir: str | os.PathLike) -> dict[str, Any]:
     """Load IEEE-CIS train_transaction + train_identity with pandas."""
     data_dir = Path(data_dir)
     tx_path = data_dir / "train_transaction.csv"
@@ -116,10 +115,10 @@ def load_ieee_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # CTU-13
 # ---------------------------------------------------------------------------
-def load_ctu13_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
+def load_ctu13_meta(data_dir: str | os.PathLike) -> dict[str, Any]:
     """Concatenate all .binetflow files using polars (streamed read)."""
     data_dir = Path(data_dir)
-    binetflow_files: List[Path] = sorted(
+    binetflow_files: list[Path] = sorted(
         data_dir.glob("*/*.binetflow"),
         key=lambda p: int(p.parent.name),
     )
@@ -155,7 +154,7 @@ def load_ctu13_meta(data_dir: str | os.PathLike) -> Dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Web Robot Sessions (Figshare 3477932)
 # ---------------------------------------------------------------------------
-def load_web_robot_meta(data_dir: str | os.PathLike, json_sample_n: int = 100) -> Dict[str, Any]:
+def load_web_robot_meta(data_dir: str | os.PathLike, json_sample_n: int = 100) -> dict[str, Any]:
     """Load simple_features.csv + semantic_features.csv with pandas, and
     stream-parse the first ``json_sample_n`` entries of public_v2.json
     without materialising the full 3 GB file.
@@ -172,10 +171,10 @@ def load_web_robot_meta(data_dir: str | os.PathLike, json_sample_n: int = 100) -
     semantic = pd.read_csv(semantic_path, low_memory=False)
 
     # --- stream-sample public_v2.json -------------------------------------
-    samples: List[Dict[str, Any]] = []
-    sample_ids: List[str] = []
-    with open(json_path, "r", encoding="utf-8") as fh:
-        first = fh.readline()  # opening "{"
+    samples: list[dict[str, Any]] = []
+    sample_ids: list[str] = []
+    with open(json_path, encoding="utf-8") as fh:
+        fh.readline()  # opening "{"
         while len(samples) < json_sample_n:
             line = fh.readline()
             if not line:
@@ -199,7 +198,7 @@ def load_web_robot_meta(data_dir: str | os.PathLike, json_sample_n: int = 100) -
                 if len(samples) >= json_sample_n:
                     break
 
-    json_schema: Dict[str, str] = {}
+    json_schema: dict[str, str] = {}
     if samples:
         for k, v in samples[0].items():
             json_schema[k] = type(v).__name__
