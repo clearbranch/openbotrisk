@@ -95,7 +95,7 @@ Avoid a single `is_proxy` or `is_bad` column. The companion implementation's `en
 | Field | Meaning | Source | Missing-value semantics | Main limitation |
 |---|---|---|---|---|
 | `ip_input`, `ip_normalized`, `ip_version` | Original value, canonical address, and family | Input/parser | Parse failures retain `ip_input`; normalized fields are `NA` | IPv4-mapped IPv6 is deliberately normalized to IPv4 |
-| `route_asn`, `asn_name`, `asn_country` | Origin ASN and route-table descriptions | IPtoASN | `NA` for invalid/IPv6/ASN 0/no route/absent source | Route origin is not user identity; `asn_country` is not IP geolocation |
+| `route_asn`, `asn_name`, `asn_country` | IPv4 or IPv6 origin ASN and route-table descriptions | IPtoASN | `NA` for invalid input/ASN 0/no containing route/absent source | Route origin is not user identity; `asn_country` is not IP geolocation |
 | `ipinfo_country`, `ipinfo_continent` | IP-range geolocation labels | IPinfo Lite | `NA` for no matching row/source | Approximate range geography, not the user's location or ASN country |
 | `ipinfo_asn`, `ipinfo_as_name`, `ipinfo_as_domain` | Independent ASN assignment and AS metadata | IPinfo Lite | Individual missing fields remain `NA` | Never overwrites route metadata |
 | `route_ipinfo_asn_agree` | Equality of normalized route and IPinfo ASNs | Derived comparison | `NA` unless both ASNs exist | A disagreement does not say which source is right |
@@ -121,14 +121,18 @@ The site build embeds the notebook's committed output; it does not download live
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#enrich-demo >}}
 
-The real examples include `45.88.80.1`, whose route ASN maps to Janet/Jisc (AS786) and whose PeeringDB record reports `Educational/Research`; `81.2.69.142`, whose route ASN maps to Andrews & Arnold (AS20712) and reports `Cable/DSL/ISP`; and `1.44.96.1`, whose route ASN maps to Amazon.com (AS16509) and reports `Enterprise`. Educational classification supplies network context, not evidence about how many users share one IP. Amazon also demonstrates why PeeringDB `Enterprise` is not a reliable shared-office indicator. None of these types attributes a user, confirms NAT, or verifies that an unmatched address is safe or residential. An empty provider tuple means the supported address family was checked and did not match. Missing values mean that the source was absent or inapplicable. Report that missingness alongside any flag rate:
+The real examples include `45.88.80.1`, whose route ASN maps to Janet/Jisc (AS786) and whose PeeringDB record reports `Educational/Research`; `81.2.69.142`, whose route ASN maps to Andrews & Arnold (AS20712) and reports `Cable/DSL/ISP`; and `1.44.96.1`, whose route ASN maps to Amazon.com (AS16509) and reports `Enterprise`. The IPv6 address `2606:4700:4700::1111` has a real match in the local combined route snapshot: AS13335 (`CLOUDFLARENET`, source country `US`). That route ASN enables the downstream Cloudflare PeeringDB `Content` classification, ASdb categories, hosting-ASN check, and route/IPinfo agreement comparison; in this run the two ASN sources agree and the hosting heuristic reports `False`. The provider match independently identifies the published `2606:4700::/32` Cloudflare range:
+
+{{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#ipv6-route-example >}}
+
+Educational classification supplies network context, not evidence about how many users share one IP. Amazon also demonstrates why PeeringDB `Enterprise` is not a reliable shared-office indicator. None of these types attributes a user, confirms NAT, or verifies that an unmatched address is safe or residential. An empty provider tuple means the supported address family was checked and did not match. Missing values mean that the source was absent or inapplicable. Report that missingness alongside any flag rate:
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#na-semantics >}}
 
 ::: {.callout-caution}
 ## Current implementation limits
 
-IPinfo and the detailed rezmoss prefix index support IPv4 and IPv6 without expanding networks. The IPtoASN route table and X4BNet interval lists remain IPv4-only, so their fields are `NA` for ordinary IPv6. PeeringDB and ASdb currently depend on the `route_asn` join; consequently they may remain unavailable for IPv6 even when IPinfo supplies an independent ASN. This page deliberately does not add an IPinfo-ASN fallback or change that lookup policy. The pipeline loads these public snapshots in memory and is intended for reproducible investigation, not an unbounded production stream.
+IPinfo, the detailed rezmoss prefix index, and the combined IPtoASN route table support IPv4 and IPv6 without expanding networks. PeeringDB, ASdb, and the hosting-ASN heuristic join through IPtoASN `route_asn` for either family; they remain unavailable when that source has no containing route or reports ASN 0, even when IPinfo supplies an independent ASN. X4BNet VPN and datacentre interval lists remain IPv4-only and therefore return `NA`, not `False`, for IPv6. This page deliberately does not add an IPinfo-ASN fallback or change that lookup policy. The pipeline loads these public snapshots in memory and is intended for reproducible investigation, not an unbounded production stream.
 :::
 
 ### Source inventory for the executed run
@@ -137,23 +141,31 @@ The inventory is generated from the notebook's shared provenance records rather 
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#source-inventory >}}
 
+The combined route artifact is also profiled by address family, without treating ASN 0 rows as usable route metadata:
+
+{{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#route-family-inventory >}}
+
 All requested datasets were present in the executed run. The local IPtoASN, IPinfo and ASdb files still have no evidenced retrieval timestamp; the ASdb artifact also has no artifact-linked publication/update date or organisation-name field in the inspected CSV. Those values remain unknown. First-party AWS and Google feeds remain a deferred comparison; the current run uses the existing rezmoss aggregate.
 
 ### Classification coverage and ASN disagreement
 
-Record matching is not the same as useful classification coverage. The table separates absent source records, present records with missing or empty classification, and records with at least one usable classification. Its UK row is precisely the distinct non-zero ASNs attached to an IPtoASN route row whose source-defined country field is `GB`; it is not all networks serving UK users:
+Record matching is not the same as useful classification coverage. The table separates absent source records, present records with missing or empty classification, and records with at least one usable classification. Each UK row is precisely the distinct non-zero ASNs attached to an IPtoASN route row in that address family whose source-defined country field is `GB`; it is not all networks serving UK users:
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#asn-classification-coverage >}}
 
-Across all 79,310 route ASNs, PeeringDB supplied usable `info_types` for 26.79%; 63.08% had no PeeringDB record and 10.14% had a record without a usable type. In the 2,072-ASN IPtoASN `GB` subset, usable PeeringDB classification was 35.57%, while ASdb supplied usable categories for 94.50%. These are ASN-level diagnostics, not traffic-, user-, or address-space-weighted estimates.
+Across the 79,310 distinct non-zero IPv4 route ASNs, PeeringDB supplied usable `info_types` for 26.79%; 63.08% had no PeeringDB record and 10.14% had a record without a usable type. In the 2,072-ASN IPv4 IPtoASN `GB` subset, usable PeeringDB classification was 35.57%, while ASdb supplied usable categories for 94.50%. The table reports IPv6 separately rather than silently changing these existing IPv4 populations. These are ASN-level diagnostics, not traffic-, user-, or address-space-weighted estimates.
 
-The IP-level comparison uses the same fixed-seed random sampling method across the full eligible IPv4 source-row set for both the overall and IPinfo `country_code=GB` views:
+For the 38,451 distinct non-zero IPv6 route ASNs, PeeringDB supplied usable types for 42.47% and ASdb supplied usable categories for 78.07%. In the 1,188-ASN IPv6 IPtoASN `GB` subset, the corresponding usable-classification shares were 53.70% and 89.06%. These measure snapshot record and classification completeness, not accuracy or the population behind those networks.
+
+The IP-level comparison uses the same fixed-seed random sampling method across each eligible source-row set. Existing overall and IPinfo `country_code=GB` IPv4 populations remain explicitly labelled; IPv6 results are separate:
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#ip-sample-summary >}}
 
 {{< embed ../../notebooks/public_ip_enrichment_demo.ipynb#ip-sample-classification >}}
 
-In the 5,000-row IPinfo `GB` sample, 4,366 rows supplied both ASNs; 21 disagreed, or 0.48% of comparable rows. PeeringDB supplied a usable classification for 73.74% of all sampled rows and ASdb for 86.76%; these denominators include the 12.62% without a route ASN, for which route-joined classifications could not be attempted. IPinfo country here is IP-range geolocation, not ASN country. The disagreement count is a prompt to inspect snapshot timing, range specificity, and source methodology, not evidence that either ASN source is generally wrong.
+In the 5,000-row IPinfo `GB` IPv4 sample, 4,366 rows supplied both ASNs; 21 disagreed, or 0.48% of comparable rows. PeeringDB supplied a usable classification for 73.74% of all sampled rows and ASdb for 86.76%; these denominators include the 12.62% without a route ASN, for which route-joined classifications could not be attempted. IPinfo country here is IP-range geolocation, not ASN country. The disagreement count is a prompt to inspect snapshot timing, range specificity, and source methodology, not evidence that either ASN source is generally wrong.
+
+In the separately sampled 5,000 IPinfo `GB` IPv6 rows, 4,581 (91.62%) had an IPtoASN route ASN and 4,469 supplied both ASNs; 19 disagreed, or 0.43% of comparable rows. PeeringDB supplied a usable classification for 88.30% of all sampled rows and ASdb for 90.94%. These are source-row diagnostics, not traffic-, user-, or address-space-weighted estimates.
 
 The identifiers in the synchrony experiment, such as `ip_res_000607`, are deliberately synthetic and are not submitted to these public lookup services. A separate authored fixture in [`notebooks/methodology_synchrony.ipynb`](https://github.com/clearbranch/openbotrisk/blob/main/notebooks/methodology_synchrony.ipynb) demonstrates how network context can be joined to those scenario identifiers. It is labelled as scenario data and does not measure public-list accuracy or real-world detection performance.
 
@@ -165,7 +177,7 @@ IP ranges are nested, so a lexical join is insufficient, but the correct policy 
 
 ### IPv4 and IPv6 are separate paths
 
-Converting IPv4 to a 32-bit integer gives a fast interval lookup, but that implementation does not generalise unchanged to IPv6. The IPinfo and provider indexes use integer prefixes for both families; IPv4-mapped IPv6 addresses are deliberately normalized to IPv4. The route table and community interval lists remain IPv4-only. An IPv6 address presented to one of those sources produces `NA`, not `False`.
+Converting IPv4 to a 32-bit integer gives a fast interval lookup, but that representation does not generalise unchanged to IPv6. IPinfo and provider indexes use integer prefixes for both families. The IPtoASN loader retains both families from the combined artifact, indexes them separately, and uses arbitrary-precision integers for IPv6 so high bits cannot be truncated. Lookup preserves the resolved table's containing-interval semantics rather than expanding ranges. IPv4-mapped IPv6 addresses are deliberately normalized to IPv4. The community VPN/datacentre interval lists remain IPv4-only; ordinary IPv6 therefore produces `NA`, not `False`, for those fields.
 
 ### Snapshot before transform
 
@@ -209,6 +221,7 @@ Other profiles help explain the source limitations:
 
 | Artifact | Snapshot result | Interpretation |
 |---|---:|---|
+| IPtoASN combined | 539,933 IPv4 rows; 183,652 IPv6 rows | Resolved interval rows, including ASN 0; row count is not routed address-space coverage |
 | rezmoss `all_providers.json` | 466,400 rows; 299,342 IPv6 (64.18%) | Row count is not address-space coverage; IPv4 and IPv6 need separate lookup paths |
 | IPinfo Lite | 4,275,771 network/single-address rows; 835,909 missing ASN values | Row count is not address-space coverage; longest-prefix matching preserves more-specific rows |
 | PeeringDB active networks | 35,735 rows; 10,370 known empty `info_types` lists | A known empty list supports checked category `False`; an absent record still remains `NA` |

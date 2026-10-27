@@ -2,8 +2,8 @@
 
 Every source remains a separate feature. Boolean results are nullable: ``True``
 means matched, ``False`` means checked and not matched, and ``NA`` means the
-source could not be applied. IPinfo and detailed provider indexes support IPv4
-and IPv6; the community interval lists and route table are explicitly IPv4-only.
+source could not be applied. IPinfo, detailed provider indexes, and the route
+table support IPv4 and IPv6; the community interval lists are explicitly IPv4-only.
 """
 
 from __future__ import annotations
@@ -703,7 +703,7 @@ def asn_agreement(left: pd.Series, right: pd.Series) -> pd.Series:
 
 
 class RouteTable:
-    """IPv4 ranges mapped to origin ASNs; ASN 0 and unmatched inputs yield NA."""
+    """Separate IPv4/IPv6 ranges mapped to origin ASNs."""
 
     def __init__(
         self,
@@ -712,19 +712,77 @@ class RouteTable:
         asn: object,
         country: object,
         description: object,
+        version: object | None = None,
     ):
-        order = np.argsort(start)
-        self.start = np.asarray(start, dtype=np.uint64)[order]
-        self.end = np.asarray(end, dtype=np.uint64)[order]
-        self.asn = np.asarray(asn, dtype=np.int64)[order]
-        self.country = np.asarray(country, dtype=object)[order]
-        self.description = np.asarray(description, dtype=object)[order]
-        if len(self.start) > 1:
-            assert (self.start[1:] > self.end[:-1]).all(), "route ranges overlap"
+        starts = [int(value) for value in start]
+        ends = [int(value) for value in end]
+        asns = [int(value) for value in asn]
+        countries = list(country)
+        descriptions = list(description)
+        versions = [4] * len(starts) if version is None else [int(value) for value in version]
+        lengths = {
+            len(starts),
+            len(ends),
+            len(asns),
+            len(countries),
+            len(descriptions),
+            len(versions),
+        }
+        if len(lengths) != 1:
+            raise ValueError("Route columns must have equal lengths")
+        if not set(versions).issubset({4, 6}):
+            raise ValueError("Route versions must be 4 or 6")
+
+        self._indexes: dict[int, dict[str, object]] = {}
+        for family in (4, 6):
+            positions = sorted(
+                (index for index, value in enumerate(versions) if value == family),
+                key=starts.__getitem__,
+            )
+            family_starts = [starts[index] for index in positions]
+            family_ends = [ends[index] for index in positions]
+            limit = 2 ** (32 if family == 4 else 128)
+            if any(
+                start_value < 0 or start_value > end_value or end_value >= limit
+                for start_value, end_value in zip(family_starts, family_ends, strict=True)
+            ):
+                raise ValueError(f"Invalid IPv{family} route range")
+            if any(
+                family_starts[index] <= family_ends[index - 1]
+                for index in range(1, len(family_starts))
+            ):
+                raise AssertionError(f"IPv{family} route ranges overlap")
+            if not positions:
+                continue
+            self._indexes[family] = {
+                "start": (
+                    np.asarray(family_starts, dtype=np.uint64)
+                    if family == 4
+                    else tuple(family_starts)
+                ),
+                "end": (
+                    np.asarray(family_ends, dtype=np.uint64)
+                    if family == 4
+                    else tuple(family_ends)
+                ),
+                "asn": np.asarray([asns[index] for index in positions], dtype=np.int64),
+                "country": np.asarray([countries[index] for index in positions], dtype=object),
+                "description": np.asarray(
+                    [descriptions[index] for index in positions], dtype=object
+                ),
+            }
+
+        order = sorted(range(len(starts)), key=lambda index: (versions[index], starts[index]))
+        self.version = np.asarray([versions[index] for index in order], dtype=np.int8)
+        self.start = np.asarray([starts[index] for index in order], dtype=object)
+        self.end = np.asarray([ends[index] for index in order], dtype=object)
+        self.asn = np.asarray([asns[index] for index in order], dtype=np.int64)
+        self.country = np.asarray([countries[index] for index in order], dtype=object)
+        self.description = np.asarray([descriptions[index] for index in order], dtype=object)
 
     @classmethod
     def from_tsv(cls, path: str | Path) -> RouteTable:
-        """Load a five-column IPtoASN-style TSV, optionally compressed."""
+        """Load a combined IPv4/IPv6 IPtoASN-style TSV, optionally compressed."""
         frame = pd.read_csv(
             path,
             sep="\t",
@@ -734,13 +792,24 @@ class RouteTable:
             names=["start", "end", "asn", "country", "description"],
             keep_default_na=False,
         )
-        frame = frame[~frame["start"].str.contains(":", regex=False)]
+        starts: list[int] = []
+        ends: list[int] = []
+        versions: list[int] = []
+        for start_text, end_text in frame[["start", "end"]].itertuples(index=False, name=None):
+            start_address = ip_address(start_text)
+            end_address = ip_address(end_text)
+            if start_address.version != end_address.version:
+                raise ValueError("Route range crosses address families")
+            starts.append(int(start_address))
+            ends.append(int(end_address))
+            versions.append(start_address.version)
         return cls(
-            frame["start"].map(lambda value: int(ip_address(value))).to_numpy(),
-            frame["end"].map(lambda value: int(ip_address(value))).to_numpy(),
+            starts,
+            ends,
             frame["asn"].astype("int64").to_numpy(),
             frame["country"].to_numpy(),
             frame["description"].to_numpy(),
+            version=versions,
         )
 
     def lookup(self, frame: pd.DataFrame) -> pd.DataFrame:
@@ -749,18 +818,35 @@ class RouteTable:
         asn = pd.array([pd.NA] * length, dtype="Int64")
         name = pd.array([pd.NA] * length, dtype="string")
         country = pd.array([pd.NA] * length, dtype="string")
-        mask = (frame["ip_version"] == 4).fillna(False).to_numpy(dtype=bool)
-        if mask.any() and len(self.start):
-            values = frame.loc[mask, "v4"].to_numpy(dtype=np.uint64)
-            positions = np.searchsorted(self.start, values, side="right") - 1
-            matched = positions >= 0
-            matched[matched] = (values[matched] <= self.end[positions[matched]]) & (
-                self.asn[positions[matched]] != 0
-            )
+        for family, index in self._indexes.items():
+            mask = (frame["ip_version"] == family).fillna(False).to_numpy(dtype=bool)
+            if not mask.any():
+                continue
+            if family == 4:
+                values: object = frame.loc[mask, "v4"].to_numpy(dtype=np.uint64)
+                positions = np.searchsorted(index["start"], values, side="right") - 1
+                matched = positions >= 0
+                matched[matched] = (
+                    values[matched] <= index["end"][positions[matched]]
+                ) & (index["asn"][positions[matched]] != 0)
+            else:
+                values = [int(ip_address(value)) for value in frame.loc[mask, "ip_normalized"]]
+                positions = np.asarray(
+                    [bisect_right(index["start"], value) - 1 for value in values],
+                    dtype=np.int64,
+                )
+                matched = np.zeros(len(positions), dtype=bool)
+                for value_index, route_index in enumerate(positions):
+                    if route_index >= 0:
+                        matched[value_index] = (
+                            values[value_index] <= index["end"][route_index]
+                            and index["asn"][route_index] != 0
+                        )
             indices = np.flatnonzero(mask)[matched]
-            asn[indices] = self.asn[positions[matched]]
-            name[indices] = self.description[positions[matched]]
-            country[indices] = self.country[positions[matched]]
+            route_positions = positions[matched]
+            asn[indices] = index["asn"][route_positions]
+            name[indices] = index["description"][route_positions]
+            country[indices] = index["country"][route_positions]
         return pd.DataFrame(
             {"route_asn": asn, "asn_name": name, "asn_country": country},
             index=frame.index,
@@ -793,6 +879,8 @@ def enrich(
 ) -> pd.DataFrame:
     """Return the stable enrichment columns, using NA for every absent source."""
     frame = ip_frame(ips)
+    original_index = frame.index.copy()
+    frame.index = pd.RangeIndex(len(frame))
     out = frame[["ip_input", "ip_normalized", "ip_version"]].copy()
     if route is not None:
         out = out.join(route.lookup(frame))
@@ -839,4 +927,5 @@ def enrich(
     out["vpn_listed"] = flag_intervals(frame, vpn)
     out["datacentre_listed"] = flag_intervals(frame, datacentre)
     out["hosting_asn_listed"] = flag_asn_list(out["route_asn"], bad_asns)
+    out.index = original_index
     return out
