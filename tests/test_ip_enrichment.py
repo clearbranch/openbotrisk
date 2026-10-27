@@ -354,6 +354,120 @@ def test_route_overlap_is_rejected():
         RouteTable([0, 5], [10, 20], [1, 2], ["x", "y"], ["a", "b"])
 
 
+def test_route_ipv6_boundaries_and_high_64_bits():
+    first_start = int(ip_address("2001:db8:1::"))
+    first_end = int(ip_address("2001:db8:1::ffff"))
+    second_start = int(ip_address("3001:db8:1::"))
+    second_end = int(ip_address("3001:db8:1::ffff"))
+    route = RouteTable(
+        [first_start, second_start],
+        [first_end, second_end],
+        [64510, 64511],
+        ["GB", "US"],
+        ["FIRST-V6", "SECOND-V6"],
+        version=[6, 6],
+    )
+
+    result = route.lookup(
+        frame(
+            str(ip_address(first_start - 1)),
+            str(ip_address(first_start)),
+            str(ip_address(first_end)),
+            str(ip_address(first_end + 1)),
+            "3001:db8:1::1234",
+        )
+    )
+
+    assert result["route_asn"].isna().tolist() == [True, False, False, True, False]
+    assert result.loc[[1, 2, 4], "route_asn"].tolist() == [64510, 64510, 64511]
+    assert result.loc[1, "asn_name"] == "FIRST-V6"
+    assert result.loc[4, "asn_country"] == "US"
+
+
+def test_route_keeps_ipv4_and_ipv6_numeric_spaces_separate_and_maps_v4_mapped_ipv6():
+    route = RouteTable(
+        [1, 1],
+        [1, 1],
+        [64500, 64501],
+        ["v4", "v6"],
+        ["IPV4", "IPV6"],
+        version=[4, 6],
+    )
+
+    result = route.lookup(frame("0.0.0.1", "::1", "::ffff:0.0.0.1"))
+
+    assert result["route_asn"].tolist() == [64500, 64501, 64500]
+    assert result["asn_name"].tolist() == ["IPV4", "IPV6", "IPV4"]
+
+
+def test_route_tsv_retains_both_families_and_treats_asn_zero_as_unknown(tmp_path):
+    path = tmp_path / "combined.tsv"
+    path.write_text(
+        "1.0.0.0\t1.0.0.255\t13335\tAU\tV4-AS\n"
+        "2001:db8::\t2001:db8::ff\t64502\tGB\tV6-AS\n"
+        "2001:db8:1::\t2001:db8:1::ff\t0\tNone\tNot routed\n"
+    )
+
+    route = RouteTable.from_tsv(path)
+    result = route.lookup(frame("1.0.0.7", "2001:db8::7", "2001:db8:1::7", "2001:db8:2::1"))
+
+    assert route.version.tolist() == [4, 6, 6]
+    assert result["route_asn"].isna().tolist() == [False, False, True, True]
+    assert result.loc[:1, "route_asn"].tolist() == [13335, 64502]
+
+
+def test_ipv6_route_enables_asn_downstream_joins_but_not_ipv4_only_lists():
+    route = RouteTable(
+        [int(ip_address("2001:db8::"))],
+        [int(ip_address("2001:db8::3"))],
+        [64502],
+        ["GB"],
+        ["V6-EXAMPLE"],
+        version=[6],
+    )
+    peeringdb = PeeringDBTable(
+        [
+            {
+                "asn": 64502,
+                "name": "IPv6 example network",
+                "info_types": ["Educational/Research", "Cable/DSL/ISP"],
+            }
+        ]
+    )
+    asdb = ASdbTable(
+        pd.DataFrame(
+            {
+                "ASN": ["AS64502"],
+                "Category 1 - Layer 1": ["Education"],
+                "Category 1 - Layer 2": ["Research"],
+            }
+        )
+    )
+    v4_only = IntervalSet.from_cidr_text("10.0.0.0/8")
+
+    result = enrich(
+        ["2001:db8::1", "2001:db8:2::1"],
+        route=route,
+        ipinfo=make_ipinfo(),
+        peeringdb=peeringdb,
+        asdb=asdb,
+        bad_asns={64502},
+        vpn=v4_only,
+        datacentre=v4_only,
+    )
+
+    assert result.loc[0, "route_asn"] == 64502
+    assert result.loc[0, "asn_name"] == "V6-EXAMPLE"
+    assert result.loc[0, "asn_country"] == "GB"
+    assert result.loc[0, "route_ipinfo_asn_agree"] == True  # noqa: E712
+    assert result.loc[0, "hosting_asn_listed"] == True  # noqa: E712
+    assert result.loc[0, "education_network_reported"] == True  # noqa: E712
+    assert result.loc[0, "cable_dsl_isp_network_reported"] == True  # noqa: E712
+    assert result.loc[0, "asdb_layer1_categories"] == ("Education",)
+    assert result.loc[:, ["vpn_listed", "datacentre_listed"]].isna().all().all()
+    assert result.loc[1, ["route_asn", "hosting_asn_listed", "peeringdb_name"]].isna().all()
+
+
 def test_asn_list_na_for_unknown_asn():
     asn = pd.Series(pd.array([13335, pd.NA, 64500], dtype="Int64"))
     result = flag_asn_list(asn, {64500})
@@ -383,6 +497,73 @@ def test_enrich_distinguishes_checked_negative_from_unavailable():
     assert result["vpn_listed"].iloc[0] == False  # noqa: E712
     assert result["vpn_listed"].iloc[1:].isna().all()
     assert result["tor_exit_listed"].isna().all()
+
+
+def test_enrich_preserves_duplicate_input_index_with_optional_metadata_sources():
+    ips = pd.Series(["1.0.0.7", "2001:db8::1"], index=pd.Index([7, 7], name="event"))
+    route = RouteTable(
+        [int(ip_address("1.0.0.0")), int(ip_address("2001:db8::"))],
+        [int(ip_address("1.0.0.255")), int(ip_address("2001:db8::3"))],
+        [13335, 64502],
+        ["AU", "GB"],
+        ["CLOUDFLARENET", "V6-EXAMPLE"],
+        version=[4, 6],
+    )
+    cloud = ProviderTable(
+        pd.DataFrame(
+            {
+                "cidr": ["1.0.0.0/24", "2001:db8::/126"],
+                "provider": ["v4-provider", "v6-provider"],
+                "service": [None, None],
+                "region": [None, None],
+                "last_updated": [None, None],
+            }
+        )
+    )
+    peeringdb = PeeringDBTable(
+        [
+            {"asn": 13335, "name": "IPv4 network", "info_types": ["Content"]},
+            {"asn": 64502, "name": "IPv6 network", "info_types": ["Educational/Research"]},
+        ]
+    )
+    asdb = ASdbTable(
+        pd.DataFrame(
+            {
+                "ASN": ["AS13335", "AS64502"],
+                "Category 1 - Layer 1": ["Technology", "Education"],
+                "Category 1 - Layer 2": ["Hosting", "Research"],
+            }
+        )
+    )
+    v4_only = IntervalSet.from_cidr_text("1.0.0.0/24")
+
+    result = enrich(
+        ips,
+        route=route,
+        cloud=cloud,
+        peeringdb=peeringdb,
+        ipinfo=make_ipinfo(),
+        asdb=asdb,
+        tor=ListedIPs(ips),
+        vpn=v4_only,
+        datacentre=v4_only,
+        bad_asns={13335, 64502},
+    )
+
+    assert len(result) == len(ips)
+    pd.testing.assert_index_equal(result.index, ips.index, exact=True)
+    assert result["ip_input"].tolist() == ips.tolist()
+    assert result["route_asn"].tolist() == [13335, 64502]
+    assert result["cloud_matches"].tolist() == [("v4-provider",), ("v6-provider",)]
+    assert result["peeringdb_name"].tolist() == ["IPv4 network", "IPv6 network"]
+    assert result["ipinfo_asn"].tolist() == [13335, 64502]
+    assert result["asdb_layer1_categories"].tolist() == [("Technology",), ("Education",)]
+    assert result["tor_exit_listed"].tolist() == [True, True]
+    assert result["hosting_asn_listed"].tolist() == [True, True]
+    assert result["vpn_listed"].iloc[0] == True  # noqa: E712
+    assert pd.isna(result["vpn_listed"].iloc[1])
+    assert result["datacentre_listed"].iloc[0] == True  # noqa: E712
+    assert pd.isna(result["datacentre_listed"].iloc[1])
 
 
 def test_enrich_reports_route_ipinfo_agreement_and_disagreement():
